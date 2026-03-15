@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Odd Pairings Part 1</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: Intro (1~5)
+          { id: 1, text: "You order a nice, juicy hamburger with some fries.", trans: "당신은 감자튀김을 곁들인 맛있고 육즙이 풍부한 햄버거를 주문합니다." },
+          { id: 2, text: "What’s next? Of course you have to have ketchup with your fries, right?", trans: "그다음은 무엇일까요? 당연히 감자튀김에는 케첩을 먹어야겠죠, 그렇지 않나요?" },
+          { id: 3, text: "Well, not for some people. In fact, some people prefer eating fries with mayonnaise, chili sauce, or even steak sauce.", trans: "글쎄요, 어떤 사람들에게는 아닙니다. 사실, 어떤 사람들은 마요네즈, 칠리소스, 혹은 심지어 스테이크 소스와 함께 감자튀김을 먹는 것을 선호합니다." },
+          { id: 4, text: "While ketchup with fries may seem quite ordinary, other combinations may seem rather odd.", trans: "감자튀김에 케첩을 곁들이는 것은 아주 평범해 보일 수 있지만, 다른 조합들은 다소 이상해 보일 수 있습니다.", isHighlight: true, logicPoint: 1, logic: 'intro' },
+          { id: 5, text: "Read on to learn about some popular dishes that have flavor combinations that you may not have thought of.", trans: "당신이 생각하지 못했을 수도 있는 맛의 조합을 가진 몇 가지 인기 있는 요리들에 대해 알아보려면 계속 읽어보세요." },
+
+          // Part 2: Hawaiian Pizza Origin (6~12)
+          { id: 6, text: "Some people love this combination, while others can’t seem to stand it. It can even cause quite heated arguments.", trans: "어떤 사람들은 이 조합을 사랑하는 반면, 다른 사람들은 도저히 견디지 못하는 것 같습니다. 심지어 꽤 격렬한 논쟁을 일으킬 수도 있습니다." },
+          { id: 7, text: "If you haven’t guessed already, it’s the tasty or nasty—depending on your taste—ham and pineapple pizza.", trans: "아직 짐작하지 못하셨다면, 그것은 당신의 취향에 따라 맛있을 수도 역겨울 수도 있는 햄과 파인애플 피자입니다.", logic: 'hawaiian' },
+          { id: 8, text: "The man who created this pizza was neither Italian nor Hawaiian.", trans: "이 피자를 만든 사람은 이탈리아인도 하와이인도 아니었습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 9, text: "A Greek immigrant from Canada, Sam Panopoulos did not want to stick to the usual ingredients on pizzas, like pepperoni and mushrooms.", trans: "캐나다에 온 그리스 이민자인 샘 파노풀로스는 페퍼로니나 버섯과 같이 피자에 들어가는 일반적인 재료들만 고집하고 싶지 않았습니다." },
+          { id: 10, text: "He spread canned pineapple and sliced ham onto a pizza and called it “the Hawaiian” because that’s what was written on the pineapple can.", trans: "그는 피자에 통조림 파인애플과 얇게 썬 햄을 올리고 파인애플 통조림 캔에 그렇게 적혀 있었기 때문에 그것을 \"하와이안\"이라고 불렀습니다." },
+          { id: 11, text: "Little did he know that he had created a classic combination.", trans: "그는 자신이 고전적인(최고의) 조합을 만들어냈다는 사실을 전혀 알지 못했습니다.", isHighlight: true, logicPoint: 3, logic: 'origin' },
+          { id: 12, text: "Even now, in the U.S. and U.K., no pizza menu seems complete without it. In Italy, however, most people find pineapple on pizza distasteful.", trans: "지금도 미국과 영국에서는 이 메뉴 없이는 피자 메뉴가 완성된 것 같지 않습니다. 하지만 이탈리아에서는 대부분의 사람들이 피자 위에 파인애플을 얹는 것을 불쾌하게 생각합니다." },
+
+          // Part 3: The Logic of Sweet & Salty (13~16)
+          { id: 13, text: "Why is the Hawaiian pizza so divisive? The combination is not that odd.", trans: "왜 하와이안 피자는 그렇게 호불호가 갈릴까요? 그 조합은 그렇게 이상하지 않습니다.", logic: 'logic' },
+          { id: 14, text: "Pineapple and ham is not the only fruit and meat pairing in kitchens around the world.", trans: "파인애플과 햄이 전 세계 주방에 있는 유일한 과일과 고기의 짝꿍은 아닙니다." },
+          { id: 15, text: "In France, duck is paired with a sweet orange sauce, and American Thanksgiving turkey dinner would not be complete without cranberry sauce.", trans: "프랑스에서는 오리가 달콤한 오렌지 소스와 짝을 이루고, 미국의 추수감사절 칠면조 저녁 식사는 크랜베리 소스 없이는 완성되지 않을 것입니다." },
+          { id: 16, text: "Many people enjoy salty and sweet flavor combinations, whereas some others prefer to keep those tastes as far from each other as possible.", trans: "많은 사람들이 짠맛과 단맛의 조합을 즐기는 반면, 어떤 사람들은 그러한 맛을 서로 가능한 멀리 떨어뜨려 놓는 것을 선호합니다.", isHighlight: true, logicPoint: 4 }
+        ];
+
+        const logicMapSteps = [
+          { id: 'intro', title: "THE HOOK (도입부)", desc: "Ordinary vs. Odd combinations", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-hamburger text-xl mb-2"></i> },
+          { id: 'hawaiian', title: "THE DIVISIVE DISH (호불호 음식)", desc: "Ham and Pineapple Pizza", color: "bg-yellow-100 border-yellow-400 text-yellow-800", icon: <i className="ph-fill ph-pizza text-xl mb-2"></i> },
+          { id: 'origin', title: "THE ORIGIN (기원)", desc: "Sam Panopoulos's Experiment", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'logic', title: "THE LOGIC (단짠의 과학)", desc: "Sweet and Salty combinations", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-scales text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-600 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-orange-800 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Odd Pairings That Work</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 1: The Divisive Classic</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-orange-50 text-orange-800 border-orange-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-amber-50 text-amber-800 border-amber-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-orange-800 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: 서론 */}
+                      <div>
+                        <div className="inline-block bg-slate-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Introduction (평범함과 이상함의 경계)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 5).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-orange-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 호불호의 클래식 */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-yellow-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Divisive Classic (하와이안 피자의 기원)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(5, 12).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-yellow-50 border border-yellow-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-orange-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-yellow-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 단짠의 논리 */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-orange-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Logic (단짠단짠의 과학적(?) 접근)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(12, 16).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-orange-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-orange-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-orange-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-orange-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-orange-600 text-white' : 'bg-orange-50 text-orange-800'}`}>
+                          POINT 01. 대조를 이끄는 접속사: While
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [While] ketchup with fries may seem ordinary, other combinations...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~인 반면에"라는 뜻입니다. 케첩이라는 아주 평범하고 익숙한 조합과, 앞으로 소개할 다소 이상한(odd) 조합들을 <strong>대조(Contrast)</strong>시키며 독자의 흥미를 유발하는 도입부 장치입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-yellow-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-yellow-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-yellow-600 text-white' : 'bg-yellow-50 text-yellow-800'}`}>
+                          POINT 02. 양자 부정 상관접속사: neither A nor B
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> was [neither] Italian [nor] Hawaiian.</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "A도 아니고 B도 아니다"라는 뜻입니다. 피자의 종주국인 이탈리아인도 아니고, 이름에 들어간 하와이인도 아닌 전혀 엉뚱한 인물(캐나다 이민자)이 만들었다는 <strong>반전의 기원</strong>을 강조합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-orange-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-orange-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-orange-600 text-white' : 'bg-orange-50 text-orange-800'}`}>
+                          POINT 03. 부정어 도치 구문
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [Little did he know] that he had created...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            부정어 Little이 문장 맨 앞으로 오면서 [조동사(did) + 주어(he) + 동사원형(know)] 순서로 도치되었습니다. 발명자조차도 이 조합이 세계적인 성공을 거둘 줄 <strong>전혀 몰랐음</strong>을 매우 강조하는 구문입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-red-500 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-red-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 4 ? 'bg-red-500 text-white' : 'bg-red-50 text-red-800'}`}>
+                          POINT 04. 대조를 이끄는 접속사: whereas
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> Many people enjoy..., [whereas] some others prefer to...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~인 반면에"라는 뜻으로 While과 비슷하게 쓰입니다. 단짠(Salty and sweet)의 조화를 사랑하는 사람들과, 두 맛을 철저히 분리하고 싶어하는 사람들의 <strong>팽팽한 호불호</strong>를 명확히 대조해 줍니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-orange-800 hover:bg-orange-700 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-amber-500 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-amber-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-amber-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-amber-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 하와이안 피자의 탄생 논리를<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-yellow-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Leads to
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Created by
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-red-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Explained by
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-amber-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 내용 일치 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 일치 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">하와이안 피자에 대한 윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "단맛과 짠맛의 조화 때문에 사람들 사이에서 호불호가 크게 갈린다." },
+                          { id: 2, text: "이 피자를 처음 만든 사람은 하와이 출신의 요리사였다.", isCorrect: true },
+                          { id: 3, text: "피자 위에 올린 통조림 파인애플 캔에 쓰인 글자에서 이름이 유래했다." },
+                          { id: 4, text: "이탈리아에서는 대부분의 사람들이 피자에 파인애플을 올리는 것을 싫어한다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-orange-400 hover:bg-orange-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 본문 8~9번 문장에 따르면, 하와이안 피자를 창안한 사람은 "이탈리아인도 하와이인도 아닌(neither Italian nor Hawaiian)" 캐나다로 이민 온 <strong>그리스인(A Greek immigrant)</strong> 샘 파노풀로스였습니다. 따라서 2번은 본문과 일치하지 않습니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          Little did he know that he had created a classic combination.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          A Greek immigrant from Canada, Sam Panopoulos did not want to stick to the usual ingredients on pizzas, like pepperoni and mushrooms. ( ① ) He spread canned pineapple and sliced ham onto a pizza and called it “the Hawaiian” because that’s what was written on the pineapple can. ( ② ) Even now, in the U.S. and U.K., no pizza menu seems complete without it. ( ③ ) In Italy, however, most people find pineapple on pizza distasteful. ( ④ ) Why is the Hawaiian pizza so divisive?
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②", isCorrect: true },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-orange-400 hover:bg-orange-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> "그는 자신이 고전적인 조합을 만들어냈다는 사실을 전혀 알지 못했다."라는 문장은, 그가 단지 통조림에 적힌 글자만 보고 '가볍게' 하와이안 피자를 만들어낸 행동(①번 뒤)과, 그것이 결국 현대에 와서 필수 메뉴가 되었다는 대성공의 결과(②번 뒤)를 매끄럽게 연결해 주는 역할을 합니다. 따라서 <strong>②번</strong> 자리가 정답입니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Despite being a highly <span className="font-bold text-orange-800">( A )</span> dish today, Hawaiian pizza is fundamentally an example of the sweet and salty flavor <span className="font-bold text-orange-800">( B )</span> that many people around the world enjoy.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) divisive —— (B) combination", isCorrect: true },
+                          { id: 2, text: "(A) traditional —— (B) isolation" },
+                          { id: 3, text: "(A) divisive —— (B) destruction" },
+                          { id: 4, text: "(A) boring —— (B) combination" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-orange-400 hover:bg-orange-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz3Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 1 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 1 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 하와이안 피자는 오늘날 극도로 <strong>호불호가 갈리는(divisive)</strong> 음식이지만, 기본적으로 세계 많은 사람들이 즐기는 단맛과 짠맛의 훌륭한 <strong>조합(combination)</strong>의 한 예시라는 것이 이 글의 핵심 논리입니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

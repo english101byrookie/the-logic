@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Jake Miller</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: Intro
+          { id: 1, text: "Hello, everyone! Thank you for your warm welcome.", trans: "안녕하세요, 여러분! 따뜻하게 환영해 주셔서 감사합니다." },
+          { id: 2, text: "It’s good to be back home, but I’m visiting you today not to perform but to talk to you about my life as a musician.", trans: "고향에 돌아오니 좋네요, 하지만 오늘 여러분을 찾아온 것은 공연을 위해서가 아니라 음악가로서의 제 삶에 대해 이야기하기 위해서입니다.", isHighlight: true, logicPoint: 1 },
+          { id: 3, text: "Last year, after 20 years of hard work, I finally signed my first record company contract.", trans: "작년에, 20년의 힘든 노력 끝에 마침내 첫 음반사 계약을 맺었습니다." },
+          { id: 4, text: "I’d like to tell you a hopeful story and give some insight into the hard work that I had to put in.", trans: "여러분에게 희망적인 이야기를 들려주고 제가 쏟아야 했던 힘든 노력에 대한 통찰을 드리고 싶습니다." },
+          { id: 5, text: "Look at this picture of Picasso’s The Old Guitarist behind me.", trans: "제 뒤에 있는 피카소의 '늙은 기타리스트' 그림을 보세요." },
+          { id: 6, text: "My grandfather was a classical guitarist, and on my 13th birthday, he gave me this picture and a new guitar.", trans: "제 할아버지는 클래식 기타리스트셨고, 제 13번째 생일에 이 그림과 새 기타를 주셨습니다." },
+          { id: 7, text: "After he passed away, I hung it up in my room as a reminder of his love for music.", trans: "할아버지가 돌아가신 후, 저는 음악에 대한 그의 사랑을 기억하기 위해 제 방에 그것을 걸어두었습니다." },
+          
+          // Part 2: Hardship
+          { id: 8, text: "I wasn’t a musical genius, but I was better than most.", trans: "저는 음악 천재는 아니었지만, 대부분의 사람들보다는 잘했습니다." },
+          { id: 9, text: "I was popular at school festivals, and I thought I was born to be a musician.", trans: "학교 축제에서 인기가 많았고, 저는 음악가가 되기 위해 태어났다고 생각했습니다." },
+          { id: 10, text: "But things were far from easy.", trans: "하지만 상황은 결코 쉽지 않았습니다.", logic: 'despair' },
+          { id: 11, text: "In college, I had to compete with classmates who were definitely more capable than I was.", trans: "대학에서 저는 분명히 저보다 더 능력 있는 동급생들과 경쟁해야 했습니다." },
+          { id: 12, text: "I don’t even remember how many contests I went to and came up short.", trans: "얼마나 많은 대회에 나가서 기대에 미치지 못했는지 기억조차 나지 않습니다." },
+          { id: 13, text: "I kept failing no matter how hard I tried.", trans: "아무리 열심히 노력해도 계속 실패했습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 14, text: "It seemed like every disappointment made me lose hope more and more.", trans: "매번의 실망이 점점 더 희망을 잃게 만드는 것 같았습니다." },
+          { id: 15, text: "I wanted to give up.", trans: "저는 포기하고 싶었습니다.", logic: 'despair' },
+          { id: 16, text: "The funny thing was whenever anyone asked me to play a song for them, I would be so happy.", trans: "재미있는 점은 누군가 저에게 노래를 연주해 달라고 요청할 때마다 저는 너무나 행복했다는 것입니다." },
+          { id: 17, text: "Although my dream was to record an album, the reality was I probably wouldn’t make it.", trans: "제 꿈은 앨범을 녹음하는 것이었지만, 현실은 아마도 해내지 못할 것이라는 것이었습니다." },
+
+          // Part 3: Turning Point
+          { id: 18, text: "Then one day, I looked at the picture of The Old Guitarist on my wall.", trans: "그러던 어느 날, 저는 벽에 걸린 '늙은 기타리스트' 그림을 보았습니다.", logic: 'turn' },
+          { id: 19, text: "I suddenly remembered what my grandfather had told me about Picasso: only a tiny fraction of the thousands of artworks he created during his lifetime are recognized by the public.", trans: "저는 문득 할아버지가 피카소에 대해 해주신 말씀이 생각났습니다: 그가 평생 동안 만든 수천 점의 예술 작품 중 아주 작은 부분만이 대중에게 인정받는다는 것입니다." },
+          { id: 20, text: "Then I thought of my grandfather and how he loved playing, practicing his art his entire life, even without fame.", trans: "그런 다음 저는 할아버지와, 명성이 없었음에도 불구하고 평생 동안 자신의 예술을 연습하며 연주를 사랑했던 그의 모습을 떠올렸습니다." },
+          { id: 21, text: "I realized the only way to become an old guitarist like him was to keep playing.", trans: "저는 그와 같은 '늙은 기타리스트'가 되는 유일한 방법은 계속 연주하는 것뿐이라는 것을 깨달았습니다.", isHighlight: true, logicPoint: 3, logic: 'realize' },
+
+          // Part 4: Success & Takeaway
+          { id: 22, text: "The happy ending to this story is that after having sent my recordings to countless producers, I finally found one who was eager to work with me.", trans: "이 이야기의 해피 엔딩은 수많은 프로듀서에게 제 녹음본을 보낸 후 마침내 저와 함께 작업하기를 열망하는 한 명을 찾았다는 것입니다.", logic: 'success' },
+          { id: 23, text: "One thing led to another, and I finally signed a record deal.", trans: "일이 순조롭게 진행되어, 마침내 음반 계약을 맺었습니다." },
+          { id: 24, text: "Opportunities only come to those who are prepared.", trans: "기회는 준비된 자에게만 옵니다.", isHighlight: true, logicPoint: 3, logic: 'lesson' },
+          { id: 25, text: "I had spent years performing on unknown streets and writing songs no one recognized.", trans: "저는 아무도 알아주지 않는 거리에서 공연하고 아무도 인정하지 않는 노래를 쓰며 수년을 보냈습니다." },
+          { id: 26, text: "The difficulties I faced were part of my journey.", trans: "제가 직면한 어려움은 제 여정의 일부였습니다." },
+          { id: 27, text: "If you love something, keep trying.", trans: "무언가를 사랑한다면 계속 시도하세요." },
+          { id: 28, text: "Someday an opportunity may come knocking at your door, and you have to be ready to welcome it.", trans: "언젠가 기회가 여러분의 문을 두드릴 수 있으며, 여러분은 그것을 환영할 준비가 되어 있어야 합니다." }
+        ];
+
+        const logicMapSteps = [
+          { id: 'despair', title: "DESPAIR (절망)", desc: "Repeated Failures & Losing Hope", color: "bg-stone-100 border-stone-400 text-stone-800", icon: <i className="ph-fill ph-cloud-rain text-xl mb-2"></i> },
+          { id: 'turn', title: "INSPIRATION (영감)", desc: "Picasso & Grandfather's Dedication", color: "bg-amber-100 border-amber-400 text-amber-800", icon: <i className="ph-fill ph-paint-brush text-xl mb-2"></i> },
+          { id: 'realize', title: "REALIZATION (깨달음)", desc: "The only way is to keep playing", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'success', title: "SUCCESS (성공)", desc: "Signed a record deal after 20 years", color: "bg-green-100 border-green-400 text-green-800", icon: <i className="ph-fill ph-confetti text-xl mb-2"></i> },
+          { id: 'lesson', title: "THE TAKEAWAY (교훈)", desc: "Opportunities come to the prepared", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-fire text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-stone-100 font-sans text-stone-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-amber-800 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-amber-900 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-stone-900 print:text-black">“Giving Up” Has No Place in My Dictionary!</h2>
+                    <p className="text-stone-500 italic mt-1 font-serif print:text-gray-600">The Story of Jake Miller</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-stone-800 hover:bg-stone-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-amber-50 text-amber-900 border-amber-800' : 'text-stone-400 border-transparent hover:bg-stone-50 hover:text-stone-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-orange-50 text-orange-800 border-orange-600' : 'text-stone-400 border-transparent hover:bg-stone-50 hover:text-stone-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-amber-900 border-b-2 border-stone-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-6 print:space-y-4">
+                      {/* 파트 A: 서론 (1~7번) */}
+                      <div>
+                        <div className="inline-block bg-stone-800 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-stone-200 print:text-black print:border print:border-stone-800">
+                          ▶ The Introduction (음악가로서의 삶 소개)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 7).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-amber-50 border border-amber-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-stone-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-amber-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-stone-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 절망 (8~17번) */}
+                      <div className="border-t border-dashed border-stone-300 pt-4 print:border-black print:pt-4">
+                        <div className="inline-block bg-stone-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-stone-200 print:text-black print:border print:border-stone-800">
+                          ▶ The Hardship (경쟁과 계속되는 좌절)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(7, 17).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-stone-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-stone-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 전환점 (18~21번) */}
+                      <div className="border-t border-dashed border-stone-300 pt-4 print:border-black print:pt-4">
+                        <div className="inline-block bg-amber-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-stone-200 print:text-black print:border print:border-stone-800">
+                          ▶ The Turning Point (그림을 통한 깨달음)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(17, 21).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-stone-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-stone-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: 결론 (22~28번) */}
+                      <div className="border-t border-dashed border-stone-300 pt-4 print:border-black print:pt-4">
+                        <div className="inline-block bg-red-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-stone-200 print:text-black print:border print:border-stone-800">
+                          ▶ The Success & Takeaway (성공과 최종 교훈)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(21, 28).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-stone-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-stone-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-amber-900 border-b-2 border-stone-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-stone-500 mb-4 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid gap-4 print:gap-6">
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-amber-600 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-amber-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 1 ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-900'}`}>
+                          POINT 01. 대조를 통한 강연 목적 강조: not A but B
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-stone-700 print:text-black">Structure:</span> not to perform but to talk</p>
+                          <p className="text-sm text-stone-600 leading-relaxed print:text-black">
+                            자신이 무대에 선 이유가 '공연(A)'이 아니라 '자신의 삶에 대한 이야기(B)'라는 것을 명확히 밝히며, 화자가 전달하고자 하는 메시지에 청중의 집중을 유도합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-orange-500 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-orange-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 2 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-900'}`}>
+                          POINT 02. 양보 구문을 통한 좌절감 강조: no matter how
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-stone-700 print:text-black">Structure:</span> kept failing no matter how hard I tried</p>
+                          <p className="text-sm text-stone-600 leading-relaxed print:text-black">
+                            '아무리 열심히 노력할지라도(no matter how)' 계속 실패했다는 양보 구문을 사용하여, 주인공이 겪은 깊은 좌절과 절망의 상태를 극적으로 강조합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-red-600 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-red-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 3 ? 'bg-red-600 text-white' : 'bg-red-50 text-red-900'}`}>
+                          POINT 03. 성공의 절대 조건 제시: The only way / only come to
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-stone-700 print:text-black">Structure:</span> the only way was to V / only come to those who ~</p>
+                          <p className="text-sm text-stone-600 leading-relaxed print:text-black">
+                            할아버지의 그림을 통해 얻은 깨달음을 나타냅니다. 성공을 위한 '유일한 방법(the only way)'은 포기하지 않는 것이며, 기회는 오직 '준비된 자(only come to those who)'에게만 온다는 글의 핵심 교훈을 완성합니다.
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-amber-900 hover:bg-amber-800 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-stone-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-stone-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-orange-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-stone-400 hover:text-stone-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-stone-200 rounded-lg bg-stone-50 text-center p-6 cursor-pointer hover:bg-orange-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-orange-400 mb-4"></i>
+                      <p className="text-stone-600 font-medium">클릭하여 제이크의 영웅의 여정을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-stone-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-amber-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Then one day
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                I realized
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-green-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Happy ending
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-stone-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-stone-800 border-b-2 border-stone-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-amber-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-stone-50 border border-stone-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-stone-800 mb-2 print:text-black">Q1. 문장 삽입</p>
+                        <p className="text-sm text-stone-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-stone-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          Then one day, I looked at the picture of The Old Guitarist on my wall.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-stone-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          It seemed like every disappointment made me lose hope more and more. I wanted to give up. ( ① ) The funny thing was whenever anyone asked me to play a song for them, I would be so happy. ( ② ) Although my dream was to record an album, the reality was I probably wouldn’t make it. ( ③ ) I suddenly remembered what my grandfather had told me about Picasso: only a tiny fraction of the thousands of artworks he created during his lifetime are recognized by the public. ( ④ ) Then I thought of my grandfather and how he loved playing.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②" },
+                          { id: 3, text: "③", isCorrect: true },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-stone-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-stone-100 text-stone-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 절망감이 극에 달한 상황(reality was I probably wouldn't make it) 뒤에, 분위기를 전환시키는 <strong>'Then one day(그러던 어느 날)'</strong>가 등장해야 합니다. 또한 주어진 문장에서 '그림을 보았다'고 했으므로, 바로 뒤에 '피카소에 대한 할아버지의 말씀이 생각났다'고 이어지는 <strong>③번</strong> 자리가 논리적으로 완벽합니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-stone-200 print:border-black" />
+
+                    {/* Q2. 요지 파악 */}
+                    <div>
+                      <div className="bg-stone-50 border border-stone-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-stone-800 mb-2 print:text-black">Q2. 요지 파악</p>
+                        <p className="text-sm text-stone-600 mb-4 print:text-black">윗글이 독자에게 주는 교훈으로 가장 적절한 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "예술적 재능은 타고나는 것이 아니라 후천적으로 길러진다." },
+                          { id: 2, text: "좌절하지 않고 꾸준히 노력하며 준비하는 자에게 기회가 온다.", isCorrect: true },
+                          { id: 3, text: "가족의 지지와 격려가 성공적인 음악가가 되는 핵심 요소이다." },
+                          { id: 4, text: "대중에게 인정받지 못하는 예술은 진정한 예술이 아니다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-stone-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-stone-100 text-stone-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-stone-500 print:text-black">①</span> 
+                            {choice.text}
+                            {quiz2Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 글의 마지막 부분에 명확하게 제시된 교훈입니다. <strong>"Opportunities only come to those who are prepared(기회는 준비된 자에게만 온다)"</strong>와 <strong>"If you love something, keep trying(무언가를 사랑한다면 계속 시도하라)"</strong>는 문장을 통해 필자가 전달하고자 하는 요지를 2번으로 도출할 수 있습니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

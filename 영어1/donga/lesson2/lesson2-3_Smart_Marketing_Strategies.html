@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Lemonade Part 3</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: Location-Based Marketing (1~3)
+          { id: 1, text: "When the organizer asked us where we wanted our stand, we knew that location was going to be important.", trans: "주최자가 우리 가판대를 어디에 두고 싶은지 물었을 때, 우리는 위치가 중요할 것이라는 것을 알았다.", isHighlight: true, logicPoint: 1, logic: 'location' },
+          { id: 2, text: "She sent us a map showing which foods were going to be sold at which stands, and we chose an opening between the tteokbokki and spicy kebab stands.", trans: "그녀는 어느 가판대에서 어떤 음식이 팔릴지 보여주는 지도를 보내주었고, 우리는 떡볶이와 매운 케밥 가판대 사이의 빈자리를 선택했다." },
+          { id: 3, text: "Who could resist a cool, sweet lemonade after some spicy and salty food?", trans: "맵고 짠 음식을 먹은 후 시원하고 달콤한 레모네이드를 누가 참을 수 있겠는가?", isHighlight: true, logicPoint: 2, logic: 'resist' },
+          
+          // Part 2: Offline & Online Strategies (4~5)
+          { id: 4, text: "Developing marketing strategies to attract more customers was the most enjoyable part.", trans: "더 많은 고객을 유치하기 위한 마케팅 전략을 개발하는 것은 가장 즐거운 부분이었다." },
+          { id: 5, text: "In addition to designing posters and fliers, we also explored various online marketing techniques.", trans: "포스터와 전단지를 디자인하는 것 외에도, 우리는 다양한 온라인 마케팅 기법을 탐색했다.", isHighlight: true, logicPoint: 3, logic: 'online' },
+
+          // Part 3: Social Media Mentions (6~7)
+          { id: 6, text: "One of our club members suggested we offer customers free refills for mentioning our stand on their social media accounts.", trans: "우리 동아리 회원 중 한 명은 고객들이 소셜 미디어 계정에 우리 가판대를 언급하면 무료 리필을 제공하자고 제안했다.", logic: 'sns1' },
+          { id: 7, text: "We all agreed that was a great way to spread the word.", trans: "우리 모두는 그것이 입소문을 내는(소문을 퍼뜨리는) 좋은 방법이라는 데 동의했다." },
+
+          // Part 4: Photo Zone & Hashtag (8)
+          { id: 8, text: "We also planned to install a photo zone and give coupons for a 10% discount to customers who posted photos they took there with the tag “#sweetsuccess,” the name of our stand.", trans: "우리는 또한 포토존을 설치하고, 그곳에서 찍은 사진을 우리 가판대의 이름인 “#sweetsuccess” 태그와 함께 올린 고객들에게 10% 할인 쿠폰을 주기로 계획했다.", isHighlight: true, logicPoint: 4, logic: 'sns2' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'location', title: "LOCATION (입지 선정)", desc: "Between spicy & salty foods", color: "bg-rose-100 border-rose-400 text-rose-800", icon: <i className="ph-fill ph-map-pin text-xl mb-2"></i> },
+          { id: 'offline', title: "OFFLINE (오프라인 마케팅)", desc: "Posters and fliers", color: "bg-pink-100 border-pink-400 text-pink-800", icon: <i className="ph-fill ph-printer text-xl mb-2"></i> },
+          { id: 'sns1', title: "ONLINE 1 (바이럴 마케팅)", desc: "Social media mentions = Free refills", color: "bg-fuchsia-100 border-fuchsia-400 text-fuchsia-800", icon: <i className="ph-fill ph-share-network text-xl mb-2"></i> },
+          { id: 'sns2', title: "ONLINE 2 (해시태그 이벤트)", desc: "Photo zone + Hashtag = 10% Discount", color: "bg-purple-100 border-purple-400 text-purple-800", icon: <i className="ph-fill ph-camera text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-rose-600 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-rose-800 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Sweet Success: Lemonade Stand</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 3: Smart Marketing Strategies</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-rose-50 text-rose-800 border-rose-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-pink-50 text-pink-800 border-pink-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-rose-700 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: 입지 마케팅 (1~3번) */}
+                      <div>
+                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Location-Based Marketing (지리적 이점을 활용한 타겟팅)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 3).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-rose-50 border border-rose-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-rose-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-rose-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 오프라인과 온라인 (4~5번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-pink-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Offline to Online (마케팅 기법의 확장)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(3, 5).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-pink-50 border border-pink-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-rose-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-pink-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 소셜 미디어 바이럴 (6~7번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-fuchsia-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Social Media Strategies 1 (소문 퍼뜨리기 전략)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(5, 7).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-fuchsia-50 border border-fuchsia-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-rose-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-fuchsia-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: 포토존 해시태그 (8번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-purple-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Social Media Strategies 2 (포토존과 할인 쿠폰)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(7, 8).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-purple-50 border border-purple-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-rose-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-purple-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-rose-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-rose-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-rose-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-rose-600 text-white' : 'bg-rose-50 text-rose-800'}`}>
+                          POINT 01. 간접의문문 (명사절)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> asked us [where we wanted our stand]</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            의문사(where) + 주어(we) + 동사(wanted)의 어순으로 쓰여 문장의 목적어 역할을 합니다. 학생들의 마케팅 전략이 단순히 상품을 파는 것을 넘어 <strong>'입지(Location)'</strong>의 중요성을 고민하는 단계로 넘어감을 보여줍니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-pink-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-pink-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-pink-600 text-white' : 'bg-pink-50 text-pink-800'}`}>
+                          POINT 02. 수사의문문 (Rhetorical Question)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [Who could resist] a cool, sweet lemonade...?</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            질문의 형태를 띠고 있지만 실제로는 대답을 요구하는 것이 아니라, "아무도 참을 수 없을 것이다"라는 <strong>강한 긍정과 확신</strong>을 강조하는 수사적 표현입니다. 입지 전략의 완벽함을 뒷받침합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-fuchsia-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-fuchsia-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-fuchsia-600 text-white' : 'bg-fuchsia-50 text-fuchsia-800'}`}>
+                          POINT 03. 부가 정보의 추가: In addition to
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [In addition to] designing posters..., we also explored...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~하는 것 외에도"라는 뜻의 전치사구입니다. 전통적인 오프라인 방식(포스터)에 더하여, 현대적인 <strong>온라인 마케팅(소셜 미디어)</strong> 기법까지 전략을 확장했음을 보여주는 연결 고리입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-purple-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-purple-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 4 ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-800'}`}>
+                          POINT 04. 관계대명사의 연속 수식
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> customers [who] posted photos [(which/that) they took there]...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            고객(customers)을 수식하는 주격 관계대명사(who) 절 안에, 사진(photos)을 수식하는 목적격 관계대명사(생략됨) 절이 이중으로 쓰여 <strong>특정 할인 조건</strong>을 구체적으로 설명합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-rose-700 hover:bg-rose-600 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-pink-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-pink-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-pink-100 hover:bg-pink-200 text-pink-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-pink-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-pink-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 학생들의 마케팅 전략을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-rose-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Combined with
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-pink-100 text-pink-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-pink-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Expanded to
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-fuchsia-100 text-fuchsia-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-fuchsia-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                And additionally
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-pink-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 내용 일치 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "동아리는 떡볶이와 매운 케밥 가판대 사이를 레모네이드 판매 위치로 정했다." },
+                          { id: 2, text: "오프라인 홍보를 위해 포스터와 전단지를 디자인했다." },
+                          { id: 3, text: "소셜 미디어에 가판대 해시태그를 올리는 모든 고객에게 무료 리필을 제공했다.", isCorrect: true },
+                          { id: 4, text: "포토존에서 사진을 찍어 특정 태그와 함께 올리면 10% 할인을 받을 수 있다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-pink-400 hover:bg-pink-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 무료 리필 혜택은 가판대를 소셜 미디어에 '언급(mentioning)'하는 대가로 제공되며, 해시태그("#sweetsuccess")와 함께 사진을 올리는 조건은 무료 리필이 아니라 <strong>'10% 할인 쿠폰(10% discount)'</strong>을 제공하기 위한 이벤트입니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 어휘 추론 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문맥상 어휘 추론</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <u>않은</u> 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          She sent us a map showing which foods were going to be sold at which stands, and we chose an opening between the tteokbokki and spicy kebab stands. Who could ①<u><span className="text-red-600 font-bold">refuse</span></u> a cool, sweet lemonade after some spicy and salty food? Developing marketing strategies to ②<u>attract</u> more customers was the most enjoyable part. In addition to designing posters and fliers, we also ③<u>explored</u> various online marketing techniques. We all agreed that was a great way to ④<u>spread</u> the word.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "① refuse", isCorrect: true },
+                          { id: 2, text: "② attract" },
+                          { id: 3, text: "③ explored" },
+                          { id: 4, text: "④ spread" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-pink-400 hover:bg-pink-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 1 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 1 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설: ① refuse $\rightarrow$ resist</strong><br/>
+                            맥락상 "맵고 짠 음식을 먹은 후에 시원한 레모네이드를 먹고 싶은 유혹을 누가 '거절할' 수 있겠는가"라는 의미에서 본문은 <strong>'resist(저항하다, 참다)'</strong>를 사용했습니다. 'refuse(제안 등을 거절하다)'보다는 식욕이나 유혹을 '참아내다'라는 의미의 resist가 수사의문문에 훨씬 자연스럽고 본문과 일치합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 문장 삽입 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <p className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          In addition to designing posters and fliers, we also explored various online marketing techniques.
+                        </p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Who could resist a cool, sweet lemonade after some spicy and salty food? Developing marketing strategies to attract more customers was the most enjoyable part. ( ① ) One of our club members suggested we offer customers free refills for mentioning our stand on their social media accounts. ( ② ) We all agreed that was a great way to spread the word. ( ③ ) We also planned to install a photo zone and give coupons for a 10% discount to customers who posted photos they took there with the tag “#sweetsuccess.” ( ④ ) 
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①", isCorrect: true },
+                          { id: 2, text: "②" },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-pink-400 hover:bg-pink-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 1 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 1 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 주어진 문장은 오프라인 마케팅(포스터 등)에서 <strong>'온라인 마케팅(online marketing techniques)'</strong>으로 전략이 넘어가는 핵심 연결 고리입니다. 이 문장 직후에 구체적인 온라인 전략 첫 번째인 '소셜 미디어 언급 시 리필 제공(social media accounts)' 아이디어가 등장해야 하므로 <strong>①번</strong> 자리가 정답입니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
