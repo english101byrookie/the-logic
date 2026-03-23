@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Case 01</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            /* 인쇄 시 페이지 넘김 방지 최적화 */
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          { id: 1, text: "My role model is Jacques Cousteau, a French ocean explorer, inventor, and filmmaker.", trans: "내 롤모델은 프랑스의 해양 탐험가이자 발명가, 영화 제작자인 자크 쿠스토이다." },
+          { id: 2, text: "He dedicated his life to exploring and documenting the wonders of the underwater world.", trans: "그는 수중 세계의 경이로움을 탐험하고 기록하는 데 일생을 바쳤다." },
+          { id: 3, text: "As a young man, he dreamed of becoming a pilot, but then he broke both of his arms in a terrible car accident.", trans: "젊은 시절 그는 조종사가 되기를 꿈꿨지만, 끔찍한 교통사고로 양팔이 부러졌다.", logic: 'crisis' },
+          { id: 4, text: "As part of his physical therapy, Cousteau began swimming.", trans: "물리 치료의 일환으로 쿠스토는 수영을 시작했다.", logic: 'turn' },
+          { id: 5, text: "He became intrigued by the mysteries of the ocean, and he wanted to explore further.", trans: "그는 바다의 신비에 매료되었고 더 멀리 탐험하고 싶어졌다." },
+          { id: 6, text: "However, the diving equipment available at that time was insufficient.", trans: "하지만 당시 이용할 수 있었던 잠수 장비는 불충분했다.", logic: 'prob' },
+          { id: 7, text: "Instead of giving up, Cousteau decided to create his own equipment.", trans: "포기하는 대신, 쿠스토는 자신만의 장비를 만들기로 결심했다.", isHighlight: true, logicPoint: 1 },
+          { id: 8, text: "After a long series of failed attempts, he finally succeeded in developing a portable breathing device, which he called the 'Aqua-Lung.'", trans: "오랜 실패의 연속 끝에, 마침내 그는 '아쿠아렁'이라고 부르는 휴대용 호흡 장치를 개발하는 데 성공했다.", isHighlight: true, logicPoint: 2, logic: 'sol' },
+          { id: 9, text: "Cousteau shared his underwater experiences with the world in a compelling documentary film released in 1956.", trans: "쿠스토는 1956년에 개봉한 흥미진진한 다큐멘터리 영화를 통해 전 세계와 자신의 수중 경험을 공유했다." },
+          { id: 10, text: "It transformed people’s perceptions of the ocean and promoted the need for marine conservation.", trans: "그것은 바다에 대한 사람들의 인식을 바꿔놓았고 해양 보존의 필요성을 알렸다." },
+          { id: 11, text: "Cousteau’s curiosity drove him to constantly challenge himself in new areas, and his passion enabled him to make the impossible a reality.", trans: "쿠스토의 호기심은 그가 끊임없이 새로운 분야에 도전하게 이끌었고, 그의 열정은 불가능을 현실로 만들 수 있게 해주었다.", isHighlight: true, logicPoint: 3 },
+          { id: 12, text: "Cousteau’s life story inspired me to push the boundaries of what I can do.", trans: "쿠스토의 인생 이야기는 내가 할 수 있는 일의 한계를 넓히도록 영감을 주었다.", isHighlight: true, logicPoint: 3 },
+          { id: 13, text: "Because of him, I am not afraid to try different things in life.", trans: "그 덕분에 나는 인생에서 새로운 것들을 시도하는 것을 두려워하지 않는다." },
+          { id: 14, text: "I will keep exploring until I find what suits me best.", trans: "나는 나에게 가장 잘 맞는 것을 찾을 때까지 계속 탐험할 것이다.", logic: 'lesson' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'crisis', title: "CRISIS (위기)", desc: "Broken Arms / Pilot Dream Lost", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { id: 'turn', title: "TURNING POINT (전환)", desc: "Swimming for Rehab → Ocean Interest", color: "bg-yellow-100 border-yellow-400 text-yellow-800", icon: <i className="ph-bold ph-pulse text-xl mb-2"></i> },
+          { id: 'prob', title: "NEW PROBLEM (장벽)", desc: "Insufficient Equipment", color: "bg-gray-100 border-gray-400 text-gray-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { id: 'sol', title: "SOLUTION (해결)", desc: "Invention of Aqua-Lung", color: "bg-green-100 border-green-400 text-green-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'lesson', title: "THE TAKEAWAY (교훈)", desc: "Not afraid to try / Keep exploring", color: "bg-purple-100 border-purple-400 text-purple-800", icon: <i className="ph-fill ph-star text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-100 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-900 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-blue-900 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">CASE 01: Jacques Cousteau</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">"Turning Adversity into Opportunity"</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-blue-50 text-blue-900 border-blue-900' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-emerald-50 text-emerald-800 border-emerald-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-blue-900 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-6 print:space-y-4">
+                      {/* 파트 A: 일대기 (1~10번) */}
+                      <div>
+                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Narrative (쿠스토의 일대기)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 10).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              {/* 인쇄 시 한국어 번역 숨김 적용 (print:hidden) */}
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 교훈 (11~14번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-4 print:border-black print:pt-4">
+                        <div className="inline-block bg-purple-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Takeaway (화자의 교훈과 다짐)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(10, 14).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-purple-50 border border-purple-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-purple-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              {/* 인쇄 시 한국어 번역 숨김 적용 (print:hidden) */}
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-blue-900 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-4 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid gap-4 print:gap-6">
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-red-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-red-300'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-red-600 text-white' : 'bg-red-50 text-red-800'}`}>
+                          POINT 01. 역경을 뒤집는 논리: Instead of
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> Instead of + Negative Situation (A) → Positive Action (B)</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            'Instead of'는 단순한 '대신에'가 아닙니다. 앞 문장의 문제 상황(giving up)을 부정하고, 주어의 주체적인 해결책(create)을 강조하는 <strong className="print:text-black">논리적 반전(Reversal)</strong>의 신호탄입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-blue-700 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-blue-300'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-blue-700 text-white' : 'bg-blue-50 text-blue-900'}`}>
+                          POINT 02. 결과의 필연성: Succeeded in
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> succeed in + ~ing</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            실패(failed attempts)의 연속 끝에 온 'Finally succeeded'는 단순한 성공이 아니라, <strong className="print:text-black">끈기(Persistence)</strong>가 만들어낸 논리적 귀결입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-purple-700 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-purple-300'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-purple-700 text-white' : 'bg-purple-50 text-purple-900'}`}>
+                          POINT 03. 인과 관계의 확장: 5형식 동사
+                        </div>
+                        <div className="p-4 bg-white">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> drove / enabled / inspired + O + to V</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            호기심과 열정(원인)이 쿠스토를 위대한 탐험가(결과)로 이끌었듯, 그의 일대기가 화자에게 영감(원인)을 주어 확고한 다짐(결과)으로 이어지는 <strong>결론부의 완벽한 인과 구조</strong>를 만듭니다.
+                          </p>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-emerald-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-emerald-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-emerald-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-emerald-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 쿠스토의 논리 구조를<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 (2번: 발명 결심, 3번: 교훈 연결) */}
+                            {idx === 2 ? (
+                              <div className="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full my-1 border border-red-200 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Instead of giving up
+                              </div>
+                            ) : idx === 3 ? (
+                              <div className="bg-purple-100 text-purple-600 text-xs font-bold px-2 py-1 rounded-full my-1 border border-purple-200 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Inspired by the story
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-blue-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 문장이 들어갈 위치로 가장 적절한 곳은?</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          Instead of giving up, Cousteau decided to create his own equipment.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          He became intrigued by the mysteries of the ocean, and he wanted to explore further. ( ① ) However, the diving equipment available at that time was insufficient. ( ② ) After a long series of failed attempts, he finally succeeded in developing a portable breathing device. ( ③ ) Cousteau shared his underwater experiences with the world. ( ④ ) It transformed people's perceptions of the ocean.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②", isCorrect: true },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 주어진 문장의 <strong>'Instead of'</strong>는 앞 문장의 '장비 부족(insufficient)'이라는 문제 상황에 대한 대안을 제시합니다. 따라서 장비가 부족했다는 내용 뒤, 마침내 발명에 성공했다는 결과 앞에 위치하는 <strong>②번</strong>이 가장 적절합니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Jacques Cousteau's story illustrates that his <span className="font-bold text-blue-800">( A )</span> in the face of physical limitations and inadequate equipment eventually led to groundbreaking <span className="font-bold text-blue-800">( B )</span> in ocean exploration.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) curiosity —— (B) restriction" },
+                          { id: 2, text: "(A) persistence —— (B) innovation", isCorrect: true },
+                          { id: 3, text: "(A) passion —— (B) isolation" },
+                          { id: 4, text: "(A) flexibility —— (B) observation" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">({choice.id})</span> 
+                            {choice.text}
+                            {quiz2Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 본문에 언급된 'passion'이나 'curiosity'도 훌륭한 키워드지만(매력적인 오답), 장비 부족과 신체적 한계 앞에서도 포기하지 않고(Instead of giving up) 실패를 거듭한 맥락을 가장 잘 요약하는 상위 개념은 <strong>'끈기(persistence)'</strong>입니다. 이를 통해 <strong>'혁신(innovation)'</strong>을 이루어낸 것이 이 글을 관통하는 핵심 논리입니다. (본문의 상황을 종합하여 '재진술(Paraphrasing)'하는 전형적인 수능형 요약 문제입니다.)
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

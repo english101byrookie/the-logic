@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Seeing the Extraordinary</title>
+    
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #f0f9ff; background-image: radial-gradient(#bae6fd 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // useRef와 useEffect를 추가로 불러옵니다.
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          { id: 1, text: "Creativity. When you hear this word, what instantly pops into your mind?", trans: "창의성. 이 단어를 들을 때, 무엇이 즉시 마음속에 떠오르나요?" },
+          { id: 2, text: "You may think it is a quality that only artists and writers possess—some special talent you are either born with or without.", trans: "당신은 그것이 예술가와 작가들만이 소유한 자질, 즉 태어날 때부터 가지고 나거나 혹은 없이 태어나는 어떤 특별한 재능이라고 생각할지도 모릅니다." },
+          { id: 3, text: "Many people accept the idea that we can be divided into two groups: those who are creative and those who are not.", trans: "많은 사람들이 우리는 두 그룹, 즉 창의적인 사람들과 그렇지 않은 사람들로 나뉠 수 있다는 생각을 받아들입니다." },
+          { id: 4, text: "This common belief, however, is far from the truth. Everyone has the ability to be creative.", trans: "그러나 이 흔한 믿음은 진실과는 거리가 멉니다. 모든 사람은 창의적일 수 있는 능력을 가지고 있습니다.", isHighlight: true, logicPoint: 1 },
+          { id: 5, text: "Finding creativity inside yourself just takes a little effort.", trans: "자신 안에서 창의성을 찾는 것은 단지 약간의 노력을 필요로 할 뿐입니다." },
+          { id: 6, text: "Some artists, for example, spark their creativity by looking closely at ordinary objects.", trans: "예를 들어, 일부 예술가들은 평범한 물건들을 자세히 관찰함으로써 그들의 창의성을 촉발합니다." },
+          { id: 7, text: "They try to discover the beauty hidden within these common objects and then turn them into works of art.", trans: "그들은 이 흔한 물건들 안에 숨겨진 아름다움을 발견하려고 노력하고, 그런 다음 그것들을 예술 작품으로 바꿉니다.", logic: 'premise' },
+          { id: 8, text: "[Giuseppe Arcimboldo] Look at these two paintings. Believe it or not, they both depict the same person, Holy Roman Emperor Rudolf II.", trans: "[주세페 아르침볼도] 이 두 그림을 보세요. 믿든 안 믿든, 둘 다 같은 인물인 신성 로마 제국 황제 루돌프 2세를 묘사하고 있습니다." },
+          { id: 9, text: "The one on the left might look familiar, as it is a standard style of portrait that you would see in a gallery or an art book.", trans: "왼쪽에 있는 것은 갤러리나 미술책에서 볼 수 있는 표준적인 스타일의 초상화이기 때문에 낯익어 보일 수 있습니다." },
+          { id: 10, text: "However, the one on the right, called Vertumnus, is very unconventional. Created by a 16th-century Italian painter named Giuseppe Arcimboldo, the painting shows striking creativity and originality.", trans: "하지만 베르툼누스라고 불리는 오른쪽에 있는 것은 매우 파격적입니다. 주세페 아르침볼도라는 16세기 이탈리아 화가에 의해 창조된 이 그림은 놀라운 창의성과 독창성을 보여줍니다." },
+          { id: 11, text: "Fruits, flowers, and vegetables are arranged like the pieces of a puzzle to create a human head.", trans: "과일, 꽃, 채소들이 사람의 머리를 만들기 위해 퍼즐 조각들처럼 배열되어 있습니다." },
+          { id: 12, text: "A cherry and a mulberry become the dark eyes, while an apple and a peach act as the pink cheeks.", trans: "사과와 복숭아가 분홍빛 뺨 역할을 하는 반면, 체리와 오디는 어두운 눈이 됩니다." },
+          { id: 13, text: "This painting is representative of the artist’s signature style of “composite portraits.” He used plants, animals, and other objects to create many other portraits like this.", trans: "이 그림은 그 예술가의 특징적인 스타일인 '조합 초상화'의 대표작입니다. 그는 식물, 동물, 그리고 다른 사물들을 사용하여 이와 같은 많은 다른 초상화들을 만들었습니다." },
+          { id: 14, text: "Another good example of Arcimboldo’s unique creativity can be found in The Gardener, one of his “reversible” paintings.", trans: "아르침볼도의 독특한 창의성의 또 다른 좋은 예는 그의 '뒤집을 수 있는' 그림 중 하나인 정원사에서 찾을 수 있습니다." },
+          { id: 15, text: "When viewed normally, it is just an ordinary still life of vegetables in a bowl. However, when flipped upside down, it is magically transformed into a smiling face!", trans: "보통으로 볼 때, 그것은 단지 그릇에 담긴 채소들의 평범한 정물화일 뿐입니다. 하지만 거꾸로 뒤집으면, 그것은 마법처럼 웃는 얼굴로 변신합니다!" },
+          { id: 16, text: "Experts have studied this painting, along with Arcimboldo’s other reversible ones. Their research showed that he first painted them as still life paintings and then turned them upside down and made some adjustments to create faces.", trans: "전문가들은 아르침볼도의 다른 뒤집을 수 있는 그림들과 함께 이 그림을 연구했습니다. 그들의 연구는 그가 먼저 그것들을 정물화로 그린 다음, 그것들을 거꾸로 뒤집고 얼굴을 만들기 위해 약간의 조정을 했다는 것을 보여주었습니다." },
+          { id: 17, text: "X-ray examination revealed that he sometimes changed the positions of some of the fruits and vegetables. Why did he make his paintings reversible? It was probably because he wanted to add an interactive element to his work by doing so. Viewers feel as if they are playing a visual game, which brings them a sense of pleasure.", trans: "X선 검사는 그가 때때로 일부 과일과 채소의 위치를 변경했다는 것을 밝혀냈습니다. 그는 왜 자신의 그림을 뒤집을 수 있게 만들었을까요? 아마도 그렇게 함으로써 자신의 작품에 상호작용적인 요소를 더하고 싶었기 때문일 것입니다. 관객들은 마치 시각적인 게임을 하는 것처럼 느끼며, 이는 그들에게 즐거움을 가져다줍니다." },
+          { id: 18, text: "Each of Arcimboldo’s works is a careful study of everyday objects. When he looked at typical objects, such as a bowl of vegetables, he saw the artistic and imaginative potential in them.", trans: "아르침볼도의 각 작품은 일상적인 사물들에 대한 세심한 연구입니다. 채소가 담긴 그릇과 같은 전형적인 사물들을 보았을 때, 그는 그것들 안에서 예술적이고 상상력 넘치는 잠재력을 보았습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 19, text: "His innovative approach to art inspired many great artists who came after him, including Pablo Picasso, Salvador Dalí, and René Magritte.", trans: "예술에 대한 그의 혁신적인 접근법은 파블로 피카소, 살바도르 달리, 르네 마그리트를 포함하여 그의 뒤를 이은 많은 위대한 예술가들에게 영감을 주었습니다.", logic: 'example1' },
+          { id: 20, text: "[Helga Stentzel] Take a look at this picture. Do you see a horse standing in a field? Or is it simply a collection of clothes hanging on a clothesline?", trans: "[헬가 스텐첼] 이 사진을 한번 보세요. 들판에 서 있는 말이 보이나요? 아니면 그것은 단순히 빨랫줄에 걸려 있는 옷들의 모음일 뿐인가요?" },
+          { id: 21, text: "This witty and amusing creation is actually a work of art created by the visual artist Helga Stentzel. Using everyday items, she creates playful visual illusions that force you to look twice in order to confirm what you have just seen.", trans: "이 재치 있고 재미있는 창작물은 사실 시각 예술가 헬가 스텐첼에 의해 창조된 예술 작품입니다. 일상 용품을 사용하여, 그녀는 방금 본 것을 확인하기 위해 두 번 보게 만드는 장난스러운 시각적 착각을 만들어냅니다." },
+          { id: 22, text: "Her unique style has been called “household surrealism.”", trans: "그녀의 독특한 스타일은 '가정용 초현실주의'라고 불려 왔습니다." },
+          { id: 23, text: "Stentzel is perhaps best known for her Clothesline Animals series. She got inspiration for the series while she was hanging her laundry.", trans: "스텐첼은 아마도 그녀의 '빨랫줄 동물들' 시리즈로 가장 잘 알려져 있을 것입니다. 그녀는 빨래를 널다가 그 시리즈에 대한 영감을 얻었습니다." },
+          { id: 24, text: "By simply adding some colorful clothespins and a dish towel, she was able to transform her black sweatshirt and dark grey pants into a horse.", trans: "단순히 다채로운 빨래집게들과 행주를 더함으로써, 그녀는 자신의 검은색 스웨트셔츠와 짙은 회색 바지를 말로 변형시킬 수 있었습니다." },
+          { id: 25, text: "Other creations followed, including a brown cow standing on some hills and a zebra crossing the desert. All of these works were created from nothing more than laundry and household items.", trans: "언덕 위에 서 있는 갈색 소와 사막을 건너는 얼룩말을 포함하여 다른 창작물들이 뒤따랐습니다. 이 모든 작품들은 오직 빨래와 가정용품만으로 만들어졌습니다." },
+          { id: 26, text: "Another series that highlights Stentzel’s astonishing creativity is Edible Creatures. For this series, she arranges food items you can find in any kitchen to create cute animals. The stars of the series are Brad Pet and Crunchie, a pair of puppies made of sliced bread and lettuce respectively.", trans: "스텐첼의 놀라운 창의성을 돋보이게 하는 또 다른 시리즈는 '먹을 수 있는 생물들'입니다. 이 시리즈를 위해, 그녀는 귀여운 동물들을 만들기 위해 어느 부엌에서나 찾을 수 있는 식품들을 배열합니다. 이 시리즈의 스타들은 얇게 썬 빵과 양상추로 각각 만들어진 강아지 한 쌍인 브래드 펫과 크런치입니다." },
+          { id: 27, text: "What do you think her secret is? Stentzel says that it is her active observation skills that allow her to make magic out of the ordinary.", trans: "당신은 그녀의 비결이 무엇이라고 생각하나요? 스텐첼은 평범함 속에서 마법을 만들어낼 수 있게 하는 것은 바로 자신의 적극적인 관찰력이라고 말합니다.", isHighlight: true, logicPoint: 3 },
+          { id: 28, text: "As a child, she would spend time staring at the patterns in the wood of her bed, trying to find different animal shapes. She admits that even today she stares at things longer than is acceptable in society. This keen observation is what enables her to continuously produce creative and imaginative works of art.", trans: "어렸을 때, 그녀는 침대 나무의 무늬들을 응시하며 다양한 동물 모양을 찾으려고 시간을 보내곤 했습니다. 그녀는 오늘날까지도 사회에서 용인되는 것보다 더 오래 사물들을 응시한다고 인정합니다. 이 예리한 관찰력이 그녀가 창의적이고 상상력 넘치는 예술 작품을 지속적으로 생산할 수 있게 해주는 것입니다.", logic: 'example2' },
+          { id: 29, text: "Creativity is not some kind of exceptional skill that belongs to exclusive groups of people.", trans: "창의성은 배타적인 사람들의 그룹에 속하는 어떤 종류의 예외적인 기술이 아닙니다." },
+          { id: 30, text: "It is actually a part of our daily lives, a power that we can display anytime we choose to. Whether we realize it or not, we are constantly using our creativity to adapt, adjust, and rearrange the things around us.", trans: "그것은 사실 우리 일상생활의 일부이며, 우리가 선택할 때마다 언제든지 발휘할 수 있는 힘입니다. 우리가 그것을 깨닫든 못 하든, 우리는 우리 주변의 것들을 적응시키고, 조정하고, 재배열하기 위해 끊임없이 우리의 창의성을 사용하고 있습니다." },
+          { id: 31, text: "By doing so, we are turning the ordinary into something extraordinary—something that has never been seen before.", trans: "그렇게 함으로써, 우리는 평범한 것을 이전에 결코 본 적 없는 비범한 것으로 바꾸고 있습니다.", isHighlight: true, logicPoint: 4 },
+          { id: 32, text: "Take a look at the things around you, but don’t just give them a quick glance. Look carefully, and you might discover something that sparks your own imagination and creativity.", trans: "주변의 것들을 한번 살펴보세요, 하지만 그저 힐끗 보지만은 마세요. 주의 깊게 본다면, 당신만의 상상력과 창의성을 촉발하는 무언가를 발견할지도 모릅니다.", logic: 'conclusion' }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "THE PREMISE", desc: "Creativity is for everyone, found in the ordinary", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-lightbulb-filament text-xl mb-2"></i> },
+          { point: 2, title: "EXAMPLE 1", desc: "Arcimboldo: Composite & Reversible Art", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-palette text-xl mb-2"></i> },
+          { point: 3, title: "EXAMPLE 2", desc: "Helga Stentzel: Household Surrealism via Observation", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-camera text-xl mb-2"></i> },
+          { point: 4, title: "CONCLUSION", desc: "Look closely to spark your own creativity", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-eye text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          // 각 지문 문장의 DOM 요소를 참조하기 위한 ref 객체 생성
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          // Logic Map 클릭 핸들러
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          // activeTab이 'text'로 바뀌고 activeLogic이 설정되었을 때 자동 스크롤 실행
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      // 탭 전환 렌더링이 완료될 시간을 주기 위해 setTimeout 사용
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+          
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-800">
+                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-blue-800"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-blue-600 font-bold mb-6 text-sm">Seeing the Extraordinary in the Ordinary</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-cyan-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-cyan-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Seeing the Extraordinary</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">in the Ordinary</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Seeing the Extraordinary</h1>
+                            <p className="text-cyan-300 text-xs">in the Ordinary</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-blue-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The Premise (모두가 가진 창의성)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 7).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Example 1: Arcimboldo (조합 초상화와 뒤집을 수 있는 그림)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(7, 19).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Example 2: Helga Stentzel (적극적 관찰을 통한 가정용 초현실주의)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(19, 28).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (일상 속 평범함을 비범함으로)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(28, 32).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-blue-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 명사절을 이끄는 관계대명사 What
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[01] ... <span className="font-bold text-blue-600">what</span> instantly pops into your mind?"</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                문장에서 주어, 목적어, 보어 역할을 하는 명사절을 이끄는 <strong className="text-blue-800 print:text-black">관계대명사 what(~하는 것)</strong>입니다. 선행사를 자체적으로 포함하고 있으며, 뒤에 주어나 목적어가 빠진 불완전한 문장이 이어집니다. (이 글에서는 21번, 27번, 28번 문장 등에서도 핵심 문법으로 반복 등장합니다.)
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 동사 + 목적어 + to-v (5형식)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[27] ... that <span className="font-bold text-blue-600">allow her to make</span> magic out of the ordinary."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                동사 allow, enable, force 등은 목적격 보어 자리에 <strong className="text-blue-800 print:text-black">to부정사</strong>를 취하는 대표적인 5형식 동사들입니다. 목적어(her)가 특정 행동(to make)을 하도록 허락하거나 가능하게 한다는 능동적인 인과관계를 나타냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* 수정된 문법 해설 부분 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 과거의 습관을 나타내는 조동사 Would
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[28] As a child, she <span className="font-bold text-cyan-600">would</span> spend time staring at the patterns..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                여기서 조동사 <strong className="text-cyan-800 print:text-black">would</strong>는 "~하곤 했다"라는 과거에 반복되었던 동작이나 습관을 나타냅니다. 헬가 스텐첼이 어린 시절 관찰력을 기르기 위해 자주 했던 행동을 묘사하고 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 양보/부사절 접속사 Whether
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[30] <span className="font-bold text-cyan-600">Whether</span> we realize it <span className="font-bold text-cyan-600">or not</span>, we are constantly using our creativity..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                「whether A or B (or not)」 구조로, 명사절이 아닌 <strong className="text-cyan-800 print:text-black">부사절</strong>로 쓰였습니다. "우리가 그것을 깨닫든 못 하든 간에"라는 의미로 주절의 내용에 영향을 미치지 않는 양보의 의미를 더합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-blue-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-blue-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {idx === 0 && <div className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-red-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">For example</div>}
+                                                    {idx === 1 && <div className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-blue-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Another example</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Ultimately</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-blue-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "창의성은 타고난 소수 예술가들만의 특별한 재능이 아니라 누구나 가진 능력이다." },
+                                                { id: 2, text: "아르침볼도는 정물화를 먼저 그린 뒤 그림을 뒤집어 얼굴을 만드는 조정을 거쳤다." },
+                                                { id: 3, text: "헬가 스텐첼은 빨래를 널다가 영감을 받아 빨랫줄 동물들 시리즈를 만들었다." },
+                                                { id: 4, text: "아르침볼도의 혁신적인 예술 접근법은 너무 파격적이어서 후대 예술가들에게 영감을 주지 못했다.", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 19번 문장에서 아르침볼도의 혁신적인 예술 접근법은 피카소나 살바도르 달리 등 후대의 많은 위대한 예술가들에게 <strong>영감을 주었다(inspired)</strong>고 명확히 서술하고 있으므로 4번은 본문의 내용과 일치하지 않습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문맥상 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 밑줄 친 (A), (B), (C) 중 문맥상 알맞은 낱말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                The one on the left might look <strong>(A) [ familiar / strange ]</strong>, as it is a standard style of portrait... However, when flipped upside down, it is <strong>(B) [ magically / barely ]</strong> transformed into a smiling face! ... Creativity is not some kind of <strong>(C) [ exceptional / common ]</strong> skill that belongs to exclusive groups of people.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) familiar — (B) magically — (C) exceptional", isCorrect: true },
+                                                { id: 2, text: "(A) familiar — (B) barely — (C) common" },
+                                                { id: 3, text: "(A) strange — (B) magically — (C) exceptional" },
+                                                { id: 4, text: "(A) strange — (B) barely — (C) common" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> (A) 갤러리에서 볼 수 있는 표준적인 스타일이므로 '친숙해(familiar)' 보일 것입니다. (B) 평범한 정물화가 뒤집혔을 때 웃는 얼굴로 '마법처럼(magically)' 변신합니다. (C) 글의 주제에 따르면 창의성은 배타적 그룹에 속하는 '예외적인(exceptional)' 기술이 아닙니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 글의 제목 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 제목으로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "The History of 16th-Century Italian Art" },
+                                                { id: 2, text: "How to Become a Professional Painter" },
+                                                { id: 3, text: "Uncovering Creativity: Seeing the Extraordinary in Everyday Objects", isCorrect: true },
+                                                { id: 4, text: "Why Artists Prefer Nature to Household Items" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 창의성은 소수만의 재능이 아니라 일상 속 평범한 대상(everyday objects)을 자세히 관찰함으로써 비범함(extraordinary)을 발견하는 누구나 가진 능력이라는 것이 글의 핵심 주제이므로 3번이 정답입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
