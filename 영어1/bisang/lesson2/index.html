@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC — 영어I 비상 Lesson 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        :root { --bg:#f8f7f4; --surface:#ffffff; --navy:#1a2b4a; --gold:#b8862a; --accent:#b54a3a; --muted:#6b7280; --border:#e5e2db; --faint:#f3f1ec; }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; overflow-x:hidden; }
+        #progress { position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); z-index:100; }
+        .page { max-width:860px; margin:0 auto; padding:0 28px; }
+        .topbar { padding:24px 0 20px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+        .bc-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--muted); text-decoration:none; text-transform:uppercase; transition:color .2s; }
+        .bc-link:hover { color:var(--navy); }
+        .bc-sep { color:var(--border); font-size:11px; margin:0 2px; }
+        .bc-current { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--accent); text-transform:uppercase; }
+        .brand-link { font-family:'Playfair Display',serif; font-size:16px; font-weight:900; letter-spacing:.08em; color:var(--navy); text-decoration:none; margin-right:2px; }
+        .header { padding:46px 0 0; }
+        .header-eyebrow { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; color:var(--accent); text-transform:uppercase; margin-bottom:12px; }
+        .header h1 { font-family:'Playfair Display',serif; font-size:clamp(28px,5vw,50px); font-weight:900; line-height:1.05; letter-spacing:-.02em; color:var(--navy); }
+        .header h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+        .header-quote { margin-top:10px; font-family:'Playfair Display',serif; font-style:italic; font-size:13px; color:var(--muted); }
+        .theme-strip { margin-top:24px; padding:14px 18px; border-radius:12px; background:var(--surface); border:1px solid var(--border); display:flex; gap:28px; flex-wrap:wrap; }
+        .theme-item { display:flex; flex-direction:column; gap:3px; }
+        .theme-label { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; }
+        .theme-value { font-size:12px; font-weight:500; color:var(--navy); }
+        .section { padding:40px 0 20px; }
+        .section-header { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
+        .section-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+        .section-line { flex:1; height:1px; background:var(--border); }
+        .lesson-card { display:flex; align-items:stretch; text-decoration:none; border:1px solid var(--border); border-radius:11px; overflow:hidden; margin-bottom:5px; background:var(--surface); transition:all .2s ease; }
+        .lesson-card:hover { border-color:var(--accent); transform:translateX(4px); box-shadow:0 8px 24px rgba(0,0,0,.06); }
+        .lesson-card:hover .lc-arrow { color:var(--navy); transform:translateX(3px); }
+        .lc-accent { width:4px; flex-shrink:0; background:var(--accent); }
+        .lc-body { flex:1; padding:18px 20px; }
+        .lc-tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.14em; text-transform:uppercase; padding:2px 7px; border-radius:3px; margin-bottom:6px; display:inline-block; border:1px solid; background:#fdf0ee; color:var(--accent); border-color:var(--accent); opacity:.8; }
+        .lc-title { font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--navy); margin-bottom:2px; line-height:1.2; }
+        .lc-desc { font-size:11px; font-weight:300; color:var(--muted); line-height:1.5; }
+        .lc-right { display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; padding:18px 14px 18px 0; min-width:54px; }
+        .lc-parts { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-align:right; }
+        .lc-arrow { font-size:14px; color:#ccc; transition:all .2s ease; }
+        footer { padding:28px 0 44px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .footer-brand { font-family:'Playfair Display',serif; font-size:13px; color:#bbb; }
+        .footer-note { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.12em; color:#ccc; text-transform:uppercase; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        .fi { animation:fadeUp .36s ease forwards; opacity:0; }
+        .fi:nth-child(1){animation-delay:.05s}.fi:nth-child(2){animation-delay:.10s}
+    </style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="page">
+    <nav class="topbar">
+        <a href="../../../index.html" class="brand-link">THE LOGIC</a>
+        <span class="bc-sep">/</span>
+        <a href="../../index.html" class="bc-link">영어 I</a>
+        <span class="bc-sep">/</span>
+        <a href="../index.html" class="bc-link">비상(홍민표)</a>
+        <span class="bc-sep">/</span>
+        <span class="bc-current">Lesson 2</span>
+    </nav>
+    <header class="header fi">
+        <div class="header-eyebrow">영어 I · 비상(홍민표) · Lesson 2</div>
+        <h1>Pieced <em>Together</em></h1>
+        <p class="header-quote">"필요와 욕구가 만들어내는 새로운 예술"</p>
+        <div class="theme-strip">
+            <div class="theme-item"><div class="theme-label">핵심 논리</div><div class="theme-value">Need/Desire → Cases → Conclusion</div></div>
+            <div class="theme-item"><div class="theme-label">주요 구문</div><div class="theme-value">분사구문 · 관계사 · since · as</div></div>
+            <div class="theme-item"><div class="theme-label">강의 수</div><div class="theme-value">1강 (PART 1–4)</div></div>
+        </div>
+    </header>
+    <section class="section">
+        <div class="section-header"><span class="section-title">강의 목록</span><div class="section-line"></div></div>
+        <a href="2.html" class="lesson-card fi">
+            <div class="lc-accent"></div>
+            <div class="lc-body">
+                <span class="lc-tag">Lesson 2 · 전문</span>
+                <div class="lc-title">Pieced Together</div>
+                <div class="lc-desc">퀼트 · 스테인드글라스 · 구슬공예 — 필요와 욕구가 만든 예술 / PART 1–4 전체 수록</div>
+            </div>
+            <div class="lc-right"><div class="lc-parts">PART 1–4</div><div class="lc-arrow">→</div></div>
+        </a>
+    </section>
+    <footer>
+        <div class="footer-brand">THE LOGIC</div>
+        <div class="footer-note">영어 I · 비상 · Lesson 2 · Pieced Together</div>
+    </footer>
+</div>
+<script>window.addEventListener('scroll',()=>{const e=document.getElementById('progress'),t=document.body.scrollHeight-window.innerHeight;e.style.width=(t>0?window.scrollY/t*100:0)+'%'});</script>
+</body>
+</html>

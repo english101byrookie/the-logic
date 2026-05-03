@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Odd Pairings Part 2</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: The Dessert (1~2)
+          { id: 1, text: "A very popular dessert in Thailand is sweet, sticky rice topped with fresh mango and coconut milk.", trans: "태국에서 매우 인기 있는 디저트는 신선한 망고와 코코넛 밀크를 얹은 달콤한 찰밥입니다.", logic: 'dessert' },
+          { id: 2, text: "Mango with sticky rice is a dish that is extremely hard not to love.", trans: "망고 찰밥은 사랑하지 않기가 극히 어려운 요리입니다." },
+
+          // Part 2: The Ingredients (3~5)
+          { id: 3, text: "Rice is one of the world’s most consumed grains, so it should not be surprising that it can be combined with other interesting ingredients.", trans: "쌀은 세계에서 가장 많이 소비되는 곡물 중 하나이므로, 그것이 다른 흥미로운 재료들과 결합될 수 있다는 것은 놀라운 일이 아닙니다.", isHighlight: true, logicPoint: 1, logic: 'ingredients' },
+          { id: 4, text: "One of those ingredients is fruit, which is nutritious, sweet, and plentiful in many parts of the world.", trans: "그 재료들 중 하나가 과일인데, 과일은 영양가가 높고, 달콤하며, 세계의 많은 지역에서 풍부합니다." },
+          { id: 5, text: "The combination of fruit and rice may seem unusual, but it’s actually quite common.", trans: "과일과 쌀의 조합은 특이해 보일 수 있지만, 실제로는 꽤 흔합니다.", isHighlight: true, logicPoint: 2 },
+
+          // Part 3: The Origin (6~8)
+          { id: 6, text: "According to the Tourism Authority of Thailand, neither mango nor sticky rice is native to Thailand.", trans: "태국 관광청에 따르면 망고와 찰밥 모두 태국이 원산지가 아닙니다.", isHighlight: true, logicPoint: 3, logic: 'origin' },
+          { id: 7, text: "Mangoes are native to Myanmar and India, and sticky rice is commonly eaten in Laos, which shares a border with Thailand.", trans: "망고는 미얀마와 인도가 원산지이며, 찰밥은 태국과 국경을 맞대고 있는 라오스에서 흔히 먹습니다." },
+          { id: 8, text: "This suggests that the roots of the dish are probably a result of the mixing of cultures in Southeast Asia.", trans: "이것은 이 요리의 뿌리가 아마도 동남아시아 문화가 섞인 결과임을 시사합니다.", isHighlight: true, logicPoint: 4 },
+
+          // Part 4: The Innovation (9)
+          { id: 9, text: "Rice is usually thought of as a food that is eaten as a meal, but its use as a dessert shows how simple ingredients can create innovative, wonderful treats.", trans: "쌀은 보통 식사로 먹는 음식으로 여겨지지만, 디저트로의 사용은 단순한 재료들이 어떻게 혁신적이고 훌륭한 간식을 만들 수 있는지를 보여줍니다.", isHighlight: true, logicPoint: 5, logic: 'innovation' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'dessert', title: "THE DESSERT (인기 디저트)", desc: "Mango with sticky rice", color: "bg-yellow-100 border-yellow-400 text-yellow-800", icon: <i className="ph-fill ph-bowl-food text-xl mb-2"></i> },
+          { id: 'ingredients', title: "THE INGREDIENTS (재료의 결합)", desc: "Rice (grain) + Fruit (sweet)", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-leaf text-xl mb-2"></i> },
+          { id: 'origin', title: "THE ROOTS (요리의 뿌리)", desc: "Mixing of Southeast Asian cultures", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> },
+          { id: 'innovation', title: "THE INNOVATION (혁신)", desc: "Rice transformed into a sweet treat", color: "bg-amber-100 border-amber-400 text-amber-800", icon: <i className="ph-fill ph-sparkle text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-yellow-500 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-yellow-700 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Odd Pairings That Work</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 2: Mango with Sticky Rice</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-yellow-50 text-yellow-800 border-yellow-500' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-amber-50 text-amber-800 border-amber-500' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-yellow-700 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: 소개 */}
+                      <div>
+                        <div className="inline-block bg-yellow-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Dessert (망고와 찰밥의 만남)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 2).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-yellow-50 border border-yellow-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-yellow-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-yellow-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 재료의 결합 */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-orange-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Ingredients (곡물과 과일의 흔한 조합)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(2, 5).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-yellow-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 문화적 융합 */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-red-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Origin (문화적 융합의 결과)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(5, 8).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-yellow-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: 혁신 */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-amber-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Innovation (평범함에서 탄생한 혁신)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(8, 9).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-amber-50 border border-amber-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-yellow-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-amber-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-yellow-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-yellow-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-yellow-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-yellow-600 text-white' : 'bg-yellow-50 text-yellow-800'}`}>
+                          POINT 01. 가주어-진주어: it should not be surprising that
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [it] should not be surprising [that] it can be combined...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            쌀이 세계에서 가장 많이 소비되는 곡물이기 때문에(원인), 다른 재료와 결합되는 것(진주어)이 전혀 놀랍지 않다(결과)며 과일+쌀 조합의 <strong>당위성</strong>을 설명합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-orange-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-orange-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-orange-600 text-white' : 'bg-orange-50 text-orange-800'}`}>
+                          POINT 02. 통념의 반박: may seem ~ but actually
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [may seem] unusual, [but] it’s [actually] quite common.</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~처럼 보일지 모르지만(통념), 실제로는 ~하다(진실)"라는 구조입니다. 쌀과 과일의 조합이 우리에겐 어색해 보일 수 있지만, 사실은 아주 흔하고 자연스러운 조합이라는 <strong>시각의 확장</strong>을 유도합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-red-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-red-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-red-600 text-white' : 'bg-red-50 text-red-800'}`}>
+                          POINT 03. 양자 부정: neither A nor B
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [neither] mango [nor] sticky rice is native to Thailand.</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "A도 아니고 B도 아니다"라는 뜻입니다. 태국의 대표 요리임에도 불구하고 핵심 재료 두 가지 모두 태국 원산지가 아니라는 <strong>아이러니한 기원</strong>을 흥미롭게 제시합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 & 5 */}
+                      <button 
+                        onClick={() => handleLogicClick(5)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 5 ? 'border-amber-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-amber-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 5 ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-800'}`}>
+                          POINT 04. 대조와 감탄의 간접의문문: how
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> usually thought of as a meal, [but] its use as a dessert shows [how] simple ingredients can create...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            주식(meal)과 디저트(dessert)를 대조(but)시키고, 뒤이어 의문사(how)가 이끄는 명사절을 통해 단순한 식재료의 결합이 만들어내는 <strong>경이로운 혁신</strong>을 요약합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-yellow-800 hover:bg-yellow-700 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-amber-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-amber-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-amber-100 hover:bg-amber-200 text-amber-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-amber-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-amber-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 망고 찰밥의 문화적 배경을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-yellow-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Made with
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Resulting from
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-red-100 text-red-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-red-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Showcasing
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-amber-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 내용 불일치 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">망고 찰밥에 대한 윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "신선한 망고와 코코넛 밀크를 얹어 만드는 태국의 인기 디저트이다." },
+                          { id: 2, text: "가장 널리 소비되는 곡물인 쌀과 세계적으로 흔한 과일이 결합되었다." },
+                          { id: 3, text: "망고는 미얀마와 인도에서 유래되었고 찰밥은 라오스에서 주로 먹는다." },
+                          { id: 4, text: "동남아시아 고유의 전통문화가 외부의 영향 없이 보존된 결과물이다.", isCorrect: true }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-yellow-400 hover:bg-yellow-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 4 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 4 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 본문 8번 문장에서 이 요리의 뿌리가 "아마도 동남아시아 문화가 섞인 결과(<strong>the mixing of cultures</strong> in Southeast Asia)"라고 시사하고 있으므로, 외부 영향 없이 보존된 결과물이라는 4번은 본문과 명백히 다릅니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          This suggests that the roots of the dish are probably a result of the mixing of cultures in Southeast Asia.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          The combination of fruit and rice may seem unusual, but it’s actually quite common. ( ① ) According to the Tourism Authority of Thailand, neither mango nor sticky rice is native to Thailand. ( ② ) Mangoes are native to Myanmar and India, and sticky rice is commonly eaten in Laos, which shares a border with Thailand. ( ③ ) Rice is usually thought of as a food that is eaten as a meal, but its use as a dessert shows how simple ingredients can create innovative, wonderful treats. ( ④ ) 
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②" },
+                          { id: 3, text: "③", isCorrect: true },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-yellow-400 hover:bg-yellow-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 주어진 문장의 <strong>'This(이것)'</strong>가 가리키는 대상을 찾아야 합니다. '이것'은 망고는 미얀마/인도 원산이고 찰밥은 라오스에서 주로 먹는다는 지리적 배경(앞 문장)을 가리킵니다. 이러한 사실들이 모여 이 요리가 동남아시아 '문화 융합(mixing of cultures)'의 결과임을 시사하므로 <strong>③번</strong> 자리가 논리적으로 완벽합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Mango with sticky rice is a popular Thai dessert that not only showcases the <span className="font-bold text-yellow-800">( A )</span> of diverse cultures but also demonstrates how a staple food can be transformed into an <span className="font-bold text-yellow-800">( B )</span> sweet treat.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) isolation —— (B) ordinary" },
+                          { id: 2, text: "(A) blending —— (B) innovative", isCorrect: true },
+                          { id: 3, text: "(A) blending —— (B) traditional" },
+                          { id: 4, text: "(A) destruction —— (B) innovative" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-yellow-400 hover:bg-yellow-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz3Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 망고 찰밥은 미얀마, 인도, 라오스 등 동남아시아 문화의 <strong>융합/혼합(mixing $\rightarrow$ blending)</strong>을 보여주는 동시에, 식사로 먹는 주식(쌀)이 어떻게 달콤하고 <strong>혁신적인(innovative)</strong> 간식으로 변신할 수 있는지를 증명합니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
