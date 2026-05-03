@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - AI: Opportunity or Threat?</title>
+    
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: The Controversy
+          { id: 1, text: "Recently, an artist used an artificial intelligence (AI) system to create the image above for an art contest.", trans: "최근 한 예술가가 미술 대회를 위해 위 이미지를 만들기 위해 인공지능(AI) 시스템을 사용했다." },
+          { id: 2, text: "The image won first place in the digital arts category.", trans: "그 이미지는 디지털 아트 부문에서 1위를 차지했다." },
+          { id: 3, text: "This led to a controversy in the art community.", trans: "이것은 미술계에 논란을 일으켰다." },
+          { id: 4, text: "Some people complained that the artist simply provided the system with basic instructions and let it do all the work.", trans: "어떤 사람들은 그 예술가가 단지 시스템에 기본 지시 사항만 제공하고 시스템이 모든 작업을 하도록 내버려 두었다고 불평했다.", isHighlight: true, logicPoint: 1 },
+          { id: 5, text: "They felt this wasn’t fair to the rest of the artists in the contest.", trans: "그들은 이것이 대회의 나머지 예술가들에게 공정하지 않다고 느꼈다." },
+          { id: 6, text: "However, there were also people who were excited by the potential of AI.", trans: "하지만, AI의 잠재력에 흥분하는 사람들도 있었다." },
+          { id: 7, text: "Today, there are numerous AI programs that can create various forms of art including images, songs, and novels.", trans: "오늘날, 이미지, 노래, 소설을 포함한 다양한 형태의 예술을 창조할 수 있는 수많은 AI 프로그램들이 있다." },
+
+          // Part 2: Example 1 - Images
+          { id: 8, text: <span><span className="font-bold text-emerald-800 mr-2">Example 1</span> Making Digital Images with AI</span>, trans: "예시 1: AI로 디지털 이미지 만들기" },
+          { id: 9, text: "AI image generators create images based on our text requests.", trans: "AI 이미지 생성기는 우리의 텍스트 요청에 기반하여 이미지를 생성한다." },
+          { id: 10, text: "They do this by copying other images that were created by humans.", trans: "그들은 인간에 의해 창조된 다른 이미지들을 복사함으로써 이를 수행한다." },
+          { id: 11, text: "The generators have the ability to analyze millions of images and their corresponding descriptions.", trans: "생성기들은 수백만 개의 이미지와 그에 해당하는 설명들을 분석하는 능력을 가지고 있다." },
+          { id: 12, text: "This allows them to create works of art in a short time based on the provided instructions.", trans: "이것은 제공된 지시 사항에 기반하여 단시간 내에 예술 작품을 창조할 수 있게 해준다." },
+          { id: 13, text: "Moreover, AI programs can mix the styles of existing images upon request.", trans: "더욱이, AI 프로그램들은 요청 시 기존 이미지들의 스타일을 혼합할 수 있다." },
+          { id: 14, text: <span>For example, you can blend a photograph of a cat with Johannes Vermeer’s <span className="italic font-medium">Girl with a Pearl Earring</span>.</span>, trans: "예를 들어, 고양이 사진을 요하네스 베르메르의 '진주 귀걸이를 한 소녀'와 혼합할 수 있다." },
+          { id: 15, text: "These two images have a few differences.", trans: "이 두 이미지는 약간의 차이가 있다." },
+          { id: 16, text: "However, the overall design, the eyes, and the scarf around the head are clearly based on Vermeer’s painting.", trans: "하지만, 전반적인 디자인, 눈, 그리고 머리 주위의 스카프는 분명히 베르메르의 그림을 바탕으로 하고 있다.", isHighlight: true, logicPoint: 2 },
+          { id: 17, text: "A simple request was enough to create this complex and detailed image.", trans: "단순한 요청만으로 이 복잡하고 상세한 이미지를 만들어 내기에 충분했다." },
+
+          // Part 3: Example 2 - Music
+          { id: 18, text: <span><span className="font-bold text-emerald-800 mr-2">Example 2</span> Making Music with AI</span>, trans: "예시 2: AI로 음악 만들기" },
+          { id: 19, text: "AI programs may lead to changes not only in the art world but also in the music industry.", trans: "AI 프로그램들은 미술계뿐만 아니라 음악 산업에서도 변화를 이끌 수 있다." },
+          { id: 20, text: "These programs are already able to compose songs, and they give you many options.", trans: "이 프로그램들은 이미 곡을 작곡할 수 있으며, 많은 선택지를 제공한다." },
+          { id: 21, text: "For example, you can choose the style and key, such as C major or A minor.", trans: "예를 들어, C 장조나 A 단조 같은 스타일과 조(key)를 선택할 수 있다." },
+          { id: 22, text: "You can also set how long the song will be.", trans: "노래의 길이도 설정할 수 있다." },
+          { id: 23, text: "Once you’ve entered the information, the program will produce a song that you can edit or use as it is.", trans: "정보를 입력하고 나면, 프로그램은 수정하거나 그대로 사용할 수 있는 노래를 생성할 것이다." },
+          { id: 24, text: <span>Furthermore, <span className="italic font-medium">computer-generated imagery</span> (commonly known as <span className="italic font-bold text-emerald-800">CGI</span>) has opened up new possibilities in the music industry.</span>, trans: "게다가, 흔히 CGI로 알려진 컴퓨터 생성 이미지는 음악 산업에 새로운 가능성을 열어주었다." },
+          { id: 25, text: <span><span className="italic font-medium">Virtual influencers</span> with extremely realistic faces, bodies, and voices have already released several songs.</span>, trans: "매우 사실적인 얼굴, 몸, 목소리를 가진 가상 인플루언서들은 이미 여러 곡을 발표했다.", isHighlight: true, logicPoint: 3 },
+          { id: 26, text: "Some of them have many followers on social media, just like human singers.", trans: "그들 중 일부는 실제 인간 가수처럼 소셜 미디어에 많은 팔로워를 가지고 있다." },
+          { id: 27, text: "These types of virtual musicians are able to speak and move realistically with the help of their human creators.", trans: "이러한 유형의 가상 음악가들은 그들을 창조한 인간의 도움으로 현실감 있게 말하고 움직일 수 있다." },
+
+          // Part 4: The Debate
+          { id: 28, text: <span><span className="font-bold text-emerald-800 mr-2">The Debate</span> on Using AI</span>, trans: "AI 사용에 관한 논쟁" },
+          { id: 29, text: "Many AI programs are open to the public, which means they can be used freely and conveniently.", trans: "많은 AI 프로그램들이 대중에게 개방되어 있으며, 이는 자유롭고 편리하게 사용될 수 있음을 의미한다." },
+          { id: 30, text: "However, these programs have sparked a debate over their impact on humans.", trans: "하지만, 이 프로그램들은 인간에게 미치는 영향에 대한 논쟁을 촉발시켰다." },
+          { id: 31, text: "Since AI has the potential to learn skills and perform them better than humans, some people view it as a threat.", trans: "AI가 기술을 배우고 인간보다 더 잘 수행할 잠재력이 있기 때문에, 어떤 사람들은 그것을 위협으로 본다." },
+          { id: 32, text: "They worry that AI will replace humans in more and more areas.", trans: "그들은 AI가 점점 더 많은 분야에서 인간을 대체할 것이라고 걱정한다." },
+          { id: 33, text: "There are also concerns that AI may imitate the styles of human artists without their consent.", trans: "또한 AI가 인간 예술가들의 동의 없이 그들의 스타일을 모방할지도 모른다는 우려도 있다." },
+          { id: 34, text: "On the other hand, others think that AI cannot exceed human imagination and that it is still dependent on human assistance.", trans: "반면에, 다른 사람들은 AI가 인간의 상상력을 뛰어넘을 수 없으며 여전히 인간의 도움에 의존하고 있다고 생각한다.", isHighlight: true, logicPoint: 4 },
+          { id: 35, text: "This is because the data that AI uses can have flaws or limitations.", trans: "이는 AI가 사용하는 데이터에 결함이나 한계가 있을 수 있기 때문이다." },
+          { id: 36, text: "A dependence on imperfect data with little diversity eventually limits the output of AI programs.", trans: "다양성이 부족한 불완전한 데이터에 대한 의존은 결국 AI 프로그램의 결과물을 제한한다." },
+          { id: 37, text: "Human imagination, on the other hand, has no limits or boundaries.", trans: "반면, 인간의 상상력에는 한계나 경계가 없다." },
+
+          // Part 5: Conclusion
+          { id: 38, text: "What kind of future do you think lies ahead of us?", trans: "우리 앞에 어떤 미래가 놓여 있다고 생각하는가?" },
+          { id: 39, text: "Will more people use AI programs to boost their creativity and productivity?", trans: "더 많은 사람들이 창의성과 생산성을 높이기 위해 AI 프로그램을 사용할 것인가?" },
+          { id: 40, text: "Or will people grow tired of the limitations of AI tools?", trans: "아니면 사람들은 AI 도구의 한계에 싫증을 느낄 것인가?" },
+          { id: 41, text: "AI provides many benefits and new opportunities.", trans: "AI는 많은 이점과 새로운 기회를 제공한다." },
+          { id: 42, text: "What we need to do is figure out how to use AI tools ethically and think about how humans and AI can collaborate.", trans: "우리가 해야 할 일은 AI 도구를 윤리적으로 사용하는 방법을 알아내고 인간과 AI가 어떻게 협력할 수 있을지 고민하는 것이다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { id: 'intro', title: "THE CONTROVERSY (도입)", desc: "AI의 미술 대회 우승과 공정성 논란", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-gavel text-xl mb-2"></i> },
+          { id: 'ex1', title: "EXAMPLE 1 (이미지 생성)", desc: "텍스트 기반 생성 및 기존 스타일의 융합", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-image text-xl mb-2"></i> },
+          { id: 'ex2', title: "EXAMPLE 2 (음악 생성)", desc: "곡 작곡 옵션과 가상 인플루언서의 등장", color: "bg-violet-100 border-violet-400 text-violet-800", icon: <i className="ph-fill ph-music-notes text-xl mb-2"></i> },
+          { id: 'debate', title: "THE DEBATE (쟁점)", desc: "위협(대체/무단 모방) vs 한계(데이터 의존/상상력 부족)", color: "bg-fuchsia-100 border-fuchsia-400 text-fuchsia-800", icon: <i className="ph-fill ph-scales text-xl mb-2"></i> },
+          { id: 'conclusion', title: "CONCLUSION (최종 결론)", desc: "윤리적 사용 및 인간과 AI의 협력 방안 모색", color: "bg-emerald-100 border-emerald-500 text-emerald-900", icon: <i className="ph-fill ph-handshake text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">AI: Opportunity or Threat?</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-emerald-900 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* 사이드바 */}
+                <aside className="hidden md:flex flex-col w-72 bg-emerald-950 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-emerald-900 border-b border-emerald-800">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl"></i>
+                            <span className="text-xs font-bold tracking-wider">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">AI: Opportunity</h1>
+                        <p className="text-emerald-300 text-sm mt-2 italic">or Threat?</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-emerald-800">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* 메인 영역 */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">AI: Opportunity</h1>
+                            <p className="text-emerald-300 text-xs italic">or Threat?</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-emerald-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-500 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-blue-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Controversy (도입 - AI 미술 대회 우승 논란)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 7).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-indigo-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Example 1 (이미지 생성 기술과 활용)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(7, 17).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-violet-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Example 2 (음악 생성 및 가상 인플루언서)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(17, 27).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-violet-50 border border-violet-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-violet-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-fuchsia-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Debate (위협론 vs 한계론)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(27, 37).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-fuchsia-50 border border-fuchsia-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-fuchsia-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 5 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Conclusion (미래의 방향: 윤리와 협력)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(37, 42).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-500 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 사역동사 let + 목적보어(원형)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[04] ... provided the system with basic instructions and <span className="font-bold text-emerald-600">let</span> it <span className="font-bold text-emerald-600">do</span> all the work."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                사역동사 let이 사용되어 목적어(it = the system)가 동작을 하게끔 '내버려 두다, 허락하다'라는 의미를 지닙니다. 따라서 목적격 보어 자리에는 반드시 <strong className="text-emerald-800 print:text-black">동사원형(do)</strong>이 와야 합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 상관접속사 not only A but also B
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[19] ... lead to changes <span className="font-bold text-emerald-600">not only</span> in the art world <span className="font-bold text-emerald-600">but also</span> in the music industry."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-emerald-800 print:text-black">"A뿐만 아니라 B도"</strong>라는 뜻으로, 전치사구 in the art world와 in the music industry가 병렬 구조를 이루고 있습니다. AI의 영향력이 미술계를 넘어 음악계까지 확장됨을 보여줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 과거분사구의 수식 (수동)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[12] ... in a short time based on the <span className="font-bold text-teal-600">provided instructions</span>."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                provide(제공하다)의 과거분사형인 provided가 뒤의 명사 instructions를 수식합니다. 지시 사항들이 사람에 의해 '제공된' 것이므로 수동의 의미를 지니는 <strong className="text-teal-800 print:text-black">과거분사</strong>를 사용했습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 동격의 접속사 that
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[33] There are also concerns <span className="font-bold text-teal-600">that</span> AI may imitate the styles of human artists..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                추상명사 concerns(우려) 뒤에 쓰인 that은 뒷문장이 완전한 형태(주어+동사+목적어)를 취하고 있어, 앞의 명사와 내용이 같음을 설명해 주는 <strong className="text-teal-800 print:text-black">동격의 접속사</strong>입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 의문사 + to부정사 / 간접의문문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[42] ... figure out <span className="font-bold text-cyan-700">how to use</span> AI tools ethically and think about <span className="font-bold text-cyan-700">how humans and AI can collaborate</span>."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                동사구(figure out)와 전치사(about)의 목적어로 각각 두 가지 명사구가 병렬로 왔습니다. 하나는 <strong className="text-cyan-800 print:text-black">[의문사 + to부정사]</strong> 형태인 '어떻게 사용할지'이고, 다른 하나는 <strong className="text-cyan-800 print:text-black">[의문사 + 주어 + 동사]</strong> 어순의 간접의문문인 '인간과 AI가 어떻게 협력할 수 있을지'입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-500 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div onClick={() => handleLogicClick(idx + 1)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === idx + 1 ? 'ring-4 ring-emerald-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-indigo-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Illustrates potential via</div>}
+                                                    {idx === 1 && <div className="bg-violet-100 text-violet-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-violet-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Expands into</div>}
+                                                    {idx === 2 && <div className="bg-fuchsia-100 text-fuchsia-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-fuchsia-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Sparks discussions on</div>}
+                                                    {idx === 3 && <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Calls for</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-500 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않는</span> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "AI는 텍스트 요청에 따라 인간이 만든 기존 이미지를 복사하고 분석하여 새로운 이미지를 생성한다." },
+                                                { id: 2, text: "음악 생성 AI를 사용하면 작곡 시 곡의 스타일, 조(key), 길이 등을 직접 설정할 수 있다." },
+                                                { id: 3, text: "가상 인플루언서들은 창작자의 도움을 받아 소셜 미디어에서 실제 인간 가수처럼 활동하기도 한다." },
+                                                { id: 4, text: "AI 프로그램이 사용하는 데이터는 한계나 경계가 없으므로 인간의 상상력을 쉽게 뛰어넘을 수 있다.", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 35~37번 문장에 따르면, AI가 사용하는 데이터는 결함이나 한계(flaws or limitations)가 있을 수 있으며, 한계나 경계가 없는(no limits or boundaries) 것은 <strong>'인간의 상상력(Human imagination)'</strong>이라고 명시되어 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                However, the overall design, the eyes, and the scarf around the head are clearly based on Vermeer’s painting.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Moreover, AI programs can mix the styles of existing images upon request. ( ① ) For example, you can blend a photograph of a cat with Johannes Vermeer’s <span className="italic">Girl with a Pearl Earring</span>. ( ② ) These two images have a few differences. ( ③ ) A simple request was enough to create this complex and detailed image. ( ④ ) AI programs may lead to changes not only in the art world but also in the music industry.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②" }, { id: 3, text: "③", isCorrect: true }, { id: 4, text: "④" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 고양이 사진과 명화 원작(두 이미지) 사이에는 '약간의 차이'가 있다고 언급한 바로 다음, <strong>However(하지만)</strong>로 역접하며 전반적인 요소들은 여전히 명화에 기반하고 있다고 설명하는 <strong>③번</strong> 자리가 논리적으로 완벽합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                AI offers incredible <span className="font-bold text-emerald-700">( A )</span> in creative fields like art and music, yet addressing ethical concerns and ensuring <span className="font-bold text-emerald-700">( B )</span> with humans is essential for future progress.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) boundaries —— (B) competition" },
+                                                { id: 2, text: "(A) potential —— (B) collaboration", isCorrect: true },
+                                                { id: 3, text: "(A) limitation —— (B) integration" },
+                                                { id: 4, text: "(A) potential —— (B) isolation" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 예술 분야에서 AI가 놀라운 <strong>잠재력(potential)</strong>을 제공하지만, 윤리적 문제를 해결하고 인간과의 <strong>협력(collaboration)</strong>을 보장하는 것이 미래를 위해 필수적이라는 것이 글의 핵심 요약입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않은</span> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                On the other hand, others think that AI cannot ①<span className="underline underline-offset-4 font-bold text-red-600 print:underline print:text-black">restrict</span> human imagination and that it is still dependent on human assistance. This is because the data that AI uses can have ②<span className="underline underline-offset-4 font-bold print:underline">flaws</span> or limitations. A dependence on ③<span className="underline underline-offset-4 font-bold print:underline">imperfect</span> data with little diversity eventually ④<span className="underline underline-offset-4 font-bold print:underline">limits</span> the output of AI programs.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① restrict", isCorrect: true }, 
+                                                { id: 2, text: "② flaws" }, 
+                                                { id: 3, text: "③ imperfect" }, 
+                                                { id: 4, text: "④ limits" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz4Answered(choice.id)} disabled={quiz4Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 1 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ① restrict $\rightarrow$ exceed</strong><br/>AI 한계론자들의 주장이므로, AI가 무한한 인간의 상상력을 '제한할 수 없다'기보다는 인간의 상상력을 <strong>'뛰어넘을(exceed)'</strong> 수 없다고 생각하는 것이 문맥상 알맞습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 요지 파악</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 요지로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "AI가 생성한 예술 작품은 저작권이 없으므로 대중이 무료로 사용해야 한다." },
+                                                { id: 2, text: "데이터의 한계 때문에 AI는 결코 예술이나 음악 분야에서 상업적 성공을 거둘 수 없다." },
+                                                { id: 3, text: "미술 대회에서 AI 도구를 활용하는 것은 다른 참가자들에 대한 명백한 부정행위이다." },
+                                                { id: 4, text: "창작 분야에서 AI의 활용은 불가피하므로 윤리적 기준 마련과 상호 협력이 필요하다.", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz5Answered(choice.id)} disabled={quiz5Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 예술과 음악 분야에서 AI의 발전과 그에 따른 논쟁(위협론과 한계론)을 소개한 뒤, 마지막 단락에서 결론적으로 <strong>AI의 윤리적 사용 방법 모색 및 인간과의 협력 필요성</strong>을 묻고 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black text-center">
+                                                "What we need to do is figure out how to use AI tools <span className="inline-block w-32 border-b-2 border-slate-800 mx-1"></span> and think about collaboration."
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "commercially" },
+                                                { id: 2, text: "ethically", isCorrect: true },
+                                                { id: 3, text: "secretly" },
+                                                { id: 4, text: "independently" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz6Answered(choice.id)} disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문의 마지막 핵심 문장(42번)을 완성하는 문제입니다. 동의 없는 무단 스타일 모방 등의 위협이 존재하는 상황에서, 우리는 AI 도구를 어떻게 <strong>'윤리적으로(ethically)'</strong> 사용할지 알아내야 합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                {/* 모바일 하단 네비게이션 */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
