@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Stocks and Stock Markets</title>
+    
+    <!-- PWA 설정 -->
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+        
+        .speaker-neil { color: #0f766e; font-weight: bold; }
+        .speaker-beth { color: #047857; font-weight: bold; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const textData = [
+          // Part 1: Intro
+          { id: 1, text: "Neil: Welcome to the 10-Minute Economics 101 podcast for teenagers! I’m your host, Neil. Thank you for tuning in.", trans: "닐: 십 대들을 위한 10분 경제학 101 팟캐스트에 오신 것을 환영합니다! 저는 진행자 닐입니다. 채널을 맞춰주셔서 감사합니다." },
+          { id: 2, text: "We have a very special guest with us, the renowned economist Beth Friedman. Please give her a warm welcome!", trans: "우리와 함께 아주 특별한 게스트인 저명한 경제학자 베스 프리드먼 님을 모셨습니다. 그녀를 따뜻하게 환영해 주세요!" },
+          { id: 3, text: "Beth: Hello, everyone. It’s truly an honor to be here with all of you.", trans: "베스: 안녕하세요, 여러분. 여러분 모두와 이 자리에 함께하게 되어 정말 영광입니다." },
+          { id: 4, text: "Neil: We’ve been exploring the basics of economics. In this 35th episode, we’ll be talking about the world of stocks. So let’s get started.", trans: "닐: 우리는 경제학의 기본을 탐구해 오고 있습니다. 35번째 에피소드인 이번 시간에는 주식의 세계에 대해 이야기해 보겠습니다. 그럼 시작하겠습니다." },
+          { id: 5, text: "Beth: Before we begin, Neil, I have a question for you. Have you ever wondered what to do with your extra money?", trans: "베스: 시작하기 전에, 닐, 질문이 하나 있습니다. 여윳돈으로 무엇을 할지 궁금해본 적이 있나요?" },
+          { id: 6, text: "Neil: Absolutely, Beth. I bet all our listeners have asked themselves the same question.", trans: "닐: 물론이죠, 베스. 청취자분들도 모두 스스로에게 같은 질문을 해보셨을 겁니다." },
+          { id: 7, text: "Beth: Indeed. It’s a question that often arises, especially among young people who are beginning to explore the world of finance. As you go about your daily lives, you find yourself engaged in financial activities such as purchasing goods and paying bus fares. After that, you might have some extra money.", trans: "베스: 맞습니다. 이것은 특히 금융의 세계를 탐험하기 시작하는 젊은이들 사이에서 자주 발생하는 질문입니다. 일상생활을 하면서 여러분은 물건을 구매하고 버스 요금을 지불하는 등의 금융 활동에 참여하고 있음을 알게 됩니다. 그러고 나면, 여윳돈이 생길 수 있죠." },
+          { id: 8, text: "Neil: You’re right. Some people might save it in the bank, and others might prefer keeping it in their wallets for immediate use. There are also a few who have already been venturing into stock trading. Today, we’re going to provide you with an overview of stocks and stock markets, enabling you to gain insight into the economy.", trans: "닐: 맞습니다. 어떤 사람들은 은행에 저축할 수도 있고, 다른 사람들은 즉시 사용하기 위해 지갑에 보관하는 것을 선호할 수도 있습니다. 이미 주식 거래에 뛰어든 사람들도 소수 있습니다. 오늘, 우리는 경제에 대한 통찰력을 얻을 수 있도록 주식과 주식 시장에 대한 개요를 제공할 것입니다.", isHighlight: true, logicPoint: 1, logic: 'intro' },
+
+          // Part 2: The Concept
+          { id: 9, text: "Beth: Okay, let’s start with the concept of a stock. A stock is a partial share of ownership in a company.", trans: "베스: 좋습니다, 주식의 개념부터 시작하겠습니다. 주식은 한 회사의 부분적인 소유권 지분입니다.", logic: 'concept' },
+          { id: 10, text: "When you buy a stock, you get a portion of the company’s ownership.", trans: "여러분이 주식을 살 때, 여러분은 그 회사의 소유권의 일부를 얻게 됩니다." },
+          { id: 11, text: "To put it simply, owning one stock is like having a slice of the company’s pie.", trans: "간단히 말해서, 주식 한 주를 소유하는 것은 회사의 파이 한 조각을 갖는 것과 같습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 12, text: "Neil: Does that mean stockholders themselves can actively participate in the management of the company?", trans: "닐: 그것은 주주들이 스스로 회사의 경영에 적극적으로 참여할 수 있다는 뜻인가요?" },
+          { id: 13, text: "Beth: Not exactly, Neil. Management is generally carried out by professional managers. However, companies hold stockholder meetings to seek the opinions of major stockholders when they make important decisions.", trans: "베스: 꼭 그렇지는 않습니다, 닐. 경영은 일반적으로 전문 경영인에 의해 수행됩니다. 하지만 기업들은 중요한 결정을 내릴 때 주요 주주들의 의견을 구하기 위해 주주 총회를 엽니다." },
+
+          // Part 3: The Stock Market
+          { id: 14, text: "Neil: I see. Then how do companies use the stock market?", trans: "닐: 알겠습니다. 그렇다면 기업들은 주식 시장을 어떻게 활용하나요?" },
+          { id: 15, text: "Beth: The stock market is very important for companies because it can provide them with the money they need to grow and expand.", trans: "베스: 주식 시장은 기업이 성장하고 확장하는 데 필요한 돈을 제공할 수 있기 때문에 기업들에게 매우 중요합니다.", logic: 'market' },
+          { id: 16, text: "Neil: How does that work?", trans: "닐: 그것이 어떻게 작용하나요?" },
+          { id: 17, text: "Beth: Let’s imagine that a small group of people start a footwear company producing innovative sneakers.", trans: "베스: 소규모의 사람들이 혁신적인 운동화를 생산하는 신발 회사를 시작한다고 상상해 봅시다." },
+          { id: 18, text: "The founders are confident that their products will be popular with consumers, but they do not have enough funds to grow the business. So they decide to put the newly formed company on the stock market.", trans: "설립자들은 그들의 제품이 소비자들에게 인기가 있을 것이라고 확신하지만, 사업을 성장시킬 자금이 충분하지 않습니다. 그래서 그들은 새로 설립된 회사를 주식 시장에 내놓기로 결정합니다." },
+          { id: 19, text: "Neil: What happens then?", trans: "닐: 그러면 어떻게 되나요?" },
+          { id: 20, text: "Beth: When a company is listed on the stock market, individuals or organizations that believe in the company’s bright future can buy shares and become partial owners of the company.", trans: "베스: 회사가 주식 시장에 상장되면, 그 회사의 밝은 미래를 믿는 개인이나 조직이 주식을 사서 그 회사의 부분적인 소유자가 될 수 있습니다." },
+          { id: 21, text: "This process makes it easy for the footwear company to raise the funds it needs to grow its business.", trans: "이 과정은 신발 회사가 사업을 성장시키는 데 필요한 자금을 조달하는 것을 쉽게 만들어줍니다.", isHighlight: true, logicPoint: 3 },
+          { id: 22, text: "As the business grows, the stock value rises, and the stockholders’ profits increase.", trans: "사업이 성장함에 따라 주식 가치도 상승하고, 주주들의 이익도 증가합니다." },
+
+          // Part 4: Prices of Stocks
+          { id: 23, text: "Neil: Then what factors affect the prices of stocks?", trans: "닐: 그렇다면 어떤 요인들이 주식 가격에 영향을 미치나요?" },
+          { id: 24, text: "Beth: Just like other transactions, the prices of stocks are decided by the law of supply and demand.", trans: "베스: 다른 거래들과 마찬가지로 주식 가격은 수요와 공급의 법칙에 의해 결정됩니다.", logic: 'price1' },
+          { id: 25, text: "In other words, the more successful a business is, the more people will see the potential value of the company and start buying its stocks.", trans: "즉, 비즈니스가 성공적일수록, 더 많은 사람들이 그 회사의 잠재적 가치를 보고 주식을 사기 시작할 것입니다.", isHighlight: true, logicPoint: 4 },
+          { id: 26, text: "As demand for the stocks increases, so does the stock price. In contrast, if a company performs disappointingly, its stock price will fall.", trans: "주식에 대한 수요가 증가함에 따라 주가도 상승합니다. 반대로 회사가 실망스러운 성과를 내면 주가는 떨어집니다.", isHighlight: true, logicPoint: 5 },
+          { id: 27, text: "Neil: Understood. Are there any other factors affecting the price?", trans: "닐: 이해했습니다. 가격에 영향을 미치는 다른 요인들이 또 있나요?" },
+          { id: 28, text: "Beth: Yes, companies are constantly under the influence of market factors such as raw material prices, advances in production technology, and labor costs.", trans: "베스: 네, 기업들은 원자재 가격, 생산 기술의 발전, 인건비와 같은 시장 요인의 영향을 끊임없이 받습니다.", logic: 'price2' },
+          { id: 29, text: "For example, in terms of raw material prices, if the price of rubber rises, a shoe company may have to pay more to import the rubber it needs from abroad to manufacture sneakers.", trans: "예를 들어, 원자재 가격 측면에서 고무 가격이 상승하면, 신발 회사는 운동화를 제조하기 위해 해외에서 필요한 고무를 수입하는 데 더 많은 비용을 지불해야 할 수도 있습니다." },
+          { id: 30, text: "This, in turn, affects production costs and leads to higher prices in the consumer market.", trans: "이것은 결과적으로 생산 비용에 영향을 미치고 소비자 시장에서의 더 높은 가격으로 이어집니다." },
+          { id: 31, text: "As consumers hesitate to purchase the company’s sneakers, the company may suffer from poor performance, leading to a decline in the stock price.", trans: "소비자들이 그 회사의 운동화 구매를 주저함에 따라, 회사는 실적 부진을 겪을 수 있고, 이는 주가 하락으로 이어집니다." },
+          { id: 32, text: "Neil: There are so many things to consider!", trans: "닐: 고려해야 할 것이 정말 많군요!" },
+          { id: 33, text: "Beth: Additionally, investors may be concerned about a company’s leadership or reputation.", trans: "베스: 게다가, 투자자들은 기업의 리더십이나 평판에 대해서도 관심을 가질 수 있습니다." },
+          { id: 34, text: "Nowadays, more and more people are starting to support companies that prioritize public values such as business transparency, environmental friendliness, and social justice.", trans: "요즘에는 경영 투명성, 친환경성, 사회 정의와 같은 공공의 가치를 우선시하는 기업을 지지하기 시작하는 사람들이 점점 더 많아지고 있습니다.", logic: 'price3' },
+          { id: 35, text: "In purchasing such stocks, they not only pursue their financial goals but also contribute to building a more sustainable economic system that benefits the entire society.", trans: "그러한 주식을 구매할 때, 그들은 재정적 목표를 추구할 뿐만 아니라 전체 사회에 이익이 되는 더 지속 가능한 경제 시스템을 구축하는 데에도 기여합니다.", isHighlight: true, logicPoint: 6 },
+          { id: 36, text: "All these variables can cause daily changes in stock prices in the stock market.", trans: "이 모든 변수들이 주식 시장에서 매일 주가 변동을 일으킬 수 있습니다." },
+
+          // Part 5: Advice & Outro
+          { id: 37, text: "Neil: It seems to get more difficult as we learn more about stocks. So how do we invest in the stock market?", trans: "닐: 주식에 대해 더 많이 알아갈수록 더 어려워지는 것 같네요. 그렇다면 주식 시장에는 어떻게 투자하나요?" },
+          { id: 38, text: "Beth: You can buy stocks through an official place called a stock exchange, or stock market, where you can easily buy or sell stocks in a company. You might think investing in stocks is an easy way to make a profit.", trans: "베스: 여러분은 주식 거래소나 주식 시장이라고 불리는 공식적인 장소를 통해 주식을 살 수 있는데, 그곳에서 회사의 주식을 쉽게 사고팔 수 있습니다. 주식 투자가 이익을 내는 쉬운 방법이라고 생각할지도 모릅니다." },
+          { id: 39, text: "But if you are investing, you must be prepared to lose money. Since the market constantly fluctuates, there is a risk of loss and debt.", trans: "하지만 투자를 한다면 돈을 잃을 각오도 해야 합니다. 시장은 끊임없이 변동하기 때문에 손실과 빚의 위험이 있습니다.", logic: 'risk' },
+          { id: 40, text: "Neil: Investing in stocks is challenging! I bet our listeners are curious about the best investment options though.", trans: "닐: 주식 투자는 참 도전적이네요! 청취자분들도 최고의 투자 옵션에 대해 궁금해하실 텐데요." },
+          { id: 41, text: "Beth: That depends on individual circumstances. Generally, it would be smart to invest in something that interests you, such as a company behind some products you are into.", trans: "베스: 그것은 개인의 상황에 따라 다릅니다. 일반적으로, 여러분이 좋아하는 제품을 만든 회사처럼 여러분의 흥미를 끄는 것에 투자하는 것이 현명할 것입니다." },
+          { id: 42, text: "Always remember to do your research, stay informed about the companies you invest in, and be mindful of your risk tolerance.", trans: "항상 조사를 하고, 투자하는 회사에 대해 정보를 파악하며, 자신의 위험 감수 능력을 유념해야 한다는 것을 기억하세요.", logic: 'advice' },
+          { id: 43, text: "Neil: Investing can be a powerful tool for building wealth, but it’s essential to approach it with knowledge and caution.", trans: "닐: 투자는 부를 축적하는 강력한 도구가 될 수 있지만, 지식과 주의를 가지고 접근하는 것이 필수적입니다." },
+          { id: 44, text: "Beth: Wise words, Neil.", trans: "베스: 지혜로운 말씀입니다, 닐." },
+          { id: 45, text: "Neil: All right. I hope today’s episode was helpful for you! I’ll be back with another exciting topic next time...", trans: "닐: 좋습니다. 오늘 에피소드가 여러분에게 도움이 되었기를 바랍니다! 다음번에도 흥미로운 주제로 돌아오겠습니다..." }
+        ];
+
+        const logicMapSteps = [
+          { id: 'concept', title: "THE CONCEPT (개념)", desc: "A partial share of ownership", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-chart-pie-slice text-xl mb-2"></i> },
+          { id: 'market', title: "THE MARKET (역할)", desc: "Provides funds for companies to grow", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-bank text-xl mb-2"></i> },
+          { id: 'prices', title: "THE PRICES (가격 요인)", desc: "Supply/Demand, Market factors, Values", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-trend-up text-xl mb-2"></i> },
+          { id: 'advice', title: "THE ADVICE (투자 조언)", desc: "High risk requires knowledge & caution", color: "bg-sky-100 border-sky-400 text-sky-800", icon: <i className="ph-fill ph-shield-check text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          
+          // Quiz states
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => { window.print(); };
+
+          // 1. 잠금 화면(로그인) UI
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">The ABCs of Stocks</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="접근 암호 (예: Made by Lee)" 
+                      className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable"
+                      value={passwordInput} 
+                      onChange={(e) => setPasswordInput(e.target.value)} 
+                    />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button 
+                      type="submit" 
+                      className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2"
+                    >
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // 2. 통합본 (All-in-One) UI
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* === 왼쪽 사이드바 (데스크톱 전용) === */}
+                <aside className="hidden md:flex flex-col w-72 bg-emerald-950 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-emerald-900 border-b border-emerald-800">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-teal-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-teal-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">The ABCs of Stocks</h1>
+                        <p className="text-emerald-300 text-sm mt-2 italic">10-Minute Economics 101</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-emerald-800">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* === 메인 콘텐츠 영역 === */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    
+                    {/* 모바일용 상단 헤더 */}
+                    <header className="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">The ABCs of Stocks</h1>
+                            <p className="text-teal-300 text-xs">Economics 101</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-emerald-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ========================================================= */}
+                        {/* SECTION 1: 지문 분석 (Text Analysis)                      */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1: Intro */}
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Introduction (주식 팟캐스트의 시작)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 8).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                                          {/* 화자 이름 강조 */}
+                                                          {item.text.startsWith("Neil:") ? <><span className="speaker-neil print:text-black">Neil:</span> {item.text.replace("Neil: ", "")}</> : 
+                                                           item.text.startsWith("Beth:") ? <><span className="speaker-beth print:text-black">Beth:</span> {item.text.replace("Beth: ", "")}</> : item.text}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2: Concept */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Concept of a Stock (주식의 개념)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(8, 13).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                                          {item.text.startsWith("Neil:") ? <><span className="speaker-neil print:text-black">Neil:</span> {item.text.replace("Neil: ", "")}</> : 
+                                                           item.text.startsWith("Beth:") ? <><span className="speaker-beth print:text-black">Beth:</span> {item.text.replace("Beth: ", "")}</> : item.text}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3: Market */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Stock Market & Companies (주식 시장의 역할)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(13, 22).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                                          {item.text.startsWith("Neil:") ? <><span className="speaker-neil print:text-black">Neil:</span> {item.text.replace("Neil: ", "")}</> : 
+                                                           item.text.startsWith("Beth:") ? <><span className="speaker-beth print:text-black">Beth:</span> {item.text.replace("Beth: ", "")}</> : item.text}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4: Prices */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Prices of Stocks (주가를 움직이는 요인들)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(22, 36).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                                          {item.text.startsWith("Neil:") ? <><span className="speaker-neil print:text-black">Neil:</span> {item.text.replace("Neil: ", "")}</> : 
+                                                           item.text.startsWith("Beth:") ? <><span className="speaker-beth print:text-black">Beth:</span> {item.text.replace("Beth: ", "")}</> : item.text}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 5: Advice */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-sky-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ How to Invest in the Stock Market (투자에 대한 조언)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(36, 45).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-sky-50 border border-sky-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-sky-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                                          {item.text.startsWith("Neil:") ? <><span className="speaker-neil print:text-black">Neil:</span> {item.text.replace("Neil: ", "")}</> : 
+                                                           item.text.startsWith("Beth:") ? <><span className="speaker-beth print:text-black">Beth:</span> {item.text.replace("Beth: ", "")}</> : item.text}
+                                                        </span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 2: 핵심 구문 (Key Syntax)                         */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 능동의 현재분사구문: enabling
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[08] ... an overview of stocks and stock markets, <span className="font-bold text-emerald-600">enabling</span> you to gain insight into the economy."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                접속사와 주어가 생략된 분사구문으로 "(그 결과) ~하게 하면서"로 해석됩니다. 주식에 대한 개요 제공이 청취자들에게 경제적 통찰력을 <strong className="text-emerald-800 print:text-black">능동적으로 부여하는 결과</strong>를 부연 설명합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 요약과 환언의 독립부정사
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[11] <span className="font-bold text-emerald-600">To put it simply</span>, owning one stock is like having a slice..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "간단히 말해서"라는 의미를 가진 독립부정사 구문입니다. 어렵고 추상적인 주식의 소유권 개념을 '파이 한 조각'이라는 쉬운 비유로 <strong className="text-emerald-800 print:text-black">다시 설명(Paraphrasing)</strong>해 주는 장치입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 가목적어-진목적어 구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[21] This process <span className="font-bold text-teal-600">makes it easy for</span> the footwear company <span className="font-bold text-teal-600">to raise</span> the funds..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                가목적어(it), 의미상 주어(for~), 진목적어(to raise)가 모두 쓰인 핵심 어법입니다. 주식 상장(process)이 신발 회사의 자금 조달을 <strong className="text-teal-800 print:text-black">쉬운 상태(easy)</strong>로 만든다는 점을 명확히 보여줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 비례적 인과: the 비교급, the 비교급
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[25] ... <span className="font-bold text-teal-600">the more</span> successful a business is, <span className="font-bold text-teal-600">the more</span> people will see..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "~하면 할수록, 더 ~하다"라는 뜻으로, 기업의 성공(원인)에 비례하여 사람들의 잠재적 가치 인식과 주식 구매(결과)가 증가한다는 <strong className="text-teal-800 print:text-black">공급과 수요의 법칙</strong>을 논리적으로 설명합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 대동사를 이용한 도치 구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[26] As demand for the stocks increases, <span className="font-bold text-cyan-600">so does the stock price</span>."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "~도 역시 그렇다"라는 뜻의 긍정 동의 표현입니다. [so + 조동사/대동사 + 주어]로 어순이 도치되었으며, 여기서 does는 앞의 일반동사 increases를 대신하여 <strong className="text-cyan-800 print:text-black">주가 상승의 동기화</strong>를 간결하게 표현합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P6 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 06. 상관접속사: not only A but also B
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[35] ... they <span className="font-bold text-cyan-600">not only</span> pursue their financial goals <span className="font-bold text-cyan-600">but also</span> contribute to building..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "A뿐만 아니라 B도"라는 뜻으로 병렬 구조를 이끕니다. 요즘의 가치 투자가 단순히 개인의 재무적 이익(A)을 넘어 사회적 선(B)으로 <strong className="text-cyan-800 print:text-black">의미가 확장되고 있음</strong>을 보여주는 핵심 구문입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 3: 논리 구조도 (Logic Map)                        */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white print:border-slate-800 print:rounded-none print:text-black ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Traded in</div>}
+                                                    {idx === 1 && <div className="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Determined by</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Approached with</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 4: 실전 문제 (Challenge)                          */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "주식을 산다는 것은 회사의 부분적인 소유권을 얻는 것을 의미한다." },
+                                                { id: 2, text: "일반적으로 주주들이 직접 회사의 경영에 적극적으로 참여한다.", isCorrect: true },
+                                                { id: 3, text: "원자재 가격의 상승은 기업의 생산 비용 증가와 주가 하락으로 이어질 수 있다." },
+                                                { id: 4, text: "최근에는 기업의 경영 투명성과 환경 친화성 같은 공공 가치를 중시하는 투자자가 늘고 있다." }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz1Answered(choice.id)}
+                                                    disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설:</strong> 본문의 13번 문장에서 베스는 주주들이 스스로 경영에 적극 참여하느냐는 질문에 "꼭 그렇지는 않습니다(Not exactly). <strong>경영은 일반적으로 전문 경영인에 의해 수행됩니다</strong>(Management is generally carried out by professional managers)."라고 대답했으므로 2번은 내용과 일치하지 않습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                This process makes it easy for the footwear company to raise the funds it needs to grow its business.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Let’s imagine that a small group of people start a footwear company producing innovative sneakers. The founders are confident that their products will be popular with consumers, but they do not have enough funds to grow the business. ( ① ) So they decide to put the newly formed company on the stock market. ( ② ) When a company is listed on the stock market, individuals or organizations that believe in the company’s bright future can buy shares and become partial owners of the company. ( ③ ) As the business grows, the stock value rises, and the stockholders’ profits increase. ( ④ ) 
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②" }, { id: 3, text: "③", isCorrect: true }, { id: 4, text: "④" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz2Answered(choice.id)}
+                                                    disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 주어진 문장의 <strong>'This process(이 과정)'</strong>는 바로 앞 문장에서 설명한 '투자자들이 주식을 사서 부분적인 소유자가 되는 과정'을 의미합니다. 이 과정을 통해 신발 회사가 자금을 모으기 쉬워진다는 결과가 뒤따르고, 그 후 사업 성장에 따른 이익 배분(주가 상승)이 언급되는 <strong>③번</strong> 자리가 논리적으로 완벽합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 글의 제목 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 제목으로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "How to Become a Professional Manager" },
+                                                { id: 2, text: "The Role of Environmental Protection in Business" },
+                                                { id: 3, text: "The Basics of Stocks and How the Market Works", isCorrect: true },
+                                                { id: 4, text: "Why You Should Always Save Money in the Bank" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz3Answered(choice.id)}
+                                                    disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 팟캐스트 진행자인 닐이 도입부에서 "주식과 주식 시장에 대한 개요(an overview of stocks and stock markets)"를 제공하겠다고 밝힌 것처럼, 이 글은 주식의 개념, 주식 시장의 원리, 주가 변동 요인 등 전반적인 <strong>기초 지식(Basics)</strong>을 다루고 있으므로 3번이 가장 적절합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                To build wealth through the stock market, investors need to understand that stock prices are determined by various <span className="font-bold text-emerald-700">( A )</span>, and they must approach investment with <span className="font-bold text-emerald-700">( B )</span> due to potential risks.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) managers —— (B) confidence" },
+                                                { id: 2, text: "(A) variables —— (B) caution", isCorrect: true },
+                                                { id: 3, text: "(A) managers —— (B) patience" },
+                                                { id: 4, text: "(A) variables —— (B) greed" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz4Answered(choice.id)}
+                                                    disabled={quiz4Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 주가는 원자재 가격, 수요 공급, 기업 가치 등 다양한 <strong>변수(variables)</strong>에 의해 결정되며, 손실의 위험이 있으므로 항상 지식과 <strong>주의/신중함(caution)</strong>을 가지고 투자에 접근해야 한다는 전체 요약입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 문맥상 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <u>않은</u> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                A stock is a partial share of ownership in a company. To put it simply, owning one stock is like having a ①<u>slice</u> of the company’s pie. If the price of rubber rises, a shoe company may have to pay more to import it. This affects production costs and leads to ②<u>higher</u> prices in the consumer market. As consumers hesitate to purchase the sneakers, the company may suffer from poor performance, leading to an ③<u><span className="text-red-600 font-bold">increase</span></u> in the stock price. Nowadays, people are starting to support companies that ④<u>prioritize</u> public values such as environmental friendliness.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① slice" }, 
+                                                { id: 2, text: "② higher" }, 
+                                                { id: 3, text: "③ increase", isCorrect: true }, 
+                                                { id: 4, text: "④ prioritize" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz5Answered(choice.id)}
+                                                    disabled={quiz5Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ③ increase $\rightarrow$ decline</strong><br/>소비자들이 비싼 운동화 구매를 주저(hesitate)하여 회사가 실적 부진(poor performance)을 겪게 되면, 당연히 주식 가격은 '상승(increase)'하는 것이 아니라 <strong>'하락/감소(decline/fall)'</strong>하게 됩니다.</p>
+                                                <button onClick={() => setQuiz5Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                                                    다시 풀기
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                You might think investing in stocks is an easy way to make a profit. But if you are investing, you must be prepared to <span className="inline-block w-32 border-b-2 border-slate-800 mx-1"></span>. Since the market constantly fluctuates, there is a risk of loss and debt.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "manage the company" },
+                                                { id: 2, text: "pay higher taxes" },
+                                                { id: 3, text: "lose money", isCorrect: true },
+                                                { id: 4, text: "hide your profits" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz6Answered(choice.id)}
+                                                    disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설:</strong> 주식 시장은 항상 변동하고 손실(loss)과 부채의 위험이 있으므로, 투자를 할 때는 반드시 <strong>'돈을 잃을(lose money)'</strong> 각오를 해야 한다는 것이 전문가의 객관적인 조언입니다.</p>
+                                                <button onClick={() => setQuiz6Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                                                    다시 풀기
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                </main>
+
+                {/* === 모바일 하단 네비게이션 (Bottom Nav) === */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

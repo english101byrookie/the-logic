@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC — 공통영어 1 (NE능률)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+        :root { --bg:#f8f7f4; --surface:#ffffff; --navy:#1a2b4a; --gold:#b8862a; --accent:#2d7a52; --muted:#6b7280; --border:#e5e2db; --faint:#f3f1ec; }
+        body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--navy); min-height:100vh; overflow-x:hidden; }
+        #progress { position:fixed; top:0; left:0; height:3px; width:0%; background:linear-gradient(90deg,var(--accent),var(--gold)); z-index:100; }
+        .page { max-width:860px; margin:0 auto; padding:0 28px; }
+        .topbar { padding:24px 0 20px; display:flex; align-items:center; gap:6px; border-bottom:1px solid var(--border); flex-wrap:wrap; }
+        .bc-link { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--muted); text-decoration:none; text-transform:uppercase; transition:color .2s; }
+        .bc-link:hover { color:var(--navy); }
+        .bc-sep { color:var(--border); font-size:11px; margin:0 2px; }
+        .bc-current { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--accent); text-transform:uppercase; }
+        .brand-link { font-family:'Playfair Display',serif; font-size:16px; font-weight:900; letter-spacing:.08em; color:var(--navy); text-decoration:none; margin-right:2px; }
+        .header { padding:48px 0 38px; border-bottom:1px solid var(--border); }
+        .pub-badge { display:inline-flex; align-items:center; background:#f5f5f5; border:1px solid #ddd; border-radius:8px; padding:5px 12px; margin-bottom:16px; }
+        .pub-badge span { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.14em; color:var(--accent); text-transform:uppercase; }
+        .header h1 { font-family:'Playfair Display',serif; font-size:clamp(28px,5vw,50px); font-weight:900; line-height:1.05; letter-spacing:-.02em; color:var(--navy); }
+        .header h1 em { font-style:italic; font-weight:400; color:var(--accent); }
+        .header-author { margin-top:8px; font-size:13px; font-weight:300; color:var(--muted); }
+        .section { padding:40px 0 20px; }
+        .section-header { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+        .section-title { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase; white-space:nowrap; }
+        .section-line { flex:1; height:1px; background:var(--border); }
+        .unit-card { display:flex; align-items:stretch; text-decoration:none; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:10px; background:var(--surface); transition:all .22s ease; }
+        .unit-card.active:hover { border-color:var(--accent); transform:translateX(4px); box-shadow:0 8px 24px rgba(0,0,0,.06); }
+        .unit-card.active:hover .uc-arrow { color:var(--navy); transform:translateX(3px); }
+        .uc-accent-bar { width:4px; flex-shrink:0; }
+        .uc-num { display:flex; align-items:center; justify-content:center; min-width:60px; font-family:'Playfair Display',serif; font-size:22px; font-weight:700; color:#ddd; border-right:1px solid var(--border); padding:18px 0; }
+        .unit-card.active .uc-num { color:var(--accent); opacity:.5; }
+        .uc-body { flex:1; padding:18px 20px; }
+        .uc-tag { font-family:'DM Mono',monospace; font-size:9px; letter-spacing:.15em; text-transform:uppercase; padding:2px 8px; border-radius:3px; margin-bottom:7px; display:inline-block; border:1px solid; }
+        .tag-ready { background:#f0faf5; color:var(--accent); border-color:var(--accent); opacity:.8; }
+        .uc-title { font-family:'Playfair Display',serif; font-size:19px; font-weight:700; color:var(--navy); margin-bottom:3px; line-height:1.2; }
+        .uc-desc { font-size:12px; font-weight:300; color:var(--muted); line-height:1.5; }
+        .uc-right { display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; padding:18px 14px 18px 0; min-width:60px; }
+        .uc-count { font-family:'DM Mono',monospace; font-size:9px; color:var(--muted); text-align:right; line-height:1.8; }
+        .uc-arrow { font-size:15px; color:#ccc; transition:all .22s ease; }
+        footer { padding:28px 0 44px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; }
+        .footer-brand { font-family:'Playfair Display',serif; font-size:13px; color:#bbb; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(13px)} to{opacity:1;transform:translateY(0)} }
+        .fi { animation:fadeUp .38s ease forwards; opacity:0; }
+        .fi:nth-child(1){animation-delay:.05s}.fi:nth-child(2){animation-delay:.10s}.fi:nth-child(3){animation-delay:.15s}.fi:nth-child(4){animation-delay:.20s}.fi:nth-child(5){animation-delay:.25s}
+    </style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="page">
+    <nav class="topbar">
+        <a href="../../index.html" class="brand-link">THE LOGIC</a>
+        <span class="bc-sep">/</span>
+        <a href="../index.html" class="bc-link">공통영어 1</a>
+        <span class="bc-sep">/</span>
+        <span class="bc-current">NE능률(민병천)</span>
+    </nav>
+    <header class="header fi">
+        <div class="pub-badge"><span>NE능률 · 민병천</span></div>
+        <h1>공통영어 <em>1</em></h1>
+        <div class="header-author">NE능률 출판사 · 민병천 저 · 2025년 제공</div>
+    </header>
+    <section class="section">
+        <div class="section-header"><span class="section-title">단원 선택</span><div class="section-line"></div></div>
+        
+        <a href="lesson1/index.html" class="unit-card active fi">
+            <div class="uc-accent-bar" style="background:#2d7a52;"></div>
+            <div class="uc-num">1</div>
+            <div class="uc-body"><span class="uc-tag tag-ready">Lesson 1 · 완료</span><div class="uc-title">Lesson 1</div><div class="uc-desc">수록 완료</div></div>
+            <div class="uc-right"><div class="uc-count">수록 완료<br>PART 1–4</div><div class="uc-arrow">→</div></div>
+        </a>
+        <a href="lesson2/index.html" class="unit-card active fi">
+            <div class="uc-accent-bar" style="background:#2d7a52;"></div>
+            <div class="uc-num">2</div>
+            <div class="uc-body"><span class="uc-tag tag-ready">Lesson 2 · 완료</span><div class="uc-title">Lesson 2</div><div class="uc-desc">수록 완료</div></div>
+            <div class="uc-right"><div class="uc-count">수록 완료<br>PART 1–4</div><div class="uc-arrow">→</div></div>
+        </a>
+        <a href="lesson3/index.html" class="unit-card active fi">
+            <div class="uc-accent-bar" style="background:#2d7a52;"></div>
+            <div class="uc-num">3</div>
+            <div class="uc-body"><span class="uc-tag tag-ready">Lesson 3 · 완료</span><div class="uc-title">Timing Is Everything</div><div class="uc-desc">The importance of finding the right moment</div></div>
+            <div class="uc-right"><div class="uc-count">수록 완료<br>PART 1–4</div><div class="uc-arrow">→</div></div>
+        </a>
+        <a href="lesson4/index.html" class="unit-card active fi">
+            <div class="uc-accent-bar" style="background:#2d7a52;"></div>
+            <div class="uc-num">4</div>
+            <div class="uc-body"><span class="uc-tag tag-ready">Lesson 4 · 완료</span><div class="uc-title">AI: Opportunity or Threat?</div><div class="uc-desc">The future impact of Artificial Intelligence</div></div>
+            <div class="uc-right"><div class="uc-count">수록 완료<br>PART 1–4</div><div class="uc-arrow">→</div></div>
+        </a>
+    </section>
+    <footer><div class="footer-brand">THE LOGIC</div></footer>
+</div>
+<script>window.addEventListener('scroll',()=>{const e=document.getElementById('progress'),t=document.body.scrollHeight-window.innerHeight;e.style.width=(t>0?window.scrollY/t*100:0)+'%'});</script>
+</body>
+</html>

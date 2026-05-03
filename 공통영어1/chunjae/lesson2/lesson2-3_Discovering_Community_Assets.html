@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Mapping Our Voices Part 3</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: The Assets (1~4)
+          { id: 1, text: "Mapping can also rally community members around the assets of their community such as libraries, community centers, and parks.", trans: "매핑은 또한 도서관, 커뮤니티 센터, 공원과 같은 지역 사회의 자산을 중심으로 지역 사회 구성원들을 결집시킬 수 있다.", logic: 'assets' },
+          { id: 2, text: "Heritage and cultural attractions, like landmarks, museums, and public artworks, are also good sources for community mapping.", trans: "랜드마크, 박물관, 공공 예술 작품과 같은 문화유산 및 문화적 명소들 또한 커뮤니티 매핑의 좋은 원천이다." },
+          { id: 3, text: "Through marking assets on a map, people become aware of the strengths and resources of their own community and build a strong bond with it.", trans: "지도에 자산을 표시함으로써, 사람들은 자신의 지역 사회의 강점과 자원을 인식하게 되고 그것과 강력한 유대감을 형성한다.", isHighlight: true, logicPoint: 1 },
+          { id: 4, text: "Also, these maps can provide valuable data to be used for tourism or urban design.", trans: "또한, 이러한 지도들은 관광이나 도시 디자인에 사용될 수 있는 가치 있는 데이터를 제공할 수 있다." },
+
+          // Part 2: The Project (5~6)
+          { id: 5, text: "The mapping project Where in Wally (short for Walthamstow, UK) is a case in point.", trans: "영국 월섬스토(Walthamstow)의 줄임말인 'Where in Wally' 매핑 프로젝트가 딱 들어맞는 사례이다.", logic: 'project' },
+          { id: 6, text: "A team of architects undertook the project to find out what spots were loved by the locals.", trans: "한 건축가 팀이 지역 주민들에게 사랑받는 장소가 어디인지 알아내기 위해 그 프로젝트를 맡았다.", isHighlight: true, logicPoint: 2 },
+
+          // Part 3: The Process (7~8)
+          { id: 7, text: "People told the team about their treasured places and the reasons why these places were special to them.", trans: "사람들은 팀에게 자신들의 소중한 장소와 그 장소들이 그들에게 특별한 이유에 대해 말해주었다.", logic: 'process' },
+          { id: 8, text: "The team then added the places to an online map and marked them in the real world with yellow tags.", trans: "그러고 나서 팀은 그 장소들을 온라인 지도에 추가하고 현실 세계에서는 노란색 태그로 표시했다.", isHighlight: true, logicPoint: 3 },
+
+          // Part 4: The Result (9)
+          { id: 9, text: "The map and tags invited people to go on a treasure hunt and told them colorful stories about the corners of Walthamstow.", trans: "그 지도와 태그는 사람들을 보물찾기로 이끌었고 그들에게 월섬스토 곳곳에 얽힌 다채로운 이야기들을 들려주었다.", logic: 'result', isHighlight: true, logicPoint: 4 }
+        ];
+
+        const logicMapSteps = [
+          { id: 'assets', title: "COMMUNITY ASSETS (지역 자산)", desc: "Libraries, parks, heritage sites", color: "bg-stone-100 border-stone-400 text-stone-800", icon: <i className="ph-fill ph-bank text-xl mb-2"></i> },
+          { id: 'project', title: "THE PROJECT (프로젝트 기획)", desc: "Where in Wally by architects", color: "bg-amber-100 border-amber-400 text-amber-800", icon: <i className="ph-fill ph-blueprint text-xl mb-2"></i> },
+          { id: 'process', title: "THE PROCESS (실행 과정)", desc: "Treasured places + Yellow tags", color: "bg-yellow-100 border-yellow-400 text-yellow-800", icon: <i className="ph-fill ph-tag text-xl mb-2"></i> },
+          { id: 'result', title: "THE RESULT (보물찾기)", desc: "Treasure hunt & Colorful stories", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-map-trifold text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-stone-50 font-sans text-stone-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-amber-600 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-amber-800 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Mapping Our Voices</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 3: Discovering Community Assets</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-amber-50 text-amber-900 border-amber-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-yellow-50 text-yellow-800 border-yellow-500' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-amber-800 border-b-2 border-stone-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: The Assets */}
+                      <div>
+                        <div className="inline-block bg-stone-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Community Assets (지역 자산과 유대감 형성)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 4).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-amber-50 border border-amber-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-800 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-amber-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: The Project */}
+                      <div className="border-t border-dashed border-stone-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Project (월섬스토의 매핑 프로젝트)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(4, 6).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-amber-50 border border-amber-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-800 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-amber-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: The Process */}
+                      <div className="border-t border-dashed border-stone-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-yellow-500 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Process (온라인과 오프라인의 연결)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(6, 8).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-yellow-50 border border-yellow-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-800 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-yellow-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: The Result */}
+                      <div className="border-t border-dashed border-stone-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-orange-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Result (보물찾기로 변한 동네)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(8, 9).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-amber-800 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-amber-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-amber-600 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-amber-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 1 ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-900'}`}>
+                          POINT 01. 수단과 방법의 전치사: Through
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [Through marking] assets on a map, people become aware...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~을 통해서"라는 수단을 나타냅니다. 지도에 장소를 표시하는 행위(수단)가 지역사회와의 강력한 유대감 형성(결과)으로 이어진다는 <strong>매핑의 핵심 가치</strong>를 보여줍니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-amber-600 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-amber-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 2 ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-900'}`}>
+                          POINT 02. 간접의문문 (명사절 목적어)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> find out [what spots were loved by the locals].</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            동사 find out의 목적어 역할을 하는 의문사절입니다. 건축가들이 멋대로 정한 것이 아니라, <strong>'지역민들에게 사랑받는 장소'</strong>를 발굴하는 것이 프로젝트의 목적임을 명확히 합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-yellow-500 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-yellow-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 3 ? 'bg-yellow-500 text-white' : 'bg-yellow-50 text-yellow-900'}`}>
+                          POINT 03. 행동의 병렬 구조: added and marked
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> The team [added] the places to an online map and [marked] them...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            온라인 지도에 추가하는 가상세계의 작업(added)과 노란 태그를 붙이는 현실 세계의 작업(marked)을 나란히 연결하여, <strong>입체적인 매핑 프로젝트의 실행 과정</strong>을 묘사합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-orange-500 shadow-md transform -translate-y-1' : 'border-stone-200 hover:border-orange-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-stone-100 print:text-black ${activeLogic === 4 ? 'bg-orange-500 text-white' : 'bg-orange-50 text-orange-900'}`}>
+                          POINT 04. 비유적 표현: treasure hunt
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> invited people to go on a [treasure hunt]</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            단순한 길 찾기를 넘어, 이웃들의 다채로운 사연(colorful stories)이 담긴 장소를 탐험하는 과정을 <strong>'보물찾기'로 은유</strong>하여 커뮤니티 매핑의 매력을 극대화합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-amber-800 hover:bg-amber-700 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-yellow-500 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-yellow-500 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-yellow-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-yellow-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 보물찾기 매핑의 과정을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-amber-100 text-amber-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-amber-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Exemplified by
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-yellow-100 text-yellow-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-yellow-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Executed through
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Creating a
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-yellow-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 내용 일치/불일치 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "지역 자산을 지도에 표시하는 것은 주민들의 유대감을 강화한다." },
+                          { id: 2, text: "완성된 지도는 향후 관광이나 도시 디자인을 위한 데이터로 활용될 수 있다." },
+                          { id: 3, text: "건축가 팀은 자신들이 개인적으로 선호하는 장소들을 골라 노란색 태그를 붙였다.", isCorrect: true },
+                          { id: 4, text: "지도와 태그를 통해 사람들은 동네 곳곳을 보물찾기 하듯 탐험할 수 있었다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-yellow-400 hover:bg-yellow-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 본문의 6~7번 문장에 따르면 건축가 팀이 자의적으로 고른 것이 아니라, <strong>지역 주민들에게 사랑받는 장소(what spots were loved by the locals)</strong>를 알아내기 위해 질문하고 주민들이 직접 추천한 장소들을 지도에 추가한 것입니다. 따라서 3번은 내용과 일치하지 않습니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          A team of architects undertook the project to find out what spots were loved by the locals.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Through marking assets on a map, people become aware of the strengths and resources of their own community and build a strong bond with it. Also, these maps can provide valuable data to be used for tourism or urban design. ( ① ) The mapping project Where in Wally is a case in point. ( ② ) People told the team about their treasured places and the reasons why these places were special to them. ( ③ ) The team then added the places to an online map and marked them in the real world with yellow tags. ( ④ ) The map and tags invited people to go on a treasure hunt.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②", isCorrect: true },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> <strong>'the project(그 프로젝트)'</strong>는 바로 앞 문장에서 소개된 'Where in Wally' 프로젝트를 가리킵니다. 또한 주어진 문장에 처음 등장한 건축가 '팀(A team)'이 ②번 자리 뒤의 문장에서 'the team'으로 이어지며 사람들의 이야기를 듣게 되므로, <strong>②번</strong> 위치가 논리적으로 가장 완벽합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          By participating in the "Where in Wally" project, locals shared their <span className="font-bold text-amber-800">( A )</span> spots, transforming ordinary streets into an engaging <span className="font-bold text-amber-800">( B )</span> that strengthened community bonds.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) hidden —— (B) competition" },
+                          { id: 2, text: "(A) meaningful —— (B) exploration", isCorrect: true },
+                          { id: 3, text: "(A) dangerous —— (B) investigation" },
+                          { id: 4, text: "(A) commercial —— (B) adventure" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz3Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 프로젝트를 통해 지역 주민들은 개인적으로 특별하고 소중한(treasured $\rightarrow$ <strong>meaningful</strong>) 장소들을 공유했고, 이것은 노란색 태그와 함께 사람들을 보물찾기와 같은 흥미로운 <strong>탐험(exploration)</strong>으로 이끌어 유대감을 강화했습니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Timing Is Everything</title>
+    
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: The Problem (식후 직후 운동의 부작용)
+          { id: 1, text: <span><span className="italic font-bold mr-1">Host:</span> Welcome back to <span className="italic font-serif text-emerald-800">Today's Health</span>.</span>, trans: "진행자: 오늘의 건강에 돌아오신 것을 환영합니다." },
+          { id: 2, text: "Today we're going to be talking about exercise.", trans: "오늘은 운동에 대해 이야기해 보겠습니다." },
+          { id: 3, text: "Dr. Victoria Hill is here, and she is going to share some useful tips.", trans: "Victoria Hill 박사님이 이 자리에 계시며, 유용한 조언을 공유해 주실 것입니다." },
+          { id: 4, text: "So, Dr. Hill, let's start with a question about my experience last month.", trans: "그럼 Hill 박사님, 지난달 제 경험에 대한 질문으로 시작하겠습니다." },
+          { id: 5, text: "I worked out right after dinner and got a stomachache.", trans: "저녁 식사 직후에 운동을 했더니 복통이 생겼습니다." },
+          { id: 6, text: "Why did that happen?", trans: "왜 그런 일이 일어났을까요?" },
+          { id: 7, text: <span><span className="italic font-bold mr-1">Dr. Hill:</span> Well, the problem is that you exercised too soon after eating.</span>, trans: "박사: 음, 문제는 식사 후 너무 일찍 운동했다는 것입니다." },
+          { id: 8, text: "This can cause various stomach issues.", trans: "이것은 다양한 위장 문제를 일으킬 수 있습니다." },
+          { id: 9, text: "When you eat, blood rushes to the digestive system to help break down the food and absorb its nutrients.", trans: "음식을 먹을 때, 혈액은 음식을 분해하고 영양소를 흡수하는 것을 돕기 위해 소화계로 몰려듭니다." },
+          { id: 10, text: "But when you start to exercise, blood moves from the digestive system to your muscles.", trans: "하지만 운동을 시작하면, 혈액은 소화계에서 근육으로 이동합니다.", isHighlight: true, logicPoint: 1 },
+          { id: 11, text: "This happens in order to supply your muscles with the oxygen and nutrients they require.", trans: "이것은 근육이 필요로 하는 산소와 영양소를 공급하기 위해 발생합니다." },
+          { id: 12, text: "As a result, the digestion process is paused until the blood returns.", trans: "결과적으로, 혈액이 돌아올 때까지 소화 과정은 일시 중지됩니다." },
+          { id: 13, text: "So, whether you're lifting weights or going for a jog, you shouldn't do it with a stomach full of food.", trans: "따라서 역기를 들든 조깅을 하든, 배에 음식이 가득 찬 상태에서 해서는 안 됩니다." },
+
+          // Part 2: The Misconception (완전 공복 운동의 위험성)
+          { id: 14, text: <span><span className="italic font-bold mr-1">Host:</span> I see. That makes sense.</span>, trans: "진행자: 알겠습니다. 일리가 있네요." },
+          { id: 15, text: "So, does that mean I should exercise on an empty stomach?", trans: "그럼 공복에 운동해야 한다는 뜻인가요?" },
+          { id: 16, text: <span><span className="italic font-bold mr-1">Dr. Hill:</span> No, it doesn't. That can also be harmful and unpleasant.</span>, trans: "박사: 아니요, 그렇지 않습니다. 그것 역시 해롭고 불쾌할 수 있습니다." },
+          { id: 17, text: "This is because the body needs energy to exercise.", trans: "왜냐하면 몸은 운동할 에너지가 필요하기 때문입니다." },
+          { id: 18, text: "The fuel that provides this energy is glycogen.", trans: "이 에너지를 제공하는 연료는 글리코겐입니다." },
+          { id: 19, text: <span>Carbohydrates in the food we eat are broken down into a kind of sugar called <span className="italic font-medium">glucose</span>.</span>, trans: "우리가 먹는 음식의 탄수화물은 포도당이라는 일종의 당으로 분해됩니다." },
+          { id: 20, text: <span>When this glucose is stored in parts of the body, such as the muscles and the liver, it is called <span className="italic font-medium">glycogen</span>.</span>, trans: "이 포도당이 근육과 간 같은 신체 부위에 저장될 때, 그것을 글리코겐이라고 부릅니다." },
+          { id: 21, text: "This is why exercising on a completely empty stomach—such as when you first wake up in the morning—can be such a challenge.", trans: "이것이 아침에 처음 일어났을 때와 같이 완전히 공복 상태에서 운동하는 것이 아주 힘든 일이 될 수 있는 이유입니다.", isHighlight: true, logicPoint: 2 },
+          { id: 22, text: "Your blood sugar levels are low, and you don't have enough glycogen stored in your body.", trans: "당신의 혈당 수치는 낮고, 몸에 저장된 글리코겐이 충분하지 않습니다." },
+          { id: 23, text: "If you exercise on an empty stomach, you will most likely lack energy and feel unusually tired.", trans: "만약 공복에 운동한다면, 당신은 십중팔구 에너지가 부족하고 비정상적으로 피곤함을 느낄 것입니다." },
+          { id: 24, text: "There can also be more serious outcomes.", trans: "더 심각한 결과도 있을 수 있습니다." },
+          { id: 25, text: "Some people end up suffering from nausea and headaches, and others even faint.", trans: "어떤 사람들은 결국 메스꺼움과 두통을 겪게 되고, 다른 사람들은 심지어 기절하기도 합니다." },
+          { id: 26, text: "This is because intense exercise uses up all the glycogen in your muscles.", trans: "이것은 격렬한 운동이 당신의 근육에 있는 모든 글리코겐을 다 써버리기 때문입니다." },
+
+          // Part 3: Post-Workout (운동 후 탄수화물 섭취)
+          { id: 27, text: <span><span className="italic font-bold mr-1">Host:</span> So, is it the loss of glycogen that causes us to have low levels of energy?</span>, trans: "진행자: 그럼 글리코겐의 손실이 우리를 낮은 에너지를 갖게 하는 원인인가요?" },
+          { id: 28, text: <span><span className="italic font-bold mr-1">Dr. Hill:</span> That's correct.</span>, trans: "박사: 맞습니다." },
+          { id: 29, text: "For this reason, doctors recommend that people eat food containing carbohydrates within thirty minutes after working out.", trans: "이러한 이유로 의사들은 운동 후 30분 이내에 탄수화물이 포함된 음식을 먹을 것을 권장합니다.", isHighlight: true, logicPoint: 3 },
+          { id: 30, text: "This replaces the muscle glycogen you have lost.", trans: "이것은 당신이 잃어버린 근육 글리코겐을 대체합니다." },
+          { id: 31, text: "Basically, you need between one and one and a half grams of carbohydrates for every kilogram you weigh.", trans: "기본적으로 당신은 체중 1킬로그램당 1그램에서 1.5그램의 탄수화물이 필요합니다." },
+          { id: 32, text: "Let's do the math.", trans: "계산을 해봅시다." },
+          { id: 33, text: "If you weigh 60 kilograms, you should try to consume between 60 and 90 grams of carbohydrates after you exercise.", trans: "만약 체중이 60kg이라면, 운동 후 60에서 90그램의 탄수화물을 섭취하려고 노력해야 합니다." },
+          { id: 34, text: "This is equal to about one bowl of white rice or three bananas.", trans: "이것은 쌀밥 한 공기나 바나나 세 개 정도와 같습니다." },
+
+          // Part 4: Pre-Workout (운동 전 식사 타이밍 조절)
+          { id: 35, text: <span><span className="italic font-bold mr-1">Host:</span> That's very interesting. But what about eating before we exercise?</span>, trans: "진행자: 아주 흥미롭네요. 하지만 운동 전에 먹는 것은 어떨까요?" },
+          { id: 36, text: "Can you explain how long we should wait after eating?", trans: "식후 얼마나 기다려야 하는지 설명해주실 수 있나요?" },
+          { id: 37, text: <span><span className="italic font-bold mr-1">Dr. Hill:</span> Well, as I said before, exercising right after you eat will cause feelings of discomfort.</span>, trans: "박사: 글쎄요, 아까 말씀드렸듯이 식사 직후에 운동하는 것은 불쾌감을 유발할 것입니다." },
+          { id: 38, text: "But, if you wait too long to exercise after eating, you'll suffer from a lack of energy.", trans: "하지만, 식후 너무 오래 기다렸다가 운동하면 에너지 부족에 시달릴 것입니다." },
+          { id: 39, text: "The best time to eat before you exercise varies from one to three hours.", trans: "운동 전에 먹기 가장 좋은 시간은 1시간에서 3시간 사이로 다양합니다.", isHighlight: true, logicPoint: 4 },
+          { id: 40, text: "Basically, it depends on several factors such as the type and amount of food as well as body size, age, and gender.", trans: "기본적으로 그것은 음식의 종류와 양, 그리고 체형, 나이, 성별과 같은 여러 요인에 따라 달라집니다." },
+          { id: 41, text: "The type of exercise also matters.", trans: "운동의 종류도 중요합니다." },
+          { id: 42, text: "For extremely active exercise like cycling, I suggest that you wait between one and a half and three hours after eating a moderate-sized meal.", trans: "사이클링과 같이 극도로 활동적인 운동의 경우, 적당한 양의 식사 후 1시간 반에서 3시간 정도 기다릴 것을 제안합니다." },
+          { id: 43, text: "But for something more casual, such as golfing, waiting for one hour after a meal should be enough.", trans: "하지만 골프와 같은 좀 더 가벼운 운동의 경우, 식후 1시간 기다리는 것으로 충분할 것입니다." },
+          { id: 44, text: "Clearly, you can wait less after eating a snack.", trans: "분명히, 간식을 먹은 후에는 덜 기다려도 됩니다." },
+
+          // Part 5: Conclusion
+          { id: 45, text: <span><span className="italic font-bold mr-1">Host:</span> Thank you very much for this fascinating information, Dr. Hill.</span>, trans: "진행자: 이 흥미로운 정보에 정말 감사드립니다, Hill 박사님." },
+          { id: 46, text: "I'm sure it will be very helpful for all of our viewers.", trans: "시청자 여러분 모두에게 아주 큰 도움이 될 것이라 확신합니다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { id: 'problem1', title: "식후 직후 운동 (The Problem)", desc: "혈류가 근육으로 이동해 소화 중단, 복통 유발", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning text-xl mb-2"></i> },
+          { id: 'problem2', title: "완전 공복 운동 (The Misconception)", desc: "글리코겐 고갈로 인한 에너지 부족, 피로 및 기절", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-battery-warning text-xl mb-2"></i> },
+          { id: 'solution1', title: "운동 후 영양 보충 (Post-Workout)", desc: "운동 후 30분 내 체중 맞춤형 탄수화물 섭취", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-bowl-food text-xl mb-2"></i> },
+          { id: 'solution2', title: "운동 전 식사 조절 (Pre-Workout)", desc: "개인/운동 요인에 따라 1~3시간 대기 후 운동", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-hourglass-medium text-xl mb-2"></i> },
+          { id: 'conclusion', title: "CONCLUSION (최종 결론)", desc: "효과적이고 건강한 운동을 위한 최적의 타이밍 조절", color: "bg-emerald-100 border-emerald-500 text-emerald-900", icon: <i className="ph-fill ph-heartbeat text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">Timing Is Everything</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-emerald-900 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* 사이드바 */}
+                <aside className="hidden md:flex flex-col w-72 bg-emerald-950 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-emerald-900 border-b border-emerald-800">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl"></i>
+                            <span className="text-xs font-bold tracking-wider">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Timing Is Everything</h1>
+                        <p className="text-emerald-300 text-sm mt-2 italic">When to Eat and Exercise</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-emerald-800">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* 메인 영역 */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Timing Is Everything</h1>
+                            <p className="text-emerald-300 text-xs">When to Eat and Exercise</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-emerald-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-500 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-red-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Problem (식후 직후 운동과 소화불량)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 13).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-orange-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Misconception (완전 공복 운동의 부작용)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(13, 26).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Post-Workout (운동 후 글리코겐 보충)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(26, 34).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Pre-Workout (운동 전 식사 타이밍 조절)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(34, 44).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 5 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Conclusion (마무리 인사)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(44, 46).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-500 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 부사적 용법의 to부정사 (목적/병렬)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[09] ... blood rushes to the digestive system <span className="font-bold text-emerald-600">to help</span> break down the food and <span className="font-bold text-emerald-600">(to) absorb</span> its nutrients."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                to부정사의 부사적 용법 중 '목적(~하기 위하여)'을 나타냅니다. 음식을 분해하는 것을 돕고 영양소를 흡수<strong className="text-emerald-800 print:text-black">하기 위해</strong> 혈액이 이동한다는 의미로, 접속사 and에 의해 두 개의 원형동사(help, absorb)가 병렬로 연결되어 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 양보의 부사절 접속사 whether
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[13] So, <span className="font-bold text-emerald-600">whether</span> you're lifting weights <span className="font-bold text-emerald-600">or</span> going for a jog, you shouldn't..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                [whether A or B] 구문이 명사절이 아닌 '부사절'로 쓰여 <strong className="text-emerald-800 print:text-black">"A이든 B이든 상관없이"</strong>라는 양보의 의미를 나타냅니다. 운동의 종류가 무엇이든 식사 직후 운동은 피해야 함을 강조합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. This is why + 결과
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[21] <span className="font-bold text-teal-600">This is why</span> exercising on a completely empty stomach ... can be such a challenge."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                'This(원인) is why + 결과' 구조입니다. 앞 문장의 글리코겐 저장 원리 때문에, 공복 상태에서의 운동이 매우 힘들어지는 <strong className="text-teal-800 print:text-black">결과(why 뒤의 내용)</strong>가 초래된다는 논리적 흐름을 만듭니다. (This is because + 원인과 구별)
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. It is ~ that 강조구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[27] So, <span className="font-bold text-teal-600">is it</span> the loss of glycogen <span className="font-bold text-teal-600">that</span> causes us to have low levels of energy?"</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                주어인 'the loss of glycogen'을 [It is ~ that] 사이에 넣어 강조한 의문문 형태입니다. 에너지를 떨어뜨리는 원인이 <strong className="text-teal-800 print:text-black">"바로 그 글리코겐의 손실인지"</strong>를 묻고 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 주요명제 동사(recommend) + that 절
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[29] ... doctors <span className="font-bold text-cyan-700">recommend that</span> people <span className="font-bold text-cyan-700">(should) eat</span> food containing carbohydrates..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                주장, 요구, 명령, 제안을 나타내는 동사(여기서는 recommend) 뒤의 that절 내용이 '~해야 한다'는 당위성을 띠므로, that절의 동사는 <strong className="text-cyan-800 print:text-black">[(should) + 동사원형]</strong> 형태인 eat이 쓰였습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-500 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div onClick={() => handleLogicClick(idx + 1)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === idx + 1 ? 'ring-4 ring-emerald-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">In contrast to</div>}
+                                                    {idx === 1 && <div className="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Solved by</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Balanced with</div>}
+                                                    {idx === 3 && <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Leading to</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-500 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않는</span> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "식사 직후에 역기를 드는 등의 운동을 하면 소화 과정이 일시 중지될 수 있다." },
+                                                { id: 2, text: "몸에 저장된 포도당을 글리코겐이라고 부르며, 이것은 운동의 에너지원이다." },
+                                                { id: 3, text: "운동 후에는 손실된 글리코겐 보충을 위해 30분 이내에 탄수화물을 섭취해야 한다." },
+                                                { id: 4, text: "골프와 같은 가벼운 운동을 하더라도 식후 최소 3시간을 기다리는 것이 가장 좋다.", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 43번 문장에 따르면, 사이클링처럼 격렬한 운동이 아닌 골프와 같은 가벼운 운동의 경우에는 식사 후 <strong>1시간 정도만 기다려도 충분하다(waiting for one hour after a meal should be enough)</strong>고 명시되어 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                This is because intense exercise uses up all the glycogen in your muscles.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Your blood sugar levels are low, and you don't have enough glycogen stored in your body. ( ① ) If you exercise on an empty stomach, you will most likely lack energy and feel unusually tired. ( ② ) There can also be more serious outcomes. ( ③ ) Some people end up suffering from nausea and headaches, and others even faint. ( ④ ) Host: So, is it the loss of glycogen that causes us to have low levels of energy? 
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②" }, { id: 3, text: "③" }, { id: 4, text: "④", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 메스꺼움, 두통, 기절 등 '심각한 결과들'을 나열한 문장 바로 뒤에, 왜 그런 일이 발생하는지(근육의 글리코겐을 모두 고갈시키기 때문) 그 원인을 설명해주는 <strong>④번</strong> 자리가 가장 자연스럽습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                To maximize exercise efficiency and avoid discomfort, you should properly <span className="font-bold text-emerald-700">( A )</span> your meals and workouts, ensuring you replenish lost <span className="font-bold text-emerald-700">( B )</span> after exercising.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) skip —— (B) oxygen" },
+                                                { id: 2, text: "(A) time —— (B) glycogen", isCorrect: true },
+                                                { id: 3, text: "(A) replace —— (B) nutrients" },
+                                                { id: 4, text: "(A) time —— (B) cholesterol" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 운동의 효율성을 높이고 불쾌감을 피하려면 식사와 운동의 <strong>타이밍을 잘 맞춰야(time)</strong> 하고, 운동 후 손실된 <strong>글리코겐(glycogen)</strong>을 탄수화물을 통해 제대로 보충해주어야 한다는 것이 글의 요약입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않은</span> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                This is why exercising on a completely ①<span className="underline underline-offset-4 font-bold print:underline">empty</span> stomach can be such a challenge. Your blood sugar levels are low, and you don't have enough glycogen ②<span className="underline underline-offset-4 font-bold print:underline">stored</span> in your body. If you exercise on an empty stomach, you will most likely ③<span className="underline underline-offset-4 font-bold text-red-600 print:underline print:text-black">boost</span> energy and feel unusually tired. There can also be more ④<span className="underline underline-offset-4 font-bold print:underline">serious</span> outcomes.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① empty" }, 
+                                                { id: 2, text: "② stored" }, 
+                                                { id: 3, text: "③ boost", isCorrect: true }, 
+                                                { id: 4, text: "④ serious" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz4Answered(choice.id)} disabled={quiz4Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ③ boost $\rightarrow$ lack</strong><br/>공복에 운동을 하면 에너지가 '증가하는(boost)' 것이 아니라 십중팔구 에너지가 <strong>'부족할(lack)'</strong> 것이며, 비정상적인 피곤함을 느끼게 될 것입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 요지 파악</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 요지로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "다이어트를 위해서는 쌀밥보다 바나나를 섭취하는 것이 더 효과적이다." },
+                                                { id: 2, text: "운동의 질과 건강을 위해 적절한 식사 타이밍 조절과 영양 보충이 필수적이다.", isCorrect: true },
+                                                { id: 3, text: "아침 공복 운동은 근육 내 글리코겐을 소모하여 체지방 감량에 도움이 된다." },
+                                                { id: 4, text: "소화 불량을 예방하기 위해서는 식사 후 최소 3시간 이상 절대 안정을 취해야 한다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz5Answered(choice.id)} disabled={quiz5Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 식후 직후 운동(소화불량)과 공복 운동(에너지 고갈)의 부작용을 설명하며, 운동 후의 탄수화물 보충과 운동 전의 개인별 맞춤 대기 시간 설정 등 <strong>식사 및 운동의 알맞은 타이밍 조절</strong>을 강조하는 글입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black text-center">
+                                                "The best time to eat before you exercise <span className="inline-block w-40 border-b-2 border-slate-800 mx-1"></span> depending on several factors."
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "is exactly thirty minutes" },
+                                                { id: 2, text: "varies from one to three hours", isCorrect: true },
+                                                { id: 3, text: "should be completely avoided" },
+                                                { id: 4, text: "is immediately after waking up" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz6Answered(choice.id)} disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 39번과 40번 문장의 내용을 합친 질문입니다. 체형, 나이, 음식의 종류 등 여러 가지 요인에 따라 최적의 식사 타이밍은 <strong>'1시간에서 3시간 사이로 다양하다(varies from one to three hours)'</strong>가 정답입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                {/* 모바일 하단 네비게이션 */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
