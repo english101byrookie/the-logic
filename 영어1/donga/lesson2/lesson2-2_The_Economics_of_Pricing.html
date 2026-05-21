@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Lemonade Part 2</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: The Core Concept (1~3)
+          { id: 1, text: "The main goal of setting up the lemonade stand was to make enough profit for a donation to the local children’s home.", trans: "레모네이드 가판대를 세우는 주요 목표는 지역 보육원에 기부할 만큼 충분한 이윤을 내는 것이었습니다." },
+          { id: 2, text: "To maximize our profit, we needed to decrease our costs and increase our revenue.", trans: "우리의 이윤을 극대화하기 위해, 우리는 비용을 줄이고 수익을 늘려야 했습니다.", isHighlight: true, logicPoint: 1, logic: 'goal' },
+          { id: 3, text: "[Profit Formula] PROFIT = REVENUE - COSTS. PROFIT is the money made when revenue exceeds costs. REVENUE is money earned, and COSTS are money spent.", trans: "[이윤 공식] 이윤 = 수익 - 비용. 이윤은 수익이 비용을 초과할 때 버는 돈입니다. 수익은 벌어들인 돈이고, 비용은 지출한 돈입니다." },
+          
+          // Part 2: Minimizing Costs (4~5)
+          { id: 4, text: "Since we wanted to minimize costs, our first step was to find the most affordable ingredients and cups available.", trans: "우리는 비용을 최소화하고 싶었기 때문에, 첫 번째 단계는 이용 가능한 가장 저렴한 재료와 컵을 찾는 것이었습니다." },
+          { id: 5, text: "As we were researching prices, we found that buying ingredients and cups in bulk would be the smartest way to go.", trans: "가격을 조사하면서, 우리는 재료와 컵을 대량으로 구매하는 것이 가장 현명한 방법이라는 것을 알게 되었습니다.", logic: 'cost' },
+
+          // Part 3: Pricing Strategy (6~10)
+          { id: 6, text: "Now that we had found out how to minimize costs, we needed to decide on a reasonable price for a cup of lemonade.", trans: "이제 비용을 최소화하는 방법을 알아냈으니, 레모네이드 한 잔의 합리적인 가격을 결정해야 했습니다." },
+          { id: 7, text: "First, we inquired about the previous year’s drink prices, and the organizer told us that soft drinks had been sold for $1.50 per cup.", trans: "먼저, 우리는 작년의 음료 가격에 대해 문의했고, 주최자는 탄산음료가 한 잔에 1.50달러에 팔렸다고 말해주었습니다." },
+          { id: 8, text: "Considering that freshly squeezed lemonade usually costs more, we decided to sell each cup for $2.", trans: "갓 짜낸 레모네이드가 보통 비용이 더 많이 든다는 점을 고려하여, 우리는 한 잔에 2달러에 팔기로 결정했습니다.", isHighlight: true, logicPoint: 2, logic: 'price' },
+          { id: 9, text: "Based on our recipe and the costs of the ingredients and cups, each cup of lemonade would cost us about $0.70 to make.", trans: "우리의 레시피와 재료 및 컵의 비용을 바탕으로, 레모네이드 한 잔을 만드는 데 약 0.70달러의 비용이 들 것입니다." },
+          { id: 10, text: "With a selling price of $2, we expected a profit of $1.30 per cup.", trans: "판매가를 2달러로 하여, 우리는 한 잔당 1.30달러의 이윤을 예상했습니다." },
+
+          // Part 4: Calculating the Final Profit (11~16)
+          { id: 11, text: "Regarding attendance, we learned that the festival organizers were expecting around 400 people for each of the two days of the festival.", trans: "참석자 수와 관련하여, 우리는 축제 주최측이 이틀간의 축제 동안 매일 약 400명의 사람들을 예상하고 있다는 것을 알게 되었습니다." },
+          { id: 12, text: "We thought we could reasonably sell lemonade to half of the people attending, so we aimed to sell 400 cups over the two days.", trans: "우리는 참석자의 절반에게는 무난히 레모네이드를 팔 수 있을 것이라 생각했고, 그래서 이틀 동안 400잔을 파는 것을 목표로 했습니다." },
+          { id: 13, text: "If we could do that, our revenue would amount to $800!", trans: "만약 우리가 그렇게 할 수 있다면, 우리의 수익은 800달러에 달할 것입니다!", isHighlight: true, logicPoint: 3 },
+          { id: 14, text: "However, this revenue wouldn’t be pure profit. We needed to subtract our costs from it.", trans: "하지만 이 수익이 순수한 이윤은 아닐 것입니다. 우리는 거기서 비용을 빼야 했습니다." },
+          { id: 15, text: "In addition to the cost of $280 required to make 400 cups, we also had to factor in the $6 we needed for posters and fliers.", trans: "400잔을 만드는 데 필요한 280달러의 비용 외에도, 포스터와 전단지에 필요한 6달러도 고려해야 했습니다.", isHighlight: true, logicPoint: 4 },
+          { id: 16, text: "If we reached our goal, we would be able to make $514 in profit. That would be a big donation!", trans: "만약 우리의 목표에 도달한다면, 우리는 514달러의 이윤을 낼 수 있을 것입니다. 그것은 큰 기부가 될 것입니다!", logic: 'profit' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'goal', title: "THE GOAL (목표 설정)", desc: "Maximize Profit for Donation", color: "bg-green-100 border-green-400 text-green-800", icon: <i className="ph-fill ph-target text-xl mb-2"></i> },
+          { id: 'cost', title: "DECREASE COSTS (비용 감소)", desc: "Buy ingredients & cups in bulk", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-trend-down text-xl mb-2"></i> },
+          { id: 'price', title: "INCREASE REVENUE (수익 증가)", desc: "Set price to $2 (Market research)", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-trend-up text-xl mb-2"></i> },
+          { id: 'profit', title: "EXPECTED PROFIT (최종 이윤)", desc: "Revenue($800) - Costs($286) = $514", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-money text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-green-600 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-green-800 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Sweet Success: Lemonade Stand</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 2: The Economics of Pricing</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-green-50 text-green-800 border-green-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-teal-50 text-teal-800 border-teal-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-green-700 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: 이윤 공식 (1~3번) */}
+                      <div>
+                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Core Concept (이윤 극대화의 기본 공식)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 3).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-green-50 border border-green-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-green-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-green-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 비용 최소화 (4~5번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-teal-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Minimizing Costs (비용 최소화 전략)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(3, 5).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-green-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 가격 책정 (6~10번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-emerald-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Pricing Strategy (시장 조사와 가격 책정)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(5, 10).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-green-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: 이윤 계산 (11~16번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Final Calculation (수익 예측과 최종 이윤 계산)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(10, 16).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-green-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-green-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-green-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-green-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-green-600 text-white' : 'bg-green-50 text-green-800'}`}>
+                          POINT 01. To부정사의 부사적 용법 (목적)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [To maximize] our profit, we needed to decrease...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "이윤을 극대화하기 위해서"라는 궁극적인 <strong>목적</strong>을 제시하고, 이를 달성하기 위해 '비용 감소'와 '수익 증가'라는 두 가지 논리적 접근이 필요함을 밝히는 핵심 문장입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-emerald-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-emerald-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-emerald-600 text-white' : 'bg-emerald-50 text-emerald-800'}`}>
+                          POINT 02. 분사구문 (이유/조건)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [Considering that] freshly squeezed lemonade usually costs more...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~라는 점을 고려하면(고려하여)"이라는 뜻으로, 단순한 탄산음료($1.50)보다 생과일 레모네이드의 가격을 더 높게($2.00) 책정한 <strong>논리적 근거</strong>를 제시하는 분사구문입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-cyan-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-cyan-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-cyan-600 text-white' : 'bg-cyan-50 text-cyan-800'}`}>
+                          POINT 03. 조건절 (수익 예측)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [If] we could do that, our revenue [would] amount to $800!</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            400잔 판매라는 가정(If)이 성공적으로 이루어졌을 때 달성할 수 있는 총 <strong>수익(Revenue)</strong>을 조동사 과거형(would)을 사용하여 논리적으로 예측합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-teal-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-teal-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 4 ? 'bg-teal-600 text-white' : 'bg-teal-50 text-teal-800'}`}>
+                          POINT 04. 부가 정보의 전치사: In addition to
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [In addition to] the cost of $280..., we also had to factor in the $6...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~에 더하여"라는 뜻입니다. 원가 계산에서 재료비($280)뿐만 아니라 홍보비($6)까지 누락 없이 <strong>추가 비용(Costs)</strong>으로 더해 최종 이윤을 깎는 논리적 과정을 보여줍니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-green-700 hover:bg-green-600 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-teal-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-teal-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-teal-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-teal-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 이윤 창출의 논리 과정을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Achieved by
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                And
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Which calculates
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-teal-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 내용 일치 (계산) */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "재료와 컵을 대량으로 구매하여 비용을 최소화하기로 했다." },
+                          { id: 2, text: "레모네이드 한 잔의 판매 가격은 작년 탄산음료보다 높게 책정되었다." },
+                          { id: 3, text: "이틀 동안 목표한 400잔을 모두 팔면 800달러의 순이익을 얻게 된다.", isCorrect: true },
+                          { id: 4, text: "최종 비용 계산에는 재료비뿐만 아니라 포스터와 전단지 비용도 포함되었다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-teal-400 hover:bg-teal-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 목표인 400잔을 2달러에 팔았을 때 얻는 800달러는 순이익(Profit)이 아니라 <strong>수익(Revenue)</strong>입니다. 본문에서도 "this revenue wouldn't be pure profit(이 수익이 순수한 이윤은 아닐 것이다)"이라고 명시했으며, 비용($286)을 뺀 <strong>514달러가 최종 목표 순이익</strong>입니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 어휘 추론 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문맥상 어휘 추론</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <u>않은</u> 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          To ①<u>maximize</u> our profit, we needed to decrease our costs and increase our revenue. Since we wanted to ②<u>minimize</u> costs, our first step was to find the most affordable ingredients and cups. If we could sell 400 cups, our revenue would amount to $800! However, this revenue wouldn’t be pure profit. We needed to ③<u><span className="text-red-600 font-bold">add</span></u> our costs from it. In ④<u>addition</u> to the cost of $280 required to make 400 cups, we also had to factor in the $6 we needed for posters.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "① maximize" },
+                          { id: 2, text: "② minimize" },
+                          { id: 3, text: "③ add", isCorrect: true },
+                          { id: 4, text: "④ addition" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-teal-400 hover:bg-teal-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설: ③ add $\rightarrow$ subtract</strong><br/>
+                            순수 이익(pure profit)을 구하기 위해서는 전체 수익(revenue)에서 비용(costs)을 '더하는(add)' 것이 아니라 <strong>'빼야(subtract)'</strong> 합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 문장 삽입 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <p className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          However, this revenue wouldn’t be pure profit.
+                        </p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Regarding attendance, we learned that the festival organizers were expecting around 400 people for each of the two days of the festival. We thought we could reasonably sell lemonade to half of the people attending, so we aimed to sell 400 cups over the two days. ( ① ) If we could do that, our revenue would amount to $800! ( ② ) We needed to subtract our costs from it. ( ③ ) In addition to the cost of $280 required to make 400 cups, we also had to factor in the $6 we needed for posters and fliers. ( ④ ) If we reached our goal, we would be able to make $514 in profit.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②", isCorrect: true },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-teal-400 hover:bg-teal-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 주어진 문장의 <strong>'this revenue(이 수익)'</strong>는 앞 문장의 $800를 가리킵니다. 800달러를 번다는 신나는 예상 직후에 역접(However)으로 "하지만 그것이 순수한 이윤은 아니다"라고 환기시키고, 뒤이어 "비용을 빼야 한다(subtract costs)"는 구체적인 행동으로 이어지는 <strong>②번</strong> 자리가 논리적으로 가장 완벽합니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
