@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - A Trip to the Netherlands</title>
+    
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: Intro & Amsterdam (Anne Frank House)
+          { id: 1, text: "Before my trip to the Netherlands, all I knew of the country was that it is famous for windmills and tulips.", trans: "네덜란드 여행 전에 내가 그 나라에 대해 아는 것이라고는 풍차와 튤립으로 유명하다는 것뿐이었다." },
+          { id: 2, text: "But as I cycled from place to place, I experienced many things that I hadn’t expected, and I wanted to share some of them with you.", trans: "하지만 자전거를 타고 이곳저곳을 다니면서 나는 기대하지 않았던 많은 것들을 경험했고, 그중 일부를 여러분과 공유하고 싶었다." },
+          { id: 3, text: "“The Anne Frank House and the Prinsengracht in Amsterdam”", trans: "“암스테르담의 안네 프랑크의 집과 프린센흐라흐트”" },
+          { id: 4, text: "My first stop was the Anne Frank House, one of the old buildings lined up along the Prinsengracht, a canal in Amsterdam.", trans: "나의 첫 번째 목적지는 암스테르담의 운하인 프린센흐라흐트를 따라 늘어선 오래된 건물들 중 하나인 안네 프랑크의 집이었다.", isHighlight: true, logicPoint: 1 },
+          { id: 5, text: "Since it was close to the hotel I was staying at, I decided to rent a bike to go there.", trans: "내가 머물고 있는 호텔에서 가까웠기 때문에, 나는 자전거를 빌려 그곳에 가기로 결정했다." },
+          { id: 6, text: "I enjoyed riding along the canal.", trans: "나는 운하를 따라 달리는 것을 즐겼다." },
+          { id: 7, text: "The Anne Frank House is one of the most visited museums in the Netherlands.", trans: "안네 프랑크의 집은 네덜란드에서 가장 많이 방문하는 박물관 중 하나이다." },
+          { id: 8, text: "It housed the secret hiding place of Anne Frank.", trans: "그곳에는 안네 프랑크의 비밀 은신처가 있었다." },
+          { id: 9, text: "There was an old bookcase on the second floor.", trans: "2층에는 오래된 책장이 있었다." },
+          { id: 10, text: "It looked ordinary, but behind it was a secret space where Anne and her family hid for over two years during World War II.", trans: "그것은 평범해 보였지만, 그 뒤에는 안네와 그녀의 가족이 제2차 세계 대전 동안 2년 넘게 숨어 지냈던 비밀 공간이 있었다." },
+          { id: 11, text: "The steep stairs and narrow passages gave me a better understanding of what life must have been like for them back then.", trans: "가파른 계단과 좁은 통로들은 그 당시 그들의 삶이 어땠을지에 대한 더 나은 이해를 나에게 주었다." },
+          { id: 12, text: "After visiting the Anne Frank House, I took a canal cruise on the Prinsengracht.", trans: "안네 프랑크의 집을 방문한 후, 나는 프린센흐라흐트에서 운하 크루즈를 탔다." },
+          { id: 13, text: "The canal houses I saw along the way had mostly been built during the Dutch Golden Age, which gives them great historical value.", trans: "가는 길에 본 운하 주변의 집들은 대부분 네덜란드의 황금기 동안 지어졌으며, 이것은 그것들에 큰 역사적 가치를 부여한다." },
+          { id: 14, text: "Taking the cruise was a great way to see the city from different angles.", trans: "크루즈를 타는 것은 다양한 각도에서 도시를 보는 훌륭한 방법이었다." },
+          { id: 15, text: "The gentle touch of the wind made the experience even more pleasant.", trans: "부드러운 바람의 손길은 그 경험을 훨씬 더 즐겁게 만들었다." },
+
+          // Part 2: Amsterdam (The Van Gogh Museum)
+          { id: 16, text: "“The Van Gogh Museum in Amsterdam”", trans: "“암스테르담의 반 고흐 박물관”" },
+          { id: 17, text: "Amsterdam is home to a lot of museums, but the Van Gogh Museum was the one I was really excited to visit.", trans: "암스테르담에는 많은 박물관이 있지만, 반 고흐 박물관은 내가 정말 방문하고 싶어 했던 곳이었다.", isHighlight: true, logicPoint: 2 },
+          { id: 18, text: "The most interesting part of the museum was the way the exhibits were arranged to show how the artist’s style had changed over time.", trans: "이 박물관의 가장 흥미로운 부분은 시간이 지남에 따라 예술가의 스타일이 어떻게 변했는지를 보여주기 위해 전시물들이 배열된 방식이었다." },
+          { id: 19, text: <span>The museum showed many of Vincent van Gogh’s most well-known works, including my personal favorites: <span className="italic font-medium">The Bedroom</span>, <span className="italic font-medium">Sunflowers</span>, and <span className="italic font-medium">Wheatfield with Crows</span>.</span>, trans: "이 박물관은 내가 개인적으로 가장 좋아하는 '침실', '해바라기', '까마귀가 있는 밀밭'을 포함하여 빈센트 반 고흐의 가장 잘 알려진 작품들 중 많은 것들을 보여주었다." },
+          { id: 20, text: <span>The bright colors in <span className="italic font-medium">The Bedroom</span> seemed to convey a sense of relaxation.</span>, trans: "'침실'의 밝은 색상들은 편안함을 전달하는 것 같았다." },
+          { id: 21, text: <span>The different shades of yellow in <span className="italic font-medium">Sunflowers</span> were just amazing.</span>, trans: "'해바라기'의 다양한 노란색 색조들은 그저 놀라웠다." },
+          { id: 22, text: <span>In <span className="italic font-medium">Wheatfield with Crows</span>, the contrast between the bright yellow wheat field and the cool blue sky was striking.</span>, trans: "'까마귀가 있는 밀밭'에서 밝은 노란색 밀밭과 시원한 파란색 하늘 사이의 대조는 인상적이었다." },
+          { id: 23, text: "Overall, seeing the artworks in person was a very powerful experience.", trans: "전반적으로 예술 작품들을 직접 보는 것은 매우 강력한 경험이었다." },
+          { id: 24, text: "The museum also displayed the letters that Van Gogh wrote to his younger brother, Theo.", trans: "이 박물관은 또한 반 고흐가 남동생 테오에게 쓴 편지들도 전시했다." },
+          { id: 25, text: "Reading those letters, I found out how much the artist loved his brother.", trans: "그 편지들을 읽으면서, 나는 그 예술가가 동생을 얼마나 사랑했는지 알게 되었다." },
+          { id: 26, text: "After I bought a few postcards with Van Gogh’s art on them, I slowly cycled back to the hotel.", trans: "반 고흐의 예술 작품이 그려진 엽서 몇 장을 산 후, 나는 천천히 자전거를 타고 호텔로 돌아왔다." },
+          { id: 27, text: "On my way back, I couldn’t help but admire the beautiful, calm, and scenic views of the city, especially people relaxing on the grass and enjoying the sun.", trans: "돌아오는 길에, 나는 이 도시의 아름답고 차분하며 경치 좋은 풍경, 특히 잔디밭에서 휴식을 취하며 햇살을 즐기는 사람들에 감탄하지 않을 수 없었다." },
+
+          // Part 3: Zaanse Schans & Volendam
+          { id: 28, text: "“Windmills in the Zaanse Schans and Seafood in Volendam”", trans: "“잔세스칸스의 풍차와 폴렌담의 해산물”" },
+          { id: 29, text: "I highly recommend visiting the Zaanse Schans and Volendam if you want to get out of the busy city to experience traditional Dutch culture.", trans: "만약 번잡한 도시에서 벗어나 전통적인 네덜란드 문화를 경험하고 싶다면 잔세스칸스와 폴렌담을 방문할 것을 강력히 추천한다.", isHighlight: true, logicPoint: 3 },
+          { id: 30, text: "A trip to the Netherlands wouldn’t be complete without a visit to the windmills.", trans: "네덜란드 여행은 풍차를 방문하지 않고는 완전하지 않을 것이다." },
+          { id: 31, text: "Fortunately, you can get to the Zaanse Schans, which is famous for its windmills, in just 17 minutes by train from Amsterdam.", trans: "다행히도, 당신은 풍차로 유명한 잔세스칸스에 암스테르담에서 기차로 단 17분 만에 갈 수 있다." },
+          { id: 32, text: "The moment I saw the village, its beauty took my breath away.", trans: "마을을 보는 순간, 그 아름다움이 나의 숨을 멎게 했다." },
+          { id: 33, text: "Several windmills were spinning by the river in the distance.", trans: "저 멀리 강가에서 여러 개의 풍차가 돌고 있었다." },
+          { id: 34, text: "Soon I felt like I was taken to a point in the past.", trans: "곧 나는 과거의 어느 시점으로 데려가진 것 같은 느낌이 들었다." },
+          { id: 35, text: "I looked into one of the working windmills, and it was grinding nuts into oil with its large stone wheels.", trans: "나는 작동하고 있는 풍차 중 하나를 들여다보았고, 그것은 큰 돌바퀴로 견과류를 갈아 기름으로 만들고 있었다." },
+          { id: 36, text: "Near the windmills, I found a cheese farm and a clog factory.", trans: "풍차 근처에서 나는 치즈 농장과 나막신 공장을 발견했다." },
+          { id: 37, text: "I was surprised by the variety of Dutch cheeses and actually a little unsure about tasting them at first because they were mostly new to me.", trans: "나는 네덜란드 치즈의 다양성에 놀랐고, 그것들이 대부분 나에게 생소했기 때문에 처음에는 맛보는 것에 대해 사실 조금 확신이 없었다." },
+          { id: 38, text: "However, when I tried some of them, they turned out to be incredibly satisfying.", trans: "하지만 몇 가지를 시식해 보았을 때, 그것들은 믿을 수 없을 정도로 만족스러운 것으로 판명되었다." },
+          { id: 39, text: "I also tried on a few pairs of clogs and found them quite comfortable, which I hadn’t expected.", trans: "나는 또한 나막신 몇 켤레를 신어 보았고 예상했던 것과 달리 그것들이 꽤 편안하다는 것을 알았다." },
+          { id: 40, text: "Volendam was a pretty fishing village with neat rows of brick houses with orange roofs.", trans: "폴렌담은 주황색 지붕을 가진 벽돌집들이 깔끔하게 늘어선 예쁜 어촌 마을이었다." },
+          { id: 41, text: "The harbor was dotted with boats.", trans: "항구에는 배들이 점점이 떠 있었다." },
+          { id: 42, text: "I rented a bike to explore Volendam, and the shop owner said, “In Volendam, do as the locals do and eat seafood.”", trans: "나는 폴렌담을 둘러보기 위해 자전거를 빌렸고, 가게 주인은 “폴렌담에서는 현지인들처럼 해산물을 드세요.”라고 말했다." },
+          { id: 43, text: <span>At a restaurant, I ordered one of the Netherlands’ most popular dishes, <span className="italic font-medium">kibbeling</span>.</span>, trans: "한 식당에서 나는 네덜란드의 가장 인기 있는 요리 중 하나인 키벨링(kibbeling)을 주문했다." },
+          { id: 44, text: "The fried fish snack was hot, fresh, and absolutely delicious!", trans: "그 생선튀김 간식은 뜨겁고, 신선하고, 정말 맛있었다!" },
+
+          // Part 4: Rotterdam (Cube Houses)
+          { id: 45, text: "“The Cube Houses in Rotterdam”", trans: "“로테르담의 큐브 하우스”" },
+          { id: 46, text: "After being completely destroyed during World War II, Rotterdam was restored into a beautiful port city.", trans: "제2차 세계 대전 중에 완전히 파괴된 후, 로테르담은 아름다운 항구 도시로 복구되었다." },
+          { id: 47, text: "Experimental and artistic constructions were used to improve the appearance of the city.", trans: "도시의 미관을 개선하기 위해 실험적이고 예술적인 건축물들이 사용되었다." },
+          { id: 48, text: "The Cube Houses in Rotterdam are among the most innovative buildings in the country.", trans: "로테르담의 큐브 하우스는 이 나라에서 가장 혁신적인 건물들 중 하나이다.", isHighlight: true, logicPoint: 4 },
+          { id: 49, text: "The bright yellow houses were something I had been looking forward to seeing, and they were as fantastic as I had expected.", trans: "그 밝은 노란색 집들은 내가 보기를 고대해 왔던 것이었고, 내가 기대했던 것만큼 환상적이었다." },
+          { id: 50, text: "One of the key features of the Cube Houses is that the cubes are tilted by 45 degrees.", trans: "큐브 하우스의 주요 특징 중 하나는 큐브들이 45도 기울어져 있다는 것이다." },
+          { id: 51, text: "I visited the Show Cube Museum to get a feel of what life in such a house was like.", trans: "나는 그런 집에서의 삶이 어떤지 느껴보기 위해 쇼 큐브 박물관을 방문했다." },
+          { id: 52, text: "From the outside, it looked entirely twisted, but once I went inside, it was surprisingly quite comfortable.", trans: "밖에서 볼 때 그것은 완전히 비틀려 보였지만, 일단 안으로 들어가니 그것은 놀랍게도 꽤 편안했다." },
+
+          // Part 5: Conclusion
+          { id: 53, text: "For the last few days after the trip, I haven’t been able to get the charming sights of the Netherlands out of my mind.", trans: "여행 후 지난 며칠 동안, 나는 네덜란드의 매력적인 풍경들을 마음속에서 지울 수 없었다." },
+          { id: 54, text: "If you ever plan to visit the country, I really hope that you will find my post helpful.", trans: "만약 당신이 이 나라를 방문할 계획이 있다면, 내 글이 도움이 되기를 진심으로 바란다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { id: 'amsterdam1', title: "AMSTERDAM 1 (역사와 운하)", desc: "안네 프랑크의 집 & 운하 크루즈", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-house-line text-xl mb-2"></i> },
+          { id: 'amsterdam2', title: "AMSTERDAM 2 (예술과 정서)", desc: "반 고흐 박물관 & 편지 전시", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-palette text-xl mb-2"></i> },
+          { id: 'tradition', title: "TRADITION (전통 문화 체험)", desc: "잔세스칸스의 풍차, 폴렌담의 어촌", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-windmill text-xl mb-2"></i> },
+          { id: 'rotterdam', title: "ROTTERDAM (혁신과 재건)", desc: "파괴 후 재건된 큐브 하우스", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-buildings text-xl mb-2"></i> },
+          { id: 'conclusion', title: "CONCLUSION (마무리)", desc: "네덜란드의 매력 회상과 추천", color: "bg-emerald-100 border-emerald-500 text-emerald-900", icon: <i className="ph-fill ph-camera text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">A Trip to the Netherlands</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-emerald-900 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* 사이드바 */}
+                <aside className="hidden md:flex flex-col w-72 bg-emerald-950 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-emerald-900 border-b border-emerald-800">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl"></i>
+                            <span className="text-xs font-bold tracking-wider">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">A Trip to the Netherlands</h1>
+                        <p className="text-emerald-300 text-sm mt-2 italic">Unexpected and Charming</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-emerald-800">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* 메인 영역 */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Netherlands</h1>
+                            <p className="text-emerald-300 text-xs italic">Unexpected and Charming</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-emerald-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-500 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-blue-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Amsterdam 1 (안네 프랑크의 집과 프린센흐라흐트 운하)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 15).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-indigo-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Amsterdam 2 (반 고흐 박물관에서의 예술적 경험)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(15, 28).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-orange-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Tradition (잔세스칸스의 풍차 마을과 폴렌담의 어촌)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(28, 45).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Rotterdam (로테르담의 혁신적인 큐브 하우스)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(45, 52).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 5 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Conclusion (매력적인 네덜란드 여행 회상)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(52, 54).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black underline underline-offset-4 print:font-bold' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-500 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 주어 역할을 하는 명사구 (all I knew)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[01] ... <span className="font-bold text-emerald-600">all I knew</span> of the country <span className="font-bold text-emerald-600">was that</span> it is famous for..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                'all (that) I knew' 구조로 관계대명사 that이 생략되어 있으며, 이 명사구가 문장의 주어 역할을 합니다. '내가 알았던 전부'는 단수 취급을 하므로 동사 <strong className="text-emerald-800 print:text-black">was</strong>가 쓰였고, 보어 자리에 명사절 접속사 <strong className="text-emerald-800 print:text-black">that</strong>이 왔습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. must have p.p. (과거에 대한 강한 추측)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[11] ... understanding of what life <span className="font-bold text-emerald-600">must have been</span> like for them back then."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                [must have + 과거분사(p.p.)] 형태는 과거의 일에 대해 <strong className="text-emerald-800 print:text-black">'~였음에 틀림없다'</strong>라는 강한 확신과 추측을 나타냅니다. 그 당시 그들의 삶이 어땠을지에 대한 필자의 깊은 공감을 표현합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 관계대명사의 계속적 용법 (, which)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[13] ... built during the Dutch Golden Age, <span className="font-bold text-teal-600">which gives</span> them great historical value."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤에 쓰인 관계대명사 which는 앞 문장의 내용(운하의 집들이 황금기에 지어졌다는 사실) 전체를 선행사로 받습니다. 절이 선행사이므로 <strong className="text-teal-800 print:text-black">단수 동사(gives)</strong>로 수일치를 해주었습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. the way (관계부사 how 대용)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[18] ... was <span className="font-bold text-teal-600">the way</span> the exhibits were arranged to show <span className="font-bold text-teal-600">how</span> the artist’s style had changed..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                the way 뒤에는 관계부사 how를 함께 쓸 수 없으므로 생략되거나 that/in which로 대신합니다. 뒤이어 나오는 'how the artist's style...'은 의문사절로 쓰여 <strong className="text-teal-800 print:text-black">'~하는 방식'</strong>과 <strong className="text-teal-800 print:text-black">'어떻게 ~했는지'</strong>라는 뜻을 각각 명확하게 나타냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. cannot help but + 동사원형
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[27] On my way back, I <span className="font-bold text-cyan-700">couldn’t help but admire</span> the beautiful, calm, and scenic views..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                [cannot help but + 동사원형]은 <strong className="text-cyan-800 print:text-black">'~하지 않을 수 없다'</strong>는 의미를 지니는 핵심 관용구입니다. [cannot help ~ing]와 같은 의미로, 풍경의 아름다움에 저절로 감탄이 나왔음을 뜻합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-500 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div onClick={() => handleLogicClick(idx + 1)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === idx + 1 ? 'ring-4 ring-emerald-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-indigo-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Moving to Art</div>}
+                                                    {idx === 1 && <div className="bg-orange-100 text-orange-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-orange-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Traveling to</div>}
+                                                    {idx === 2 && <div className="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Finally visiting</div>}
+                                                    {idx === 3 && <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Reflecting on</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-500 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않는</span> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "안네 프랑크의 집 2층에 있는 평범해 보이는 책장 뒤에는 비밀 공간이 있었다." },
+                                                { id: 2, text: "잔세스칸스에서 맛본 여러 네덜란드 치즈들은 여행 전부터 필자가 매우 좋아하던 것들이었다.", isCorrect: true },
+                                                { id: 3, text: "폴렌담에서 필자는 자전거를 빌려 마을을 구경하고 생선튀김 간식인 키벨링을 먹었다." },
+                                                { id: 4, text: "로테르담의 큐브 하우스는 밖에서 볼 때 비틀려 보이지만 내부는 꽤 편안했다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 37번 문장에서 필자는 네덜란드 치즈가 <strong>대부분 생소하여(they were mostly new to me) 처음에는 맛보는 것에 확신이 없었다(unsure about tasting them at first)</strong>고 명시되어 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                After visiting the Anne Frank House, I took a canal cruise on the Prinsengracht.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                There was an old bookcase on the second floor. It looked ordinary, but behind it was a secret space where Anne and her family hid for over two years during World War II. ( ① ) The steep stairs and narrow passages gave me a better understanding of what life must have been like for them back then. ( ② ) The canal houses I saw along the way had mostly been built during the Dutch Golden Age, which gives them great historical value. ( ③ ) Taking the cruise was a great way to see the city from different angles. ( ④ ) The gentle touch of the wind made the experience even more pleasant.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②", isCorrect: true }, { id: 3, text: "③" }, { id: 4, text: "④" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 안네 프랑크의 집에 대한 묘사(가파른 계단과 통로)가 끝난 직후이자, 운하 크루즈를 타면서 본 풍경(canal houses I saw along the way)이 시작되기 직전인 <strong>②번</strong> 자리에 들어가는 것이 가장 자연스럽습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                The writer's trip to the Netherlands was filled with <span className="font-bold text-emerald-700">( A )</span> experiences, ranging from the deep history of Amsterdam and traditional Dutch culture to the <span className="font-bold text-emerald-700">( B )</span> architecture of Rotterdam.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) familiar —— (B) classical" },
+                                                { id: 2, text: "(A) unexpected —— (B) innovative", isCorrect: true },
+                                                { id: 3, text: "(A) unexpected —— (B) ordinary" },
+                                                { id: 4, text: "(A) disappointing —— (B) unique" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 필자는 여행 중 <strong>예상치 못한(unexpected)</strong> 다채로운 경험을 했으며, 로테르담에서는 큐브 하우스라는 <strong>혁신적인(innovative)</strong> 건축물을 보았다는 내용이 전체 요약에 부합합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <span className="underline underline-offset-4 font-bold text-red-600 print:text-black print:underline">않은</span> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                After being completely ①<span className="underline underline-offset-4 font-bold print:underline">destroyed</span> during World War II, Rotterdam was ②<span className="underline underline-offset-4 font-bold print:underline">restored</span> into a beautiful port city. Experimental and artistic constructions were used to ③<span className="underline underline-offset-4 font-bold print:underline">improve</span> the appearance of the city. The Cube Houses in Rotterdam are among the most ④<span className="underline underline-offset-4 font-bold text-red-600 print:underline print:text-black">traditional</span> buildings in the country. 
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① destroyed" }, 
+                                                { id: 2, text: "② restored" }, 
+                                                { id: 3, text: "③ improve" }, 
+                                                { id: 4, text: "④ traditional", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz4Answered(choice.id)} disabled={quiz4Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 4 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ④ traditional $\rightarrow$ innovative</strong><br/>로테르담의 큐브 하우스는 '전통적인(traditional)' 건물이 아니라 도시 미관 개선을 위한 실험적이고 <strong>'혁신적인(innovative)'</strong> 건축물의 대표적인 예시입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 목적 파악</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글을 쓴 목적으로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "네덜란드의 대중교통 이용 방법을 안내하기 위해" },
+                                                { id: 2, text: "안네 프랑크와 반 고흐의 생애를 비교 분석하기 위해" },
+                                                { id: 3, text: "네덜란드 여행에서 겪은 매력적인 경험들을 공유하기 위해", isCorrect: true },
+                                                { id: 4, text: "로테르담의 큐브 하우스 건축 과정을 세밀히 설명하기 위해" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz5Answered(choice.id)} disabled={quiz5Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 2번 문장("I wanted to share some of them with you")에서 명확히 드러나듯, 필자가 네덜란드의 여러 도시를 여행하며 느낀 <strong>예상치 못한 다채로운 경험과 매력을 독자와 공유</strong>하는 것이 이 기행문의 목적입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black text-center">
+                                                "On my way back, I couldn’t help but <span className="inline-block w-40 border-b-2 border-slate-800 mx-1"></span> the beautiful, calm, and scenic views of the city."
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "completely ignore" },
+                                                { id: 2, text: "deeply criticize" },
+                                                { id: 3, text: "admire", isCorrect: true },
+                                                { id: 4, text: "rapidly change" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz6Answered(choice.id)} disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 27번 문장에 해당하는 관용구 문제입니다. 'cannot help but 동사원형(~하지 않을 수 없다)' 구문 뒤에, 도시의 아름다운 풍경을 보고 감탄할 수밖에 없었다는 문맥이므로 <strong>'감탄하다(admire)'</strong>가 정답입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                {/* 모바일 하단 네비게이션 */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

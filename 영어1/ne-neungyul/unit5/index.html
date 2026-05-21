@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - A Journey From War to the Olympics</title>
+    
+    <meta name="theme-color" content="#166534">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #f0fdf4; background-image: radial-gradient(#bbf7d0 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: Early Life & Dream
+          { id: 1, text: "When Yusra Mardini was a young girl growing up in Damascus, Syria, her life centered around swimming.", trans: "시리아 다마스쿠스에서 자라는 어린 소녀였을 때, 유스라 마르디니의 삶은 수영을 중심으로 돌아갔다." },
+          { id: 2, text: "Her father was a former professional swimmer, and she started learning how to swim from a young age.", trans: "그녀의 아버지는 전직 프로 수영 선수였고, 그녀는 어릴 때부터 수영하는 법을 배우기 시작했다." },
+          { id: 3, text: "When she was nine years old, she was already faster than many older swimmers.", trans: "9살 때, 그녀는 이미 많은 나이 든 수영 선수들보다 더 빨랐다." },
+          { id: 4, text: "It was clear that she had a special talent, and she fell in love with the sport.", trans: "그녀에게 특별한 재능이 있다는 것은 분명했고, 그녀는 그 스포츠와 사랑에 빠졌다." },
+          { id: 5, text: "She enjoyed watching Olympic swimming events with her father, which led her to dream about competing in the Olympics.", trans: "그녀는 아버지와 올림픽 수영 경기를 보는 것을 즐겼고, 이것은 그녀가 올림픽에 출전하는 꿈을 꾸게 이끌었다." },
+          { id: 6, text: "She got the chance to represent Syria in an international swimming championship, and it seemed like her Olympic dream might someday come true.", trans: "그녀는 국제 수영 선수권 대회에서 시리아를 대표할 기회를 얻었고, 언젠가 그녀의 올림픽 꿈이 실현될 것처럼 보였다." },
+
+          // Part 2: The War & The Decision
+          { id: 7, text: "However, Yusra had no idea that her life would soon be turned upside down by the horrors of the Syrian civil war, which had broken out in 2011.", trans: "그러나 유스라는 2011년에 발발한 시리아 내전의 참상으로 인해 자신의 삶이 곧 뒤집힐 것이라는 것을 전혀 알지 못했다.", isHighlight: true, logicPoint: 1 },
+          { id: 8, text: "Over the next few years, normal activities like going to school became risky.", trans: "그 후 몇 년 동안 학교에 가는 것과 같은 정상적인 활동들이 위험해졌다." },
+          { id: 9, text: "Through all of this chaos, she clung to her dream and kept swimming.", trans: "이 모든 혼란 속에서도 그녀는 꿈에 매달렸고 계속해서 수영했다." },
+          { id: 10, text: "However, even this became dangerous.", trans: "하지만 이것조차 위험해졌다." },
+          { id: 11, text: "One fateful day, a bomb fell in the pool where she was training.", trans: "어느 운명적인 날, 그녀가 훈련하고 있던 수영장에 폭탄이 떨어졌다." },
+          { id: 12, text: "Although it did not explode, this incident was horrifying enough to be a wake-up call for Yusra and her sister Sara.", trans: "비록 폭발하지는 않았지만, 이 사건은 유스라와 그녀의 언니 사라에게 경각심을 일깨워주기에 충분히 끔찍했다." },
+          { id: 13, text: "They realized that they could no longer stay in their home country, and they made up their minds to flee Syria and go to Germany to avoid the war.", trans: "그들은 더 이상 고국에 머물 수 없다는 것을 깨달았고, 전쟁을 피해 시리아를 떠나 독일로 가기로 결심했다." },
+          { id: 14, text: "If they reached Europe, the rest of the family would follow.", trans: "그들이 유럽에 도착하면, 나머지 가족들도 따라올 것이었다." },
+          { id: 15, text: "The decision was not an easy one, but Yusra knew that it was her only option if she wanted to pursue her dream and live without fear.", trans: "그 결정은 쉬운 것이 아니었지만, 유스라는 만약 그녀가 두려움 없이 살며 꿈을 추구하길 원한다면 그것이 유일한 선택이라는 것을 알았다." },
+
+          // Part 3: The Dangerous Journey
+          { id: 16, text: "In August, 2015, the sisters began their dangerous journey by making their way to their first destination, Türkiye.", trans: "2015년 8월, 자매는 첫 번째 목적지인 튀르키예로 향하며 위험한 여정을 시작했다." },
+          { id: 17, text: "There, along with 18 other people, including children and babies, they boarded a tiny boat designed for seven passengers.", trans: "그곳에서 그들은 어린이와 아기를 포함한 18명의 다른 사람들과 함께 7인승용으로 설계된 작은 보트에 탑승했다." },
+          { id: 18, text: "They were heading across the sea towards Greece when disaster struck.", trans: "그들이 바다를 가로질러 그리스를 향해 가고 있을 때 재난이 닥쳤다." },
+          { id: 19, text: "The boat’s engine failed in the middle of the open sea, and the weather rapidly grew worse.", trans: "망망대해 한가운데서 보트의 엔진이 고장 났고 날씨는 급격히 악화되었다." },
+          { id: 20, text: "The heavy boat began to sink, and the panicked, desperate passengers had no choice but to throw their possessions into the sea.", trans: "무거운 보트가 가라앉기 시작했고 공포에 질린 절망적인 승객들은 바다에 자신들의 소지품을 던지는 것 외에는 선택의 여지가 없었다." },
+          { id: 21, text: "Yusra felt heartbroken as she watched people’s treasured belongings disappear under the waves.", trans: "유스라는 사람들의 소중한 소지품이 파도 아래로 사라지는 것을 보며 가슴이 아팠다." },
+          { id: 22, text: "However, she had no time to reflect.", trans: "하지만 그녀는 깊이 생각할 시간이 없었다." },
+          { id: 23, text: "She had to take action immediately in order to save herself and the other passengers.", trans: "그녀는 자신과 다른 승객들을 구하기 위해 즉시 행동을 취해야 했다." },
+          { id: 24, text: "She jumped into the water along with Sara and two others, and the four of them guided the drifting boat.", trans: "그녀는 사라와 다른 두 명과 함께 물에 뛰어들었고, 그들 네 명은 표류하는 보트를 이끌었다.", isHighlight: true, logicPoint: 2 },
+          { id: 25, text: "They swam for three and a half hours until they arrived safely with all the other passengers on the shore of a Greek island.", trans: "그들은 다른 모든 승객들과 함께 그리스의 한 섬 해안에 안전하게 도착할 때까지 세 시간 반 동안 수영했다." },
+
+          // Part 4: Reaching Germany & A New Coach
+          { id: 26, text: "Next, Yusra and Sara had to travel through Macedonia, Serbia, Hungary, and Austria.", trans: "다음으로, 유스라와 사라는 마케도니아, 세르비아, 헝가리, 오스트리아를 거쳐 여행해야 했다." },
+          { id: 27, text: "They walked great distances, and even though they caught rides in small cars and crowded buses from time to time, they had to cross every border on foot.", trans: "그들은 먼 거리를 걸었고, 때때로 작은 차나 붐비는 버스를 타기도 했지만, 모든 국경은 걸어서 건너야 했다." },
+          { id: 28, text: "No matter how exhausted they were, they kept moving.", trans: "아무리 지치더라도 그들은 계속 움직였다." },
+          { id: 29, text: "At the end of this overwhelming 25-day journey, they finally made it to Germany and settled at a refugee center in Berlin.", trans: "이 압도적인 25일간의 여정 끝에, 그들은 마침내 독일에 도착했고 베를린의 난민 센터에 정착했다." },
+          { id: 30, text: "Despite all the hardships and adversities she underwent, Yusra’s passion for swimming never left her.", trans: "그녀가 겪은 모든 고난과 역경에도 불구하고, 수영을 향한 유스라의 열정은 결코 그녀를 떠나지 않았다." },
+          { id: 31, text: "In fact, it was the only thing she could do to feel at home in this foreign land.", trans: "사실, 그것은 이 낯선 땅에서 편안함을 느끼기 위해 그녀가 할 수 있는 유일한 것이었다." },
+          { id: 32, text: "She decided to take up training again, and she started looking for a coach in Berlin who could help her reach her full potential.", trans: "그녀는 다시 훈련을 시작하기로 결심했고, 베를린에서 그녀가 자신의 모든 잠재력에 도달하도록 도울 수 있는 코치를 찾기 시작했다." },
+          { id: 33, text: "She eventually met Sven Spannekrebs at a swimming club near the refugee center and asked if he could be her coach.", trans: "그녀는 마침내 난민 센터 근처의 수영 클럽에서 스벤 스파네크렙스를 만났고 그가 자신의 코치가 되어줄 수 있는지 물었다." },
+          { id: 34, text: "When he saw her swim, he immediately recognized her outstanding talent and agreed to do so.", trans: "그가 그녀의 수영을 보았을 때, 그는 즉시 그녀의 뛰어난 재능을 알아보고 그렇게 하기로 동의했다.", isHighlight: true, logicPoint: 3 },
+          { id: 35, text: "Sven helped Yusra stay focused and persistent in her efforts to pursue excellence.", trans: "스벤은 유스라가 탁월함을 추구하려는 노력에 집중하고 끈기를 유지하도록 도왔다." },
+          { id: 36, text: "Following his instructions, Yusra trained hard day and night, hoping her efforts would pay off one day.", trans: "그의 지시에 따라 유스라는 밤낮으로 열심히 훈련하며 자신의 노력이 언젠가 결실을 맺기를 바랐다." },
+
+          // Part 5: The Olympics & The Message
+          { id: 37, text: "Yusra soon received a chance to make her dream a reality when she was invited to join the first ever refugee team at the 2016 Summer Olympic Games in Rio de Janeiro.", trans: "유스라는 2016년 리우데자네이루 하계 올림픽에서 사상 첫 난민 팀에 합류하라는 초대를 받았을 때 곧 그녀의 꿈을 현실로 만들 기회를 얻었다." },
+          { id: 38, text: "Although it seemed like a great opportunity, Yusra was hesitant.", trans: "그것은 훌륭한 기회처럼 보였지만 유스라는 망설였다." },
+          { id: 39, text: "If she joined the refugee team, she thought, people might view her with pity instead of seeing her as a serious athlete.", trans: "만약 그녀가 난민 팀에 합류한다면 사람들이 그녀를 진지한 운동선수로 보는 대신 동정심으로 볼지도 모른다고 생각했다." },
+          { id: 40, text: "She almost turned down the invitation, but she decided to accept it after she realized that she could inspire hope in millions of other refugees facing similar challenges.", trans: "그녀는 초대를 거의 거절할 뻔했지만, 비슷한 어려움에 직면한 수백만 명의 다른 난민들에게 희망을 불어넣을 수 있다는 것을 깨달은 후 수락하기로 결정했다.", isHighlight: true, logicPoint: 4 },
+          { id: 41, text: "At the Games, Yusra competed in both the 100-meter butterfly and the 100-meter freestyle events.", trans: "올림픽에서 유스라는 100미터 접영과 100미터 자유형 두 종목에 모두 출전했다." },
+          { id: 42, text: "When she stepped onto the starting blocks, she was determined to pour everything she had into the competition.", trans: "출발대에 올라섰을 때, 그녀는 자신이 가진 모든 것을 경기에 쏟아붓기로 결심했다." },
+          { id: 43, text: "She came in 41st out of 45 competitors in the butterfly event and 45th out of 46 in the freestyle event.", trans: "그녀는 접영 경기에서 45명의 경쟁자 중 41위, 자유형 경기에서 46명 중 45위를 차지했다." },
+          { id: 44, text: "Even though she left the Olympics without a medal, she was proud to have made history alongside her teammates.", trans: "비록 그녀는 메달 없이 올림픽을 떠났지만, 팀 동료들과 함께 역사를 만든 것을 자랑스럽게 생각했다." },
+          { id: 45, text: "The time on the scoreboard did not matter.", trans: "전광판의 시간은 중요하지 않았다." },
+          { id: 46, text: "In one interview, when a reporter asked if she could make a statement, she remarked, “I want everyone to stay strong for their goals in life, because if you have your goals in front of your eyes, you will do everything you can; and I think even if I fail, I will try again. …", trans: "한 인터뷰에서 기자가 한 말씀 해 주실 수 있는지 묻자 그녀는 말했다. \"저는 모든 사람이 삶의 목표를 향해 굳건히 유지하기를 바랍니다. 목표가 눈앞에 있으면 할 수 있는 모든 것을 다할 것이기 때문입니다. 그리고 실패하더라도 다시 도전할 것이라고 생각합니다...\"" },
+          { id: 47, text: "I want to show everybody that it’s hard to arrive at your dreams, but it’s not impossible. You can do it; everyone can do it.”", trans: "\"... 저는 모든 사람에게 꿈에 도달하는 것이 어렵지만 불가능하지 않다는 것을 보여주고 싶습니다. 당신도 할 수 있고, 누구나 할 수 있습니다.\"", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "CRISIS", desc: "올림픽의 꿈과 시리아 내전의 발발", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { point: 2, title: "SURVIVAL", desc: "보트를 끌고 수영하며 목숨을 구함", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-waves text-xl mb-2"></i> },
+          { point: 3, title: "RESILIENCE", desc: "독일 정착과 코치를 통한 훈련 재개", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-barbell text-xl mb-2"></i> },
+          { point: 4, title: "PURPOSE", desc: "난민 팀 합류와 희망의 메시지 결심", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-hands-clapping text-xl mb-2"></i> },
+          { point: 5, title: "INSPIRATION", desc: "메달보다 빛난 불굴의 도전과 희망", color: "bg-emerald-100 border-emerald-500 text-emerald-900", icon: <i className="ph-fill ph-star text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-green-700">
+                  <div className="mx-auto bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-green-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-green-600 font-bold mb-6 text-sm">A Journey From War to the Olympics</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-green-800 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-green-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-green-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">From War to Olympics</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">Yusra Mardini's Journey</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Yusra's Journey</h1>
+                            <p className="text-green-300 text-xs">From War to Olympics</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-green-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Early Life (어린 시절과 올림픽의 꿈)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 6).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 hover:bg-slate-50 border border-transparent print:border-none`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-red-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The War (내전 발발과 피난의 결심)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(6, 15).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The Journey (목숨을 건 항해와 수영)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(15, 25).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Reaching Germany (독일 정착과 훈련 재개)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(25, 36).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {/* Chunk 5 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The Olympics (리우 올림픽과 희망의 메시지)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(36, 47).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-green-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-green-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 계속적 용법의 관계대명사 (which)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[05] She enjoyed watching Olympic swimming events with her father, <span className="font-bold text-green-600">which led</span> her to dream about competing in the Olympics."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤에 쓰인 관계대명사 <strong className="text-green-800 print:text-black">which</strong>는 앞 문장의 내용 전체(아버지와 올림픽 경기를 즐겨본 것)를 선행사로 받습니다. "그리고 그것이(and it) 그녀를 꿈꾸게 이끌었다"라고 자연스럽게 이어서 해석합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. have no choice but to
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[20] ... passengers <span className="font-bold text-emerald-600">had no choice but to throw</span> their possessions into the sea."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-emerald-800 print:text-black">"~할 수밖에 없었다"</strong>라는 의미의 중요 구문입니다. 여기서 but은 '~을 제외하고'라는 뜻의 전치사 역할을 하며, 뒤에는 반드시 동사원형(throw)이 오거나 to부정사(to throw) 형태가 와야 합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 지각동사 + 목적어 + 동사원형
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[21] ... as she <span className="font-bold text-teal-600">watched</span> people’s treasured belongings <span className="font-bold text-teal-600">disappear</span> under the waves."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                지각동사(watch) 뒤에 목적어(belongings)가 오고, 목적격 보어로 <strong className="text-teal-800 print:text-black">동사원형(disappear)</strong>이 쓰였습니다. 소지품들이 물속으로 사라지는 모습을 직접 보았다는 것을 표현합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 복합관계부사 (No matter how)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[28] <span className="font-bold text-cyan-600">No matter how exhausted they were</span>, they kept moving."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "아무리 ~하더라도"라는 양보의 부사절을 이끌며 <strong className="text-cyan-800 print:text-black">However exhausted they were</strong>로 바꿔 쓸 수 있습니다. 형용사(exhausted)가 의문사 how 바로 뒤에 붙어 나오는 어순에 주의해야 합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 완료부정사 (to have p.p)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[44] ... she was proud <span className="font-bold text-blue-600">to have made</span> history alongside her teammates."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                자랑스러워한 시점(과거: was proud)보다 올림픽에서 역사를 만든 시점(대과거)이 더 먼저 일어난 일임을 나타내기 위해 단순 부정사(to make)가 아닌 <strong className="text-blue-800 print:text-black">완료부정사(to have made)</strong>를 사용했습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-green-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-green-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-green-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 일치/불일치</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "유스라는 훈련 중 수영장에 떨어진 폭탄이 폭발하여 큰 부상을 입었다.", isCorrect: true },
+                                                { id: 2, text: "그리스로 향하던 중 보트의 엔진이 고장 나자 사람들은 소지품을 버려야 했다." },
+                                                { id: 3, text: "유스라는 독일 베를린의 난민 센터 근처에서 새로운 수영 코치를 만났다." },
+                                                { id: 4, text: "난민 팀 합류를 고민하던 유스라는 다른 난민들에게 희망을 주기 위해 이를 수락했다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-green-400 hover:bg-green-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 12번 문장에서 "Although it did not explode(비록 폭발하지는 않았지만)"라고 명시되어 있으므로 부상을 입었다는 내용은 본문과 일치하지 않습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문맥상 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 밑줄 친 (A), (B) 중 문맥상 알맞은 낱말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                ... it was her only option if she wanted to <strong>(A) [ pursue / abandon ]</strong> her dream and live without fear.<br/><br/>
+                                                Although it seemed like a great opportunity, Yusra was <strong>(B) [ confident / hesitant ]</strong>. If she joined the refugee team, she thought, people might view her with pity...
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) pursue — (B) confident" },
+                                                { id: 2, text: "(A) abandon — (B) hesitant" },
+                                                { id: 3, text: "(A) pursue — (B) hesitant", isCorrect: true },
+                                                { id: 4, text: "(A) abandon — (B) confident" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-green-400 hover:bg-green-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> (A) 두려움 없이 살며 꿈을 '추구하기(pursue)' 원한다면 시리아를 떠나는 것이 유일한 선택이었습니다. (B) 난민 팀 합류 제안을 받았을 때 사람들이 동정할까 봐 처음에는 '망설였습니다(hesitant)'.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
