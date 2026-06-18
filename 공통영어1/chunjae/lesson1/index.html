@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Logan's Speech</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: The Disaster (1~24)
+          { id: 1, text: "“The assignment is to write a speech about someone who you admire,” Ms. Harper told the class.", trans: "“과제는 여러분이 존경하는 사람에 대한 연설문을 쓰는 것입니다.” 하퍼 선생님이 반 학생들에게 말씀하셨다." },
+          { id: 2, text: "My classmates began brainstorming a list of people they might pick—mostly athletes, singers, and actors.", trans: "반 친구들은 자신들이 선택할 수 있는 사람들의 목록을 짜내기 시작했다—대부분 운동선수, 가수, 그리고 배우들이었다." },
+          { id: 3, text: "However, I knew right away who my speech was going to be about.", trans: "하지만, 나는 내 연설이 누구에 대한 것이 될지 즉시 알았다." },
+          { id: 4, text: "Grandma is the person I admire the most.", trans: "할머니는 내가 가장 존경하는 분이다." },
+          { id: 5, text: "Writing a speech about her would be a piece of cake.", trans: "할머니에 대한 연설문을 쓰는 것은 식은 죽 먹기일 것이다.", isHighlight: true, logicPoint: 1 },
+          { id: 6, text: "A few days later, Ms. Harper talked about how to deliver a good speech.", trans: "며칠 후, 하퍼 선생님은 좋은 연설을 하는 방법에 대해 이야기하셨다." },
+          { id: 7, text: "This reminded me that it wasn’t just a writing assignment, but a speech I would have to give in front of my classmates!", trans: "이것은 그것이 단순한 글쓰기 과제가 아니라 반 친구들 앞에서 해야 할 연설이라는 것을 내게 상기시켜 주었다!", isHighlight: true, logicPoint: 2 },
+          { id: 8, text: "The thought of standing in front of the entire class made my palms sweat.", trans: "반 전체 앞에 선다는 생각만으로도 손바닥에 땀이 났다." },
+          { id: 9, text: "I’m too shy to raise my hand in class even when I know the answer.", trans: "나는 답을 알 때조차도 부끄러워서 수업 시간에 손을 들지 못한다." },
+          { id: 10, text: "How on earth can I speak in front of everyone?", trans: "도대체 어떻게 모두 앞에서 말을 할 수 있단 말인가?" },
+          { id: 11, text: "I couldn’t sleep at all that night.", trans: "나는 그날 밤 한숨도 자지 못했다." },
+          { id: 12, text: "The big day for the speech finally arrived, and I felt more anxious than ever.", trans: "마침내 연설을 위한 중요한 날이 다가왔고, 나는 그 어느 때보다 불안했다." },
+          { id: 13, text: "I had spent the previous week imagining how my classmates would react to my speech.", trans: "나는 지난 일주일을 반 친구들이 내 연설에 어떻게 반응할지 상상하며 보냈다." },
+          { id: 14, text: "I was still mostly thinking about what my classmates might think.", trans: "나는 여전히 주로 반 친구들이 어떻게 생각할지에 대해서만 생각하고 있었다." },
+          { id: 15, text: "I wasn’t putting much thought into what I was actually going to say.", trans: "나는 내가 실제로 무슨 말을 할 것인지에 대해서는 많은 생각을 하지 않았다." },
+          { id: 16, text: "I figured I could just speak off the top of my head.", trans: "나는 그저 머릿속에 떠오르는 대로 말할 수 있을 거라 생각했다." },
+          { id: 17, text: "After all, I was going to talk about my grandmother.", trans: "어쨌든, 나는 우리 할머니에 대해 이야기할 것이었으니까." },
+          { id: 18, text: "I didn’t need any notes.", trans: "노트는 필요 없었다." },
+          { id: 19, text: "I was sweating as I walked up to the front of the class.", trans: "교실 앞으로 걸어 나갈 때 나는 땀을 흘리고 있었다." },
+          { id: 20, text: "My heart was racing so fast that I thought it might fly out of my chest.", trans: "심장이 너무 빨리 뛰어 가슴 밖으로 날아갈 것만 같았다.", isHighlight: true, logicPoint: 3 },
+          { id: 21, text: "I could feel my face turning red.", trans: "얼굴이 붉어지는 것을 느낄 수 있었다." },
+          { id: 22, text: "I didn’t know where to look.", trans: "어디를 봐야 할지 몰랐다." },
+          { id: 23, text: "I blanked out.", trans: "머릿속이 하얗게 변했다." },
+          { id: 24, text: "I just stood there silently.", trans: "나는 그저 말없이 서 있었다.", logic: 'disaster' },
+
+          // Part 2: The Awakening (25~40)
+          { id: 25, text: "Ms. Harper tried to help me out. “Start by telling us a bit about your grandmother, Logan.”", trans: "하퍼 선생님이 나를 도와주려 하셨다. “너희 할머니에 대해 조금 이야기하는 것으로 시작해 보렴, 로건.”" },
+          { id: 26, text: "I spoke about what kind of work my grandmother used to do, but I quickly ran out of words to say.", trans: "나는 할머니가 예전에 어떤 일을 하셨는지에 대해 이야기했지만, 금방 할 말을 잃었다." },
+          { id: 27, text: "Then Ms. Harper said, “How about telling us a bit about why you admire her so much?”", trans: "그러자 하퍼 선생님이 말씀하셨다. “네가 왜 그렇게 할머니를 존경하는지에 대해 조금 말해 보는 건 어떨까?”" },
+          { id: 28, text: "I barely managed to share a short story about her.", trans: "나는 간신히 할머니에 대한 짧은 이야기를 공유했다." },
+          { id: 29, text: "After that, I just rushed to my seat and put my head in my hands.", trans: "그 후, 나는 서둘러 자리로 돌아가 두 손으로 머리를 감쌌다." },
+          { id: 30, text: "I knew I had messed up. I hadn’t said all the things I wanted to say.", trans: "나는 내가 망쳤다는 것을 알았다. 나는 하고 싶었던 말을 다 하지 못했다." },
+          { id: 31, text: "The next day, I met Ms. Harper after school to talk about the speech.", trans: "다음 날 방과 후, 나는 연설에 대해 이야기하기 위해 하퍼 선생님을 만났다." },
+          { id: 32, text: "I said, “I’m embarrassed about the speech. I must have looked like a fool. I know I could have done better.”", trans: "나는 말했다. “연설 때문에 부끄러워요. 바보처럼 보였을 거예요. 더 잘할 수 있었다는 걸 알아요.”" },
+          { id: 33, text: "“It’s quite all right to fall short of your own expectations as long as you learn something from it,” she said in a warm voice.", trans: "“그것으로부터 무언가를 배우기만 한다면, 자신의 기대에 미치지 못해도 괜찮단다.” 선생님이 따뜻한 목소리로 말씀하셨다.", isHighlight: true, logicPoint: 4 },
+          { id: 34, text: "“What was bothering you the most while you prepared for the speech?”", trans: "“연설을 준비하는 동안 너를 가장 괴롭혔던 것이 뭐였니?”" },
+          { id: 35, text: "“I was afraid the other students would laugh at me if my speech wasn’t good enough.”", trans: "“제 연설이 충분히 좋지 않으면 다른 학생들이 저를 비웃을까 봐 두려웠어요.”" },
+          { id: 36, text: "She replied, “You certainly can’t control what others think about your speech.", trans: "선생님이 대답하셨다. “너는 다른 사람들이 네 연설에 대해 어떻게 생각할지 확실히 통제할 수 없단다." },
+          { id: 37, text: "That means you should be focusing on the one thing you can control — how you give your speech.”", trans: "그것은 네가 통제할 수 있는 단 한 가지, 즉 '네가 연설을 어떻게 하는가'에 집중해야 한다는 뜻이야.”", logic: 'advice', isHighlight: true, logicPoint: 5 },
+          { id: 38, text: "That woke me up from the depths of despair.", trans: "그 말은 절망의 늪에서 나를 깨웠다." },
+          { id: 39, text: "Of course, that was it! I wouldn’t have been able to make my classmates like what I wanted to say.", trans: "물론, 바로 그거였다! 내가 하고 싶은 말을 반 친구들이 좋아하게 만들 수는 없었을 것이다." },
+          { id: 40, text: "I really should have focused on my performance.", trans: "나는 정말로 내 발표 자체에 집중했어야 했다." },
+
+          // Part 3: The Triumph (41~53)
+          { id: 41, text: "A couple of weeks later, the class was given another speech assignment.", trans: "몇 주 후, 반에 또 다른 연설 과제가 주어졌다." },
+          { id: 42, text: "I didn’t want to drop the ball like the first time.", trans: "나는 처음처럼 실수하고 싶지 않았다." },
+          { id: 43, text: "So this time, I practiced delivering the speech.", trans: "그래서 이번에는 연설하는 연습을 했다.", logic: 'action' },
+          { id: 44, text: "I stood in front of the mirror every day for a week and went over all the things I wanted to say.", trans: "나는 일주일 동안 매일 거울 앞에 서서 내가 하고 싶은 모든 말들을 점검했다." },
+          { id: 45, text: "I used cue cards which contained key phrases about important facts.", trans: "나는 중요한 사실들에 대한 핵심 구문들이 적힌 큐카드를 사용했다." },
+          { id: 46, text: "I rehearsed how I would stand, how I would make eye contact with the audience, and even when I would pause.", trans: "나는 어떻게 설지, 청중과 어떻게 눈을 맞출지, 심지어 언제 쉴지까지 예행연습을 했다." },
+          { id: 47, text: "I felt nervous again when the big day finally arrived.", trans: "마침내 중요한 날이 왔을 때, 나는 다시 긴장감을 느꼈다." },
+          { id: 48, text: "But when the teacher called my name, I noticed that my nerves had actually calmed down a bit.", trans: "하지만 선생님이 내 이름을 부르셨을 때, 나는 내 긴장이 실제로 조금 가라앉았다는 것을 알아차렸다." },
+          { id: 49, text: "I felt way better than the last time, for sure!", trans: "확실히 지난번보다 기분이 훨씬 좋았다!" },
+          { id: 50, text: "I walked up to the front of the class and looked out into the audience.", trans: "나는 교실 앞으로 걸어 나가 청중을 내다보았다." },
+          { id: 51, text: "My heart began to race, and I took a deep breath to calm it down.", trans: "심장이 뛰기 시작했고, 나는 그것을 진정시키기 위해 심호흡을 했다." },
+          { id: 52, text: "While my voice trembled from time to time, I managed to get my whole message across.", trans: "가끔 목소리가 떨리기도 했지만, 나는 내 메시지 전체를 무사히 전달해냈다.", isHighlight: true, logicPoint: 6 },
+          { id: 53, text: "When I was done, I felt so proud of myself that I barely noticed how loudly everyone was clapping for me!", trans: "연설을 마쳤을 때, 나는 내 자신이 너무 자랑스러워서 모두가 나를 위해 얼마나 크게 박수를 치고 있는지 거의 알아차리지 못했다!", logic: 'success' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'disaster', title: "THE DISASTER (실패)", desc: "Feared others' reactions & No prep", color: "bg-stone-100 border-stone-400 text-stone-800", icon: <i className="ph-fill ph-cloud-rain text-xl mb-2"></i> },
+          { id: 'advice', title: "THE EPIPHANY (깨달음)", desc: "Focus on what you CAN control", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'action', title: "THE ACTION (실천)", desc: "Practiced with cue cards & mirrors", color: "bg-violet-100 border-violet-400 text-violet-800", icon: <i className="ph-fill ph-person-simple-run text-xl mb-2"></i> },
+          { id: 'success', title: "THE TRIUMPH (성장)", desc: "Got the message across & Felt proud", color: "bg-purple-100 border-purple-400 text-purple-800", icon: <i className="ph-fill ph-medal text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-indigo-800 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-indigo-900 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Logan's Speech</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">"Focus on the Controllable"</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-indigo-50 text-indigo-900 border-indigo-800' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-violet-50 text-violet-800 border-violet-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 (한 문장씩 분리됨) */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-indigo-900 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      {/* 파트 A: 첫 발표의 실패 (1~24번) */}
+                      <div>
+                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Disaster (타인의 시선 의식과 실패)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 24).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-indigo-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 깨달음 (25~40번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-indigo-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Awakening (선생님의 조언과 깨달음)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(24, 40).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-indigo-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 성장 (41~53번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-violet-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Triumph (철저한 준비와 마침내 얻은 성취)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(40, 53).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-violet-50 border border-violet-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-indigo-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-violet-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 (6개로 확대됨) */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-indigo-900 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-indigo-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-indigo-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-900'}`}>
+                          POINT 01. 비유적 표현: a piece of cake
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "식은 죽 먹기"라는 뜻의 관용구입니다. 철저한 준비의 필요성을 전혀 깨닫지 못한 로건의 <strong>초기 자만심(Overconfidence)</strong>을 잘 보여주는 표현입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-indigo-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-indigo-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-indigo-600 text-white' : 'bg-indigo-50 text-indigo-900'}`}>
+                          POINT 02. 명사절 접속사: remind A that
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> remind + A(간접목적어) + that절(직접목적어)</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "A에게 ~라는 것을 상기시키다"라는 뜻입니다. 단순한 글쓰기가 아닌 '발표'라는 차가운 <strong>현실을 자각하는 순간</strong>을 연결하는 구문입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-violet-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-violet-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-violet-600 text-white' : 'bg-violet-50 text-violet-900'}`}>
+                          POINT 03. 원인과 결과: so ~ that
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> racing so fast that I thought...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "너무 ~해서 ...하다"라는 의미로 원인과 결과를 묶어줍니다. 심장이 너무 빨리 뛰어서(원인) 가슴 밖으로 날아갈 것 같았다(결과)며 <strong>극도의 긴장감</strong>을 묘사합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-violet-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-violet-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 4 ? 'bg-violet-600 text-white' : 'bg-violet-50 text-violet-900'}`}>
+                          POINT 04. 조건을 나타내는 접속사: As long as
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> ... as long as you learn something from it</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~하는 한, ~하기만 한다면"이라는 뜻으로, 실패가 용인되는 유일한 조건이 바로 <strong>'그것으로부터의 배움'</strong>임을 강조하는 선생님의 따뜻한 조언입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 5 */}
+                      <button 
+                        onClick={() => handleLogicClick(5)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 md:col-span-2 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 5 ? 'border-purple-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-purple-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 5 ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>
+                          POINT 05. 통제권의 전환 (Focusing on the Controllable)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> focusing on the one thing you can control</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            로건의 실패 원인이었던 '통제할 수 없는 타인의 시선(what others think)'에서 벗어나, '내가 통제할 수 있는 발표 준비(how you give your speech)'로 시각을 옮기게 해주는 이 글의 <strong>핵심 주제문(Main Idea)</strong>입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 6 */}
+                      <button 
+                        onClick={() => handleLogicClick(6)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 md:col-span-2 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 6 ? 'border-purple-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-purple-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 6 ? 'bg-purple-600 text-white' : 'bg-purple-50 text-purple-900'}`}>
+                          POINT 06. 성취의 동사: manage to V
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> I managed to get my whole message across</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            단순히 무언가를 했다(did)는 것이 아니라, <strong>'여러 어려움과 떨림을 뚫고 간신히 ~해내다'</strong>라는 뉘앙스를 담고 있습니다. 마침내 스스로를 극복해낸 로건의 성취감을 극대화하는 동사입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-indigo-900 hover:bg-indigo-800 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-violet-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-violet-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-violet-100 hover:bg-violet-200 text-violet-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-violet-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-violet-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 로건의 성장 서사를<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-indigo-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Rescued by
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-violet-100 text-violet-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-violet-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Leads to
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-purple-100 text-purple-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-purple-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Results in
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-indigo-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 심경 추론 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 심경 변화 추론</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글에 나타난 주인공(Logan)의 심경 변화로 가장 적절한 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "excited → disappointed" },
+                          { id: 2, text: "anxious and embarrassed → proud and satisfied", isCorrect: true },
+                          { id: 3, text: "bored → amazed" },
+                          { id: 4, text: "confident → jealous" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-indigo-400 hover:bg-indigo-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 이야기 초반부 첫 발표에서 로건은 극도로 <strong>불안하고 부끄러워(anxious and embarrassed)</strong> 합니다(My heart was racing, I blanked out, I'm embarrassed). 하지만 선생님의 조언을 듣고 연습한 뒤 두 번째 발표를 마쳤을 때는 스스로가 매우 <strong>자랑스럽고 만족스러워(proud and satisfied)</strong> 합니다(I felt so proud of myself). 
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          That woke me up from the depths of despair.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          “I was afraid the other students would laugh at me if my speech wasn’t good enough.” ( ① ) She replied, “You certainly can’t control what others think about your speech. ( ② ) That means you should be focusing on the one thing you can control — how you give your speech.” ( ③ ) Of course, that was it! ( ④ ) I really should have focused on my performance.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②" },
+                          { id: 3, text: "③", isCorrect: true },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-indigo-400 hover:bg-indigo-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 주어진 문장의 <strong>'That'</strong>이 가리키는 것은 바로 앞선 하퍼 선생님의 조언("통제할 수 있는 것에 집중해라")입니다. 이 조언을 듣고 깊은 절망에서 깨어났으며, 그 깨달음에 대한 리액션("Of course, that was it!")이 바로 뒤에 이어져야 하므로 <strong>③번</strong> 자리가 가장 적절합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 요지 파악 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 글의 요지 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">윗글을 통해 필자가 전달하고자 하는 핵심 요지로 가장 적절한 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "완벽한 대본이 성공적인 연설을 보장한다." },
+                          { id: 2, text: "타인의 평가보다 자신이 통제할 수 있는 준비 과정에 집중해야 한다.", isCorrect: true },
+                          { id: 3, text: "발표 불안증은 시간이 지나면 자연스럽게 극복된다." },
+                          { id: 4, text: "청중의 반응에 따라 유연하게 발표 내용을 수정해야 한다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-indigo-400 hover:bg-indigo-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz3Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 첫 번째 발표에서 로건은 '다른 사람들이 어떻게 생각할지'를 걱정하느라 실패했습니다. 하지만 선생님의 조언을 듣고 '자신이 통제할 수 있는 것(발표 준비 및 수행)'에 집중하여 두 번째 발표를 성공적으로 마칩니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q4. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          Logan was able to overcome his fear of public speaking by shifting his focus from <span className="font-bold text-indigo-800">( A )</span> to <span className="font-bold text-indigo-800">( B )</span>, achieving a successful outcome through thorough practice.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) script length —— (B) eye contact" },
+                          { id: 2, text: "(A) others' opinions —— (B) his own performance", isCorrect: true },
+                          { id: 3, text: "(A) his own performance —— (B) others' opinions" },
+                          { id: 4, text: "(A) topic selection —— (B) audience engagement" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz4Answered(choice.id)}
+                            disabled={quiz4Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz4Answered === null ? 'border-slate-200 hover:border-indigo-400 hover:bg-indigo-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz4Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz4Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz4Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz4Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 로건은 타인의 생각(what others think = others' opinions)에 대한 두려움에서 벗어나, 자신이 통제할 수 있는 발표 과정 자체(performance)에 집중함으로써 성공을 이끌어냈습니다.
+                          </p>
+                          <button onClick={() => setQuiz4Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

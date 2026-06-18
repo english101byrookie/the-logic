@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC Interactive App - Odd Pairings Part 4</title>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          // Part 1: The Context (1~2)
+          { id: 1, text: "The world is a big place, and everyone has to eat.", trans: "세상은 넓고, 누구나 먹어야 합니다." },
+          { id: 2, text: "Eating the same thing every day can get quite boring.", trans: "매일 똑같은 것을 먹는 것은 꽤 지루해질 수 있습니다.", logic: 'context' },
+
+          // Part 2: The Solution (3)
+          { id: 3, text: "Sometimes all you need is to combine some ingredients in novel ways to create a new flavor.", trans: "때로는 새로운 맛을 만들어내기 위해 신선한 방식으로 몇 가지 재료를 섞는 것만으로도 충분합니다.", isHighlight: true, logicPoint: 1, logic: 'solution' },
+
+          // Part 3: Overcoming Prejudice (4~5)
+          { id: 4, text: "But if you think it’s odd, it’s probably because you haven’t tried it before.", trans: "하지만 만약 당신이 그것이 이상하다고 생각한다면, 그것은 아마도 당신이 전에 그것을 시도해 본 적이 없기 때문일 것입니다." },
+          { id: 5, text: "Considering how diverse the world is, there are probably more food combinations that seem odd than seem “normal.”", trans: "세상이 얼마나 다양한지를 고려하면, '정상적'으로 보이는 것보다 이상해 보이는 음식 조합이 아마 더 많을 것입니다.", isHighlight: true, logicPoint: 2, logic: 'prejudice' },
+
+          // Part 4: Conclusion (6~7)
+          { id: 6, text: "Maybe odd is just something you haven’t experienced yet.", trans: "어쩌면 이상하다는 것은 단지 당신이 아직 경험하지 못한 것일 뿐일지도 모릅니다.", isHighlight: true, logicPoint: 3 },
+          { id: 7, text: "They are just new experiences waiting for you to discover.", trans: "그것들은 단지 당신이 발견하기를 기다리는 새로운 경험일 뿐입니다.", isHighlight: true, logicPoint: 4, logic: 'conclusion' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'context', title: "THE CONTEXT (배경)", desc: "Eating the same thing gets boring", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-clock-counter-clockwise text-xl mb-2"></i> },
+          { id: 'solution', title: "THE SOLUTION (해결책)", desc: "Combine ingredients in novel ways", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-flask text-xl mb-2"></i> },
+          { id: 'prejudice', title: "OVERCOME PREJUDICE (편견의 극복)", desc: "Odd = Just not tried yet", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-eye-slash text-xl mb-2"></i> },
+          { id: 'conclusion', title: "CONCLUSION (최종 결론)", desc: "New experiences waiting for you", color: "bg-sky-100 border-sky-400 text-sky-800", icon: <i className="ph-fill ph-sparkle text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [activeTab, setActiveTab] = useState(1);
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => {
+            window.print();
+          };
+
+          return (
+            <div className="min-h-screen bg-slate-50 font-sans text-slate-800 p-4 md:p-8 flex justify-center print:bg-white print:p-0">
+              <div className="max-w-4xl w-full flex flex-col gap-6 print:flex print:flex-col print:gap-6 print:max-w-none">
+                
+                {/* 헤더 */}
+                <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-sky-600 print:shadow-none print:border-t-4 print:border-black print:rounded-none flex justify-between items-start">
+                  <div>
+                    <h1 className="text-sm font-bold text-sky-800 tracking-wider mb-2 print:text-black">THE LOGIC INTERACTIVE</h1>
+                    <h2 className="text-3xl font-serif font-bold text-slate-900 print:text-black">Odd Pairings That Work</h2>
+                    <p className="text-slate-500 italic mt-1 font-serif print:text-gray-600">Part 4: Expand Your Taste</p>
+                  </div>
+                  <button 
+                    onClick={handlePrint}
+                    className="print:hidden flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm"
+                  >
+                    <i className="ph-bold ph-printer text-lg"></i> 인쇄하기
+                  </button>
+                </div>
+
+                {/* 탭 네비게이션 */}
+                <div className="flex bg-white rounded-xl shadow-sm overflow-hidden print:hidden">
+                  <button 
+                    onClick={() => setActiveTab(1)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 1 ? 'bg-sky-50 text-sky-800 border-sky-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-book-open mr-2"></i>
+                    1. 지문 및 구문 분석
+                  </button>
+                  <button 
+                    onClick={() => setActiveTab(2)}
+                    className={`flex-1 py-4 px-2 text-center font-bold text-base md:text-lg transition-all duration-300 border-b-4 ${activeTab === 2 ? 'bg-teal-50 text-teal-800 border-teal-600' : 'text-slate-400 border-transparent hover:bg-slate-50 hover:text-slate-600'}`}
+                  >
+                    <i className="ph-fill ph-puzzle-piece mr-2"></i>
+                    2. 논리 구조 및 실전 문제
+                  </button>
+                </div>
+
+                {/* === TAB 1: 지문 및 구문 분석 영역 === */}
+                <div className={`space-y-6 print:space-y-4 ${activeTab === 1 ? 'block' : 'hidden print:block'}`}>
+                  {/* 1. 지문 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none">
+                    <h3 className="text-xl font-bold text-sky-700 border-b-2 border-slate-100 pb-3 mb-4 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-book-open text-2xl print:text-black"></i> PART 1. Text Analysis
+                    </h3>
+                    
+                    <div className="space-y-8 print:space-y-6">
+                      
+                      {/* 파트 A: 배경 (1~2번) */}
+                      <div>
+                        <div className="inline-block bg-slate-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Context (지루한 식사 생활의 배경)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(0, 2).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-slate-500 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 B: 해결책 (3번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-teal-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ The Solution (새로운 조합을 통한 즐거움)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(2, 3).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-sky-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 C: 편견 극복 (4~5번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-cyan-600 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Overcoming Prejudice ('이상함'에 대한 편견 버리기)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(3, 5).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-sky-700 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* 파트 D: 결론 (6~7번) */}
+                      <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print:pt-4">
+                        <div className="inline-block bg-sky-700 text-white text-sm font-bold px-3 py-1 rounded mb-3 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                          ▶ Conclusion (미지의 맛을 향한 열린 마음)
+                        </div>
+                        <div className="space-y-2 print:space-y-1">
+                          {textData.slice(5, 7).map((item) => (
+                            <div 
+                              key={item.id} 
+                              className={`p-2 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2
+                                ${activeLogic === item.logicPoint ? 'bg-sky-50 border border-sky-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}
+                              `}
+                            >
+                              <p className="text-base md:text-lg leading-relaxed print:text-base print:text-black">
+                                <span className="font-bold text-sky-800 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                <span className={`${activeLogic === item.logicPoint ? 'font-bold text-sky-700 print:text-black print:underline print:underline-offset-4' : ''}`}>
+                                  {item.text}
+                                </span>
+                              </p>
+                              <p className="text-sm text-slate-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ml-9 print:hidden">
+                                {item.trans}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* 2. 구문 로직 영역 */}
+                  <div className="bg-white p-6 md:p-8 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-sky-800 border-b-2 border-slate-100 pb-3 mb-6 print:text-black print:border-black">
+                      PART 2. The Logic Syntax
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6 print:hidden">💡 아래의 포인트를 클릭하면 지문의 해당 문장이 강조됩니다.</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-1 print:gap-6">
+                      
+                      {/* POINT 1 */}
+                      <button 
+                        onClick={() => handleLogicClick(1)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 1 ? 'border-teal-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-teal-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 1 ? 'bg-teal-600 text-white' : 'bg-teal-50 text-teal-800'}`}>
+                          POINT 01. 필수 요건의 강조: all you need is
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [all you need is] to combine some ingredients...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "네가 필요한 것은 오직 ~뿐이다"라는 뜻입니다. 지루한 식사 생활에서 벗어나 새로운 즐거움을 찾는 방법이 거창한 것이 아니라 <strong>'약간의 창의적인 조합'</strong>이면 충분하다는 점을 강조합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 2 */}
+                      <button 
+                        onClick={() => handleLogicClick(2)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 2 ? 'border-cyan-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-cyan-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 2 ? 'bg-cyan-600 text-white' : 'bg-cyan-50 text-cyan-800'}`}>
+                          POINT 02. 분사구문 (조건/이유): Considering
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> [Considering] how diverse the world is, there are...</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            "~을 고려하면"이라는 뜻으로, 독립분사구문처럼 쓰입니다. 세계의 문화적 다양성을 <strong>객관적인 전제</strong>로 삼아, '이상한 조합이 더 많을 것이다'라는 필자의 추론에 힘을 실어줍니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 3 */}
+                      <button 
+                        onClick={() => handleLogicClick(3)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 md:col-span-2 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 3 ? 'border-sky-600 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-sky-400'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 3 ? 'bg-sky-600 text-white' : 'bg-sky-50 text-sky-800'}`}>
+                          POINT 03. 의미의 재정의 (Reframing)
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> odd is just something you haven’t experienced yet.</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            사람들이 거부감을 느끼는 '이상함(odd)'이라는 단어를, 단순한 호불호의 영역에서 <strong>'아직 탐험하지 않은 미지의 세계'</strong>라는 긍정적인 개념으로 완벽하게 재정의(Reframing)하는 시리즈의 핵심 결론입니다.
+                          </p>
+                        </div>
+                      </button>
+
+                      {/* POINT 4 */}
+                      <button 
+                        onClick={() => handleLogicClick(4)}
+                        className={`text-left border-2 rounded-lg overflow-hidden transition-all duration-300 md:col-span-2 print:border-2 print:border-slate-800 print:shadow-none print:transform-none print:rounded-none
+                          ${activeLogic === 4 ? 'border-sky-700 shadow-md transform -translate-y-1' : 'border-slate-200 hover:border-sky-500'}
+                        `}
+                      >
+                        <div className={`px-4 py-2 font-bold print:bg-slate-100 print:text-black ${activeLogic === 4 ? 'bg-sky-700 text-white' : 'bg-sky-50 text-sky-900'}`}>
+                          POINT 04. 분사의 후치 수식: waiting
+                        </div>
+                        <div className="p-4 bg-white h-full">
+                          <p className="mb-2"><span className="font-semibold text-slate-700 print:text-black">Structure:</span> new experiences [waiting] for you to discover.</p>
+                          <p className="text-sm text-slate-600 leading-relaxed print:text-black">
+                            현재분사 waiting이 앞의 명사(experiences)를 수식합니다. 세상의 독특한 음식 조합들이 결국 우리가 발견해주기를 기다리고 있는 <strong>경험의 선물</strong>이라는 낭만적인 문장으로 글을 마무리합니다.
+                          </p>
+                        </div>
+                      </button>
+
+                    </div>
+
+                    <div className="mt-8 text-center print:hidden">
+                       <button onClick={() => setActiveTab(2)} className="bg-sky-800 hover:bg-sky-700 text-white px-8 py-3 rounded-full font-bold shadow-md transition-colors flex items-center gap-2 mx-auto">
+                         구문 분석 완료! 실전 문제로 이동 <i className="ph-bold ph-arrow-right"></i>
+                       </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* === TAB 2: 논리 구조도 및 퀴즈 영역 === */}
+                <div className={`space-y-6 print:space-y-4 print:mt-4 ${activeTab === 2 ? 'block' : 'hidden print:block'}`}>
+                  
+                  {/* 3. 로직 맵 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-teal-600 print:shadow-none print:border print:border-slate-300 print:border-t-4 print:border-t-black print:rounded-none print-avoid-break">
+                    <div className="flex justify-between items-center border-b-2 border-slate-100 pb-3 mb-6 print:border-black">
+                      <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2 print:text-black">
+                        <i className="ph-fill ph-play-circle text-2xl text-teal-600 print:text-black"></i> PART 3. Logic Map
+                      </h3>
+                      <div className="print:hidden">
+                        {mapStep > 0 && mapStep < logicMapSteps.length && (
+                          <button onClick={nextMapStep} className="bg-teal-100 hover:bg-teal-200 text-teal-800 px-3 py-1 rounded text-sm font-bold transition-colors">
+                            Next Step ➔
+                          </button>
+                        )}
+                        {mapStep === logicMapSteps.length && (
+                           <button onClick={resetMap} className="text-slate-400 hover:text-slate-600 text-sm underline">
+                            Reset
+                           </button>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div 
+                      className={`h-64 flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50 text-center p-6 cursor-pointer hover:bg-teal-50 transition-colors 
+                        ${mapStep === 0 ? 'flex' : 'hidden'} print:!hidden
+                      `} 
+                      onClick={nextMapStep}
+                    >
+                      <i className="ph-fill ph-play-circle text-5xl text-teal-400 mb-4"></i>
+                      <p className="text-slate-600 font-medium">클릭하여 시리즈 결론의 논리 과정을<br/>단계별로 파악해 보세요.</p>
+                    </div>
+                    
+                    <div className={`flex-col items-center gap-2 py-4 ${mapStep > 0 ? 'flex' : 'hidden'} print:!flex`}>
+                      {logicMapSteps.map((step, idx) => (
+                        <React.Fragment key={step.id}>
+                          <div 
+                            className={`w-full max-w-sm border-2 rounded-lg p-4 flex flex-col items-center text-center transition-all duration-500 transform
+                              print:!opacity-100 print:!translate-y-0 print:!flex print:border-slate-800 print:rounded-none print:bg-white print:text-black
+                              ${idx < mapStep ? `opacity-100 translate-y-0 ${step.color}` : 'opacity-0 translate-y-8 hidden'}
+                            `}
+                          >
+                            <div className="print:hidden">{step.icon}</div>
+                            <span className="font-bold text-sm mb-1 print:text-black">{step.title}</span>
+                            <span className="text-sm opacity-90 print:text-black">{step.desc}</span>
+                          </div>
+                          <div 
+                            className={`flex-col items-center opacity-100 animate-pulse 
+                              print:!flex print:!opacity-100 print:animate-none
+                              ${idx < logicMapSteps.length - 1 && idx < mapStep ? 'flex' : 'hidden'}
+                            `}
+                          >
+                            <div className="w-0.5 h-6 bg-slate-300 print:bg-slate-800"></div>
+                            {/* 화살표 라벨 추가 */}
+                            {idx === 0 ? (
+                              <div className="bg-teal-100 text-teal-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Resolved by
+                              </div>
+                            ) : idx === 1 ? (
+                              <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Which helps
+                              </div>
+                            ) : idx === 2 ? (
+                              <div className="bg-sky-100 text-sky-700 text-xs font-bold px-2 py-1 rounded-full my-1 border border-sky-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">
+                                Ultimately proving
+                              </div>
+                            ) : null}
+                            <i className="ph-bold ph-arrow-right text-base text-slate-400 transform rotate-90 print:text-slate-800"></i>
+                          </div>
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. 실전 변형 문제 */}
+                  <div className="bg-white p-6 rounded-xl shadow-sm print:shadow-none print:border print:border-slate-300 print:rounded-none print-avoid-break">
+                    <h3 className="text-xl font-bold text-slate-800 border-b-2 border-slate-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                      <i className="ph-fill ph-check-circle text-2xl text-sky-600 print:text-black"></i> PART 4. Challenge
+                    </h3>
+                    
+                    {/* Q1. 주제 파악 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 글의 요지 파악</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">윗글을 통해 필자가 독자에게 궁극적으로 전달하고자 하는 요지로 가장 적절한 것은?</p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "건강한 식습관을 위해 신선한 재료를 섭취해야 한다." },
+                          { id: 2, text: "전통적인 요리법을 보존하는 것이 세계화 시대에 중요하다." },
+                          { id: 3, text: "익숙하지 않은 새로운 음식 조합에 열린 마음을 가져야 한다.", isCorrect: true },
+                          { id: 4, text: "매일 똑같은 음식을 먹는 것은 소화 불량의 주요 원인이다." }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz1Answered(choice.id)}
+                            disabled={quiz1Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz1Answered === null ? 'border-slate-200 hover:border-sky-400 hover:bg-sky-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz1Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz1Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz1Answered === 3 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 3부작 시리즈 전체의 사례(하와이안 피자, 망고 찰밥, 엘비스 샌드위치)를 종합하는 결론입니다. 필자는 "이상하다(odd)고 생각되는 것은 단지 경험해보지 않은 새로운 맛(new experience)일 뿐"이라며 <strong>다양성과 새로운 시도에 대한 열린 태도</strong>를 강조하고 있습니다.
+                          </p>
+                          <button onClick={() => setQuiz1Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q2. 문장 삽입 */}
+                    <div className="mb-8">
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                        <div className="text-md font-bold text-center bg-white p-4 border border-slate-200 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                          Sometimes all you need is to combine some ingredients in novel ways to create a new flavor.
+                        </div>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          The world is a big place, and everyone has to eat. ( ① ) Eating the same thing every day can get quite boring. ( ② ) But if you think it’s odd, it’s probably because you haven’t tried it before. ( ③ ) Considering how diverse the world is, there are probably more food combinations that seem odd than seem “normal.” ( ④ ) Maybe odd is just something you haven’t experienced yet. 
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                        {[
+                          { id: 1, text: "①" },
+                          { id: 2, text: "②", isCorrect: true },
+                          { id: 3, text: "③" },
+                          { id: 4, text: "④" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz2Answered(choice.id)}
+                            disabled={quiz2Answered !== null}
+                            className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz2Answered === null ? 'border-slate-200 hover:border-sky-400 hover:bg-sky-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                  (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            {choice.text}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz2Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz2Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 매일 똑같은 것을 먹는 것은 지루하다는 '문제 상황(boring)' 뒤에, 이를 해결할 수 있는 '해결책(새로운 재료 조합)'을 제시하는 내용이 오는 것이 논리적입니다. 또한 그 해결책에 대해 "하지만 이상하다고 생각한다면(But if you think it's odd...)"으로 문맥이 반전되며 이어지므로 <strong>②번</strong> 위치가 완벽합니다.
+                          </p>
+                          <button onClick={() => setQuiz2Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <hr className="my-8 border-slate-200 print:border-black" />
+
+                    {/* Q3. 요약문 완성 */}
+                    <div>
+                      <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-6">
+                        <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                        <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                        <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                          In a diverse world, what we perceive as <span className="font-bold text-sky-800">( A )</span> food combinations are often merely <span className="font-bold text-sky-800">( B )</span> experiences waiting to be discovered, breaking the boredom of routine eating.
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 print:space-y-3">
+                        {[
+                          { id: 1, text: "(A) traditional —— (B) familiar" },
+                          { id: 2, text: "(A) strange —— (B) unexplored", isCorrect: true },
+                          { id: 3, text: "(A) strange —— (B) predictable" },
+                          { id: 4, text: "(A) healthy —— (B) unexplored" }
+                        ].map((choice) => (
+                          <button
+                            key={choice.id}
+                            onClick={() => setQuiz3Answered(choice.id)}
+                            disabled={quiz3Answered !== null}
+                            className={`w-full text-left p-3 rounded-lg border flex items-center transition-all duration-200
+                              print:border-none print:p-1 print:text-black
+                              ${quiz3Answered === null ? 'border-slate-200 hover:border-sky-400 hover:bg-sky-50' : 
+                                (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 font-bold shadow-sm' : 
+                                  (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-500' : 'border-slate-100 text-slate-400 opacity-50'))
+                              }
+                            `}
+                          >
+                            <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> 
+                            {choice.text}
+                            {quiz3Answered !== null && choice.isCorrect && <i className="ph-fill ph-check-circle text-lg ml-auto text-green-500 print:hidden"></i>}
+                          </button>
+                        ))}
+                      </div>
+
+                      {quiz3Answered !== null && (
+                        <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed animate-fade-in print:hidden
+                          ${quiz3Answered === 2 ? 'bg-green-100 text-green-900 border border-green-300' : 'bg-red-100 text-red-900 border border-red-300'}
+                        `}>
+                          <p className="font-bold mb-1">
+                            {quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}
+                          </p>
+                          <p>
+                            <strong>해설:</strong> 우리가 <strong>이상하다/낯설다(strange/odd)</strong>고 인식하는 음식 조합들은 사실 일상의 지루함을 깨뜨려 줄, 아직 <strong>탐험되지 않은(unexplored/unexperienced)</strong> 새로운 경험일 뿐이라는 것이 이 글의 핵심 요지입니다.
+                          </p>
+                          <button onClick={() => setQuiz3Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                            다시 풀기
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
