@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Sustainable Fashion</title>
+    
+    <!-- PWA 설정 -->
+    <meta name="theme-color" content="#064e3b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/064e3b/ffffff.png?text=LOGIC">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            /* 인쇄 시 모든 탭 내용을 다 보여주기 위한 강제 설정 */
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#a7f3d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #6ee7b7; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: Intro (Jessi's Habit)
+          { id: 1, text: "Jessi is a fashion blogger who loves unique, vibrant clothes.", trans: "제시는 독특하고 생기 넘치는 옷을 좋아하는 패션 블로거이다." },
+          { id: 2, text: "But guess what? She does not buy new clothes.", trans: "하지만 그거 아는가? 그녀는 새 옷을 사지 않는다." },
+          { id: 3, text: "Instead, she buys them secondhand.", trans: "대신, 그녀는 그것들을 중고로 산다." },
+          { id: 4, text: "You may think secondhand clothes are old fashioned, but by buying them, Jessi can try different styles.", trans: "중고 옷이 구식이라고 생각할지도 모르지만, 그것들을 구입함으로써 제시는 다양한 스타일을 시도할 수 있다." },
+          { id: 5, text: "She also does not get too attached to any style or brand because there is always another exciting outfit waiting to be discovered.", trans: "또한 항상 발견되기를 기다리는 또 다른 흥미로운 옷이 있기 때문에 그녀는 어떤 스타일이나 브랜드에 너무 얽매이지 않는다." },
+          { id: 6, text: "Jessi’s clothing habits are not just about creating a style; they are about saving the Earth.", trans: "제시의 의류 습관은 단순히 스타일을 만드는 것에 관한 것이 아니다; 그것은 지구를 구하는 것에 관한 것이다." },
+          { id: 7, text: "The reason is that her actions help reduce the production and consumption of clothes.", trans: "그 이유는 그녀의 행동이 옷의 생산과 소비를 줄이는 데 도움을 주기 때문이다." },
+
+          // Part 2: The Problem (Linear Fashion)
+          { id: 8, text: "Worth over $3 trillion and making up 2% of the world’s GDP, the fashion industry today has an almost entirely linear approach.", trans: "가치가 3조 달러가 넘고 세계 GDP의 2%를 차지하는 오늘날의 패션 산업은 거의 전적으로 선형적인 접근 방식을 취하고 있다.", isHighlight: true, logicPoint: 1 },
+          { id: 9, text: "The process moves in a straight line from design to consumption to disposal.", trans: "그 과정은 디자인에서 소비, 폐기로 일직선으로 이동한다." },
+          { id: 10, text: "Material extraction, textile manufacturing, the supply chain, design, sales, marketing, and other steps are guided by the aim of maximizing garment consumption without considering other issues.", trans: "재료 추출, 직물 제조, 공급망, 디자인, 판매, 마케팅 및 기타 단계들은 다른 문제들을 고려하지 않고 의류 소비를 극대화하려는 목표에 의해 주도된다." },
+          { id: 11, text: "Due to linear fashion, the fashion industry negatively affects the environment.", trans: "선형 패션으로 인해, 패션 산업은 환경에 부정적인 영향을 미친다.", logic: 'problem' },
+          { id: 12, text: "85% of textiles go into landfills, only 1% of the material is recycled, at least 500,000 tons of microfibers end up in the ocean (equal to 50 billion plastic bottles), and 93 billion cubic meters of water is required for textile production annually.", trans: "직물의 85%가 매립지로 가고, 재료의 단 1%만이 재활용되며, 최소 50만 톤의 극세사가 바다로 흘러가고(플라스틱 병 500억 개와 같음), 매년 직물 생산에 930억 입방미터의 물이 필요하다." },
+          { id: 13, text: "Alarming numbers like these will keep increasing if producers maintain the old system.", trans: "생산자들이 옛 시스템을 유지한다면 이와 같은 우려스러운 수치들은 계속 증가할 것이다." },
+          { id: 14, text: "It is clear that waste and pollution from the fashion industry must be reduced.", trans: "패션 산업에서 발생하는 쓰레기와 오염이 줄어들어야 한다는 것은 분명하다.", isHighlight: true, logicPoint: 2 },
+          { id: 15, text: "Linear fashion must change, and this could happen through circular fashion.", trans: "선형 패션은 변해야 하며, 이것은 순환 패션을 통해 일어날 수 있다.", logic: 'solution' },
+
+          // Part 3: The Solution (Circular Fashion)
+          { id: 16, text: "Circular fashion is inspired by the principles of a circular economy and sustainable development.", trans: "순환 패션은 순환 경제와 지속 가능한 발전의 원칙에서 영감을 받았다." },
+          { id: 17, text: "A circular economy is based on limiting waste, keeping resources and materials in use, and reusing them.", trans: "순환 경제는 쓰레기를 제한하고, 자원과 재료를 계속 사용하며, 그것들을 재사용하는 것에 기초한다." },
+          { id: 18, text: "In a circular model, we make, use, and reuse materials for as long as possible to extract their maximum value.", trans: "순환 모델에서 우리는 재료의 최대 가치를 추출하기 위해 가능한 한 오랫동안 재료를 만들고, 사용하고, 재사용한다." },
+          { id: 19, text: "Therefore, clothing and textiles are produced, used, and reused to minimize waste.", trans: "그러므로 의류와 직물은 쓰레기를 최소화하기 위해 생산되고, 사용되고, 재사용된다." },
+          { id: 20, text: "It is a renewable approach to reduce the fashion industry’s environmental impact.", trans: "그것은 패션 산업의 환경적 영향을 줄이기 위한 재생 가능한 접근 방식이다." },
+          { id: 21, text: "Circular fashion provides numerous benefits.", trans: "순환 패션은 수많은 이점을 제공한다." },
+          { id: 22, text: "First, extending the lifespan of fibers significantly reduces textile waste, benefiting the environment.", trans: "첫째, 섬유의 수명을 연장하는 것은 직물 쓰레기를 크게 줄여 환경에 이익을 준다.", isHighlight: true, logicPoint: 3 },
+          { id: 23, text: "Second, circular processes utilize chemicals and materials safe for human health and the environment.", trans: "둘째, 순환 과정은 인간의 건강과 환경에 안전한 화학 물질과 재료를 활용한다." },
+          { id: 24, text: "This practice protects the environment and consumer health.", trans: "이러한 관행은 환경과 소비자 건강을 보호한다." },
+          { id: 25, text: "Third, materials are regenerated instead of being disposed of, which enables their long-term use.", trans: "셋째, 재료들은 폐기되는 대신 재생되며, 이는 그것들의 장기적인 사용을 가능하게 한다.", isHighlight: true, logicPoint: 4 },
+
+          // Part 4: The Innovation (Tech & Ideas)
+          { id: 26, text: "The rise of circular fashion is facilitated by new technology and ideas.", trans: "순환 패션의 부상은 새로운 기술과 아이디어에 의해 촉진된다.", logic: 'innovation' },
+          { id: 27, text: "Materials commonly used in clothing are not eco-friendly because they require considerable resources and often break down slowly.", trans: "의류에 흔히 사용되는 재료들은 상당한 자원을 필요로 하고 종종 느리게 분해되기 때문에 친환경적이지 않다." },
+          { id: 28, text: "This creates a need for eco-friendly textile alternatives.", trans: "이것은 친환경적인 직물 대안에 대한 필요성을 낳는다." },
+          { id: 29, text: "Currently, companies are developing recycled fibers and fibers extracted from agricultural waste products like leaves, peels, and seeds.", trans: "현재 기업들은 재활용 섬유와 잎, 껍질, 씨앗 같은 농업 폐기물에서 추출한 섬유를 개발하고 있다." },
+          { id: 30, text: "One company uses nanotechnology to make soft material from orange peels.", trans: "한 회사는 오렌지 껍질로 부드러운 소재를 만들기 위해 나노 기술을 사용한다." },
+          { id: 31, text: "Another makes fabrics from kapok tree seeds.", trans: "또 다른 회사는 케이폭 나무 씨앗으로 직물을 만든다." },
+          { id: 32, text: "The trees grow well in poor soil without needing much water.", trans: "그 나무들은 많은 물을 필요로 하지 않고 척박한 토양에서도 잘 자란다." },
+          { id: 33, text: "These new fabrics produce less waste, last a long time, and break down easily.", trans: "이러한 새로운 직물들은 쓰레기를 덜 발생시키고, 오래 지속되며, 쉽게 분해된다." },
+          { id: 34, text: "In addition to these manufacturing techniques, technology will improve in such a way that it may become normal to produce clothes only when people order them.", trans: "이러한 제조 기술 외에도, 사람들이 주문할 때만 옷을 생산하는 것이 일반화되는 방식으로 기술이 향상될 것이다." },
+          { id: 35, text: "This “make-to-order” method will cost more, but then less money will be spent on maintaining offline stores.", trans: "이 '주문 제작' 방식은 비용이 더 많이 들겠지만, 오프라인 매장을 유지하는 데 드는 돈은 줄어들 것이다." },
+          { id: 36, text: "And 3D technology will enable people to see how clothes will fit online without trying them on in a store.", trans: "그리고 3D 기술은 사람들이 매장에서 입어보지 않고도 옷이 어떻게 맞을지 온라인으로 볼 수 있게 해줄 것이다." },
+          { id: 37, text: "In the long run, innovation in production and sales will facilitate sustainable fashion and considerably reduce material waste and logistics emissions.", trans: "장기적으로, 생산과 판매에서의 혁신은 지속 가능한 패션을 촉진하고 재료 낭비와 물류 배출을 상당히 줄일 것이다." },
+
+          // Part 5: Action & Conclusion
+          { id: 38, text: "Another key to making fashion sustainable is the consumer: us.", trans: "패션을 지속 가능하게 만드는 또 다른 열쇠는 소비자, 즉 우리이다.", logic: 'action' },
+          { id: 39, text: "If we want the fashion industry to adopt more sustainable practices, we must care about how clothes come to us.", trans: "만약 우리가 패션 산업이 더 지속 가능한 관행을 채택하기를 원한다면, 우리는 옷이 어떻게 우리에게 오는지에 관심을 가져야 한다." },
+          { id: 40, text: "We should then demonstrate our concerns through what we buy.", trans: "그러고 나서 우리는 우리가 구매하는 것을 통해 우리의 관심을 증명해야 한다.", isHighlight: true, logicPoint: 5 },
+          { id: 41, text: "The market, of course, will respond.", trans: "물론 시장은 반응할 것이다." },
+          { id: 42, text: "We can also reduce waste by discarding clothes responsibly.", trans: "우리는 또한 옷을 책임감 있게 버림으로써 쓰레기를 줄일 수 있다." },
+          { id: 43, text: "To be specific, we should buy only what we need and pass clothing on to someone who will wear it or to a thrift shop when discarding it.", trans: "구체적으로 말하자면, 우리는 필요한 것만 사야 하고, 옷을 버릴 때 그것을 입을 누군가에게 주거나 중고품 가게에 넘겨주어야 한다." },
+          { id: 44, text: "Circular fashion will not solve every problem in the fashion industry overnight.", trans: "순환 패션이 하룻밤 사이에 패션 산업의 모든 문제를 해결하지는 못할 것이다." },
+          { id: 45, text: "However, small steps in the right direction are better than nothing.", trans: "하지만, 올바른 방향으로 나아가는 작은 발걸음이 아무것도 없는 것보다 낫다." },
+          { id: 46, text: "Keeping things in the supply chain for as many cycles as possible is really important.", trans: "가능한 한 여러 주기에 걸쳐 물건들을 공급망 안에 유지하는 것이 정말 중요하다." },
+          { id: 47, text: "By making small changes to our clothing habits today, the fashion industry will gradually improve.", trans: "오늘날 우리의 의류 습관에 작은 변화를 만듦으로써, 패션 산업은 점진적으로 개선될 것이다." },
+          { id: 48, text: "After all, nothing is more fashionable than saving the planet.", trans: "결국, 지구를 구하는 것보다 더 멋진(fashionable) 것은 없다.", isHighlight: true, logicPoint: 6, logic: 'conclusion' }
+        ];
+
+        const logicMapSteps = [
+          { id: 'problem', title: "THE PROBLEM (문제의 인식)", desc: "Linear fashion causes pollution", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { id: 'solution', title: "THE SOLUTION (해결책 제시)", desc: "Transition to Circular fashion", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-bold ph-arrows-clockwise text-xl mb-2"></i> },
+          { id: 'innovation', title: "THE INNOVATION (기술적 혁신)", desc: "Eco-materials & Make-to-order", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'action', title: "THE ACTION (소비자의 실천)", desc: "Responsible buying & discarding", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-users-three text-xl mb-2"></i> },
+          { id: 'conclusion', title: "CONCLUSION (최종 결론)", desc: "Saving the planet is fashionable", color: "bg-green-100 border-green-500 text-green-900", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">Sustainable Fashion</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-emerald-900 hover:bg-emerald-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* 사이드바 */}
+                <aside className="hidden md:flex flex-col w-72 bg-emerald-950 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-emerald-900 border-b border-emerald-800">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl"></i>
+                            <span className="text-xs font-bold tracking-wider">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Sustainable Fashion</h1>
+                        <p className="text-emerald-300 text-sm mt-2 italic">Why Fashion Needs to Change</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-600 text-white font-bold shadow-md' : 'text-emerald-200 hover:bg-emerald-800/50'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-emerald-800">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-700 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* 메인 영역 */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-emerald-950 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Sustainable Fashion</h1>
+                            <p className="text-emerald-300 text-xs">Why Fashion Needs to Change</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-emerald-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-500 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Intro (제시의 습관과 지구 구하기)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 7).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-red-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Problem (선형 패션의 폐해)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(7, 15).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Solution (순환 경제와 순환 패션)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(15, 25).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Innovation (친환경 신기술과 주문 제작)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(25, 37).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 5 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Action & Conclusion (소비자의 실천과 최종 결론)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(37, 48).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-500 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 분사구문 (동시동작 / 부대상황)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[08] <span className="font-bold text-emerald-600">Worth</span> over $3 trillion and <span className="font-bold text-emerald-600">making up</span> 2% of the world’s GDP, the fashion industry..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                접속사와 주어가 생략된 분사구문입니다. 패션 산업이 세계 경제에 미치는 엄청난 <strong className="text-emerald-800 print:text-black">규모와 영향력</strong>을 주절 앞에 부연 설명하여 문제의 심각성을 부각시킵니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 가주어 - 진주어 구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[14] <span className="font-bold text-emerald-600">It</span> is clear <span className="font-bold text-emerald-600">that</span> waste and pollution from the fashion industry must be reduced."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                가주어(It)와 진주어(that절) 구조입니다. 심각한 환경 오염 수치를 나열한 뒤, 문제 해결(쓰레기와 오염 감소)이 시급하다는 필자의 <strong className="text-emerald-800 print:text-black">확고한 주장과 결론</strong>을 분명하게(clear) 전달합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 분사구문의 계속적 용법 (결과)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[22] ... extending the lifespan of fibers significantly reduces textile waste, <span className="font-bold text-teal-600">benefiting</span> the environment."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤에 오는 분사구문으로 ', and it benefits'의 축약 형태입니다. 섬유 수명 연장(원인)이 환경 보호라는 <strong className="text-teal-800 print:text-black">필연적이고 긍정적인 결과</strong>로 이어짐을 자연스럽게 연결합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 관계대명사의 계속적 용법: , which
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[25] ... materials are regenerated instead of being disposed of, <span className="font-bold text-teal-600">which</span> enables their long-term use."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤의 which는 앞 문장 전체(재료가 재생된다는 사실)를 선행사로 받습니다. 폐기 대신 재생되는 혁신적인 순환 방식이 장기적인 사용을 <strong className="text-teal-800 print:text-black">가능하게 한다(enable)</strong>는 의미를 추가합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 관계대명사 What (명사절)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[40] We should then demonstrate our concerns through <span className="font-bold text-cyan-700">what</span> we buy."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                전치사 through의 목적어 역할을 하는 명사절(~하는 것)을 이끕니다. 소비자가 단순히 걱정만 할 것이 아니라, <strong className="text-cyan-800 print:text-black">'우리가 구매하는 것(소비 행위)'</strong>을 통해 환경에 대한 관심과 의지를 적극적으로 증명해야 함을 강조합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P6 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-green-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 06. 부정 주어를 통한 최상급 표현
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[48] After all, <span className="font-bold text-green-700">nothing is more</span> fashionable <span className="font-bold text-green-700">than</span> saving the planet."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                [부정대명사(nothing) + 비교급(more) + than]이 결합하여 <strong className="text-green-800 print:text-black">"지구를 구하는 것이 가장 멋진(최고의) 일이다"</strong>라는 최상급의 의미를 나타내는 이 글 전체의 완벽하고 수려한 최종 결론입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-500 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div onClick={() => handleLogicClick(idx + 1)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === idx + 1 ? 'ring-4 ring-emerald-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-red-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Solved by</div>}
+                                                    {idx === 1 && <div className="bg-teal-100 text-teal-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-teal-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Supported by</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Requiring</div>}
+                                                    {idx === 3 && <div className="bg-emerald-100 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-emerald-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Leading to</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-500 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "오늘날 패션 산업의 선형적(linear) 방식은 심각한 환경 오염과 쓰레기를 유발한다." },
+                                                { id: 2, text: "순환 패션 과정에서는 인간과 환경에 안전한 화학 물질과 재료를 활용한다." },
+                                                { id: 3, text: "옷을 주문할 때만 생산하는 방식은 비용이 늘어나지만 오프라인 매장 유지비를 줄여준다." },
+                                                { id: 4, text: "소비자들은 자신에게 필요한 것을 적극적으로 소비하여 시장 경제를 활성화해야 한다.", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 4 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 43번 문장에서 소비자는 <strong>"자신이 꼭 필요한 것만 사야 한다(buy only what we need)"</strong>고 명시하며 과도한 소비를 지양하고 옷을 책임감 있게 재사용하거나 버려야 한다고 주장합니다. 무분별한 소비 경제 활성화는 이 글의 요지와 정반대입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                Linear fashion must change, and this could happen through circular fashion.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Due to linear fashion, the fashion industry negatively affects the environment. ( ① ) Alarming numbers like these will keep increasing if producers maintain the old system. ( ② ) It is clear that waste and pollution from the fashion industry must be reduced. ( ③ ) Circular fashion is inspired by the principles of a circular economy and sustainable development. ( ④ ) A circular economy is based on limiting waste, keeping resources and materials in use, and reusing them.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②" }, { id: 3, text: "③", isCorrect: true }, { id: 4, text: "④" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 주어진 문장은 선형 패션(문제)에서 <strong>순환 패션(해결책)</strong>으로 화제가 전환되는 결정적인 연결 고리입니다. 선형 패션의 폐해를 마무리하며 오염이 줄어야 한다는 문장 뒤에 오고, 곧이어 순환 패션의 개념 설명이 시작되는 <strong>③번</strong> 자리가 가장 완벽합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                To address the environmental damage caused by the <span className="font-bold text-emerald-700">( A )</span> fashion industry, we must transition to a <span className="font-bold text-emerald-700">( B )</span> model supported by eco-friendly technologies and responsible consumer habits.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) sustainable —— (B) linear" },
+                                                { id: 2, text: "(A) linear —— (B) circular", isCorrect: true },
+                                                { id: 3, text: "(A) circular —— (B) traditional" },
+                                                { id: 4, text: "(A) linear —— (B) disposable" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 쓰고 버리는 <strong>선형적인(linear)</strong> 패션 산업이 일으킨 환경 문제를 해결하기 위해, 우리는 자원을 재활용하는 <strong>순환적인(circular)</strong> 모델로 전환해야 한다는 것이 이 글의 가장 핵심적인 요지입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <u>않은</u> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Linear fashion is guided by the aim of ①<u>maximizing</u> garment consumption without considering other issues. However, it is clear that waste and pollution must be ②<u>reduced</u>. This creates a need for ③<u>eco-friendly</u> textile alternatives. First, ④<u><span className="text-red-600 font-bold">shortening</span></u> the lifespan of fibers significantly reduces textile waste, benefiting the environment.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① maximizing" }, 
+                                                { id: 2, text: "② reduced" }, 
+                                                { id: 3, text: "③ eco-friendly" }, 
+                                                { id: 4, text: "④ shortening", isCorrect: true }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz4Answered(choice.id)} disabled={quiz4Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 4 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 4 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ④ shortening $\rightarrow$ extending</strong><br/>순환 패션의 주요 장점 중 첫 번째는 섬유의 수명을 '단축하는(shortening)' 것이 아니라 오랫동안 재사용 가능하도록 <strong>'연장하는(extending)'</strong> 것입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 요지 파악</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 요지로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "온라인 쇼핑이 활성화되면서 오프라인 의류 매장의 중요성이 커지고 있다." },
+                                                { id: 2, text: "패션 산업의 환경 문제를 해결하기 위해 순환 패션의 도입과 소비자의 책임감 있는 행동이 필요하다.", isCorrect: true },
+                                                { id: 3, text: "농업 폐기물을 이용한 신소재 개발은 생산 비용이 너무 높아 상용화에 어려움이 있다." },
+                                                { id: 4, text: "중고 옷 시장의 성장은 최신 패션 트렌드에 뒤처지게 만들 수 있다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz5Answered(choice.id)} disabled={quiz5Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 글 전체에 걸쳐, 선형 패션이 야기한 환경 문제를 지적하고, 이를 해결할 대안으로 '순환 패션(Circular Fashion)'과 신기술을 제안하며, 마지막으로 <strong>소비자의 작은 실천과 책임감</strong>이 모여 패션 산업을 점진적으로 개선시킬 수 있다고 주장하고 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black text-center">
+                                                "After all, nothing is more fashionable than <span className="inline-block w-40 border-b-2 border-slate-800 mx-1"></span>."
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "buying the latest trends" },
+                                                { id: 2, text: "maximizing consumption" },
+                                                { id: 3, text: "saving the planet", isCorrect: true },
+                                                { id: 4, text: "ignoring environmental issues" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz6Answered(choice.id)} disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">①</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문의 마지막을 장식하는 강렬한 결론입니다. 새로운 옷을 소비하여 외형을 꾸미는 것보다 더 '패셔너블(멋진)'한 것은 바로 <strong>'지구를 구하는 일(saving the planet)'</strong>이라는 필자의 통찰을 담고 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                {/* 모바일 하단 네비게이션 */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

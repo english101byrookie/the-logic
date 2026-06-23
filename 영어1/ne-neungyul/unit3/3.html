@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Under a Shared Roof</title>
+    
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #f0f9ff; background-image: radial-gradient(#bae6fd 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const textData = [
+          { id: 1, text: "Humanitas is a yellow brick house located in the city of Deventer, the Netherlands.", trans: "휴머니타스(Humanitas)는 네덜란드 데벤테르시에 위치한 노란색 벽돌집입니다." },
+          { id: 2, text: "It is a care center that houses more than 160 elderly residents who require assistance.", trans: "이곳은 도움이 필요한 160명 이상의 노인 거주자들을 수용하는 요양 센터입니다." },
+          { id: 3, text: "Along with its supportive environment, Humanitas offers something unusual: young neighbors.", trans: "지원적인 환경과 더불어, 휴머니타스는 무언가 독특한 것을 제공하는데, 바로 젊은 이웃들입니다." },
+          { id: 4, text: "At Humanitas, elderly residents share their living space with university students.", trans: "휴머니타스에서 노인 거주자들은 대학생들과 생활 공간을 공유합니다." },
+          { id: 5, text: "This unique “intergenerational living” project began in 2012, after budget cuts reduced the amount of money care homes in the Netherlands received.", trans: "이 독특한 '세대 간 공존' 프로젝트는 네덜란드의 요양원들이 받는 자금 지원을 예산 삭감으로 줄인 후인 2012년에 시작되었습니다.", isHighlight: true, logicPoint: 1 },
+          { id: 6, text: "This funding reduction led to the loss of many essential elderly care programs, including social, educational, and counseling services.", trans: "이러한 자금 삭감은 사회, 교육, 상담 서비스를 포함한 많은 필수 노인 돌봄 프로그램의 상실로 이어졌습니다.", logic: 'problem' },
+          { id: 7, text: "Humanitas needed to seek an affordable solution to fill the gap left by the removal of these services.", trans: "휴머니타스는 이러한 서비스의 제거로 남겨진 공백을 메우기 위해 감당할 수 있는 해결책을 찾아야만 했습니다." },
+          { id: 8, text: "Since the building had numerous empty rooms available, the director decided to offer local university students free accommodations in return for spending time with the elderly residents.", trans: "건물에 이용 가능한 빈 방이 많았기 때문에, 원장은 노인 거주자들과 시간을 보내는 대가로 지역 대학생들에게 무료 숙식을 제공하기로 결정했습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 9, text: "Many students were struggling to afford the area’s high rents, so the proposal was a true win-win situation. Now, let’s hear more about this intriguing place from two of the residents.", trans: "많은 학생들이 그 지역의 높은 임대료를 감당하는 데 어려움을 겪고 있었기 때문에, 이 제안은 진정한 윈윈 상황이었습니다. 이제 두 명의 거주자로부터 이 흥미로운 장소에 대해 더 들어봅시다.", logic: 'solution' },
+          { id: 10, text: "[More Than a Free Place to Stay] Hi! My name is Jacob Jansen, and I’ve been living at Humanitas for over two years.", trans: "[무료 숙소 그 이상] 안녕하세요! 제 이름은 제이콥 얀센이고, 휴머니타스에서 2년 넘게 살고 있습니다." },
+          { id: 11, text: "I’ve really enjoyed my time here. As a live-in student, I’m required to spend at least 30 hours per month with my elderly neighbors in exchange for free accommodations.", trans: "저는 이곳에서의 시간을 정말 즐겼습니다. 입주 학생으로서, 저는 무료 숙박의 대가로 한 달에 최소 30시간을 나이 든 이웃들과 보내야 합니다." },
+          { id: 12, text: "In reality, however, we spend a lot more time together than that. Sometimes I teach them things, such as how to use social media, and other times I just hang out with them.", trans: "하지만 실제로는 그보다 훨씬 더 많은 시간을 함께 보냅니다. 때때로 저는 소셜 미디어 사용법과 같은 것들을 그들에게 가르쳐주고, 다른 때는 그저 그들과 어울려 놉니다." },
+          { id: 13, text: "We have meals together, play games, and go shopping. Humanitas doesn’t feel like a care home to me. Instead, I consider it a community that I am a part of.", trans: "우리는 함께 식사하고, 게임을 하고, 쇼핑을 갑니다. 휴머니타스는 저에게 요양원처럼 느껴지지 않습니다. 대신에, 저는 이곳을 제가 속한 커뮤니티로 생각합니다." },
+          { id: 14, text: "Every time I come home, I tell my neighbors about my day. When I have a problem, they always have useful advice to share.", trans: "집에 올 때마다 저는 이웃들에게 제 하루에 대해 이야기합니다. 제게 문제가 생기면 그들은 항상 나눌 유용한 조언을 가지고 있습니다." },
+          { id: 15, text: "With so much experience gathered over a lifetime, they possess knowledge that I have yet to acquire.", trans: "평생에 걸쳐 쌓은 많은 경험 덕분에, 그들은 제가 아직 습득하지 못한 지식을 소유하고 있습니다.", isHighlight: true, logicPoint: 3 },
+          { id: 16, text: "They also teach me lots of little but important things, often without realizing it.", trans: "그들은 종종 자신도 모르게 작지만 중요한 많은 것들을 저에게 가르쳐주기도 합니다." },
+          { id: 17, text: "For example, I’ve learned the value of having a casual chat over a cup of coffee from them. It’s a really great way to take a break from rushing around all the time.", trans: "예를 들어, 저는 그들로부터 커피 한 잔을 마시며 가벼운 대화를 나누는 것의 가치를 배웠습니다. 그것은 항상 서두르는 일상에서 휴식을 취하는 정말 좋은 방법입니다." },
+          { id: 18, text: "I used to feel sorry for the elderly because I focused only on the things they can’t do. When I look at them now, however, I see all the things they can do.", trans: "저는 예전에 노인들이 할 수 없는 것들에만 집중했기 때문에 그들을 안쓰럽게 생각하곤 했습니다. 하지만 지금 그들을 볼 때, 저는 그들이 할 수 있는 모든 것을 봅니다." },
+          { id: 19, text: "Obviously, Humanitas provides me with much more than a free place to stay. I’ve made deep, meaningful friendships that I’ll never forget here.", trans: "분명히, 휴머니타스는 저에게 무료 숙소보다 훨씬 더 많은 것을 제공합니다. 저는 이곳에서 결코 잊지 못할 깊고 의미 있는 우정을 쌓았습니다." },
+          { id: 20, text: "I intend to stay at Humanitas for at least one more year. Living here has changed my life in ways I never thought possible, and I’m really grateful for this transformative experience.", trans: "저는 적어도 1년은 더 휴머니타스에 머물 계획입니다. 이곳에서의 생활은 제가 가능하다고 생각하지 못했던 방식으로 제 삶을 변화시켰고, 저는 이 변화의 경험에 정말 감사합니다." },
+          { id: 21, text: "I have learned so much from my neighbors already, but I’m sure there is still a lot more that they can teach me.", trans: "저는 이미 이웃들로부터 많은 것을 배웠지만, 그들이 저에게 가르쳐 줄 수 있는 것이 여전히 훨씬 더 많을 것이라고 확신합니다." },
+          { id: 22, text: "[A Breath of Fresh Air] My name is Helena Smit, and I am 93 years old. I have been living at Humanitas for the past 15 years, so I remember when we were first informed that we would have young people as neighbors.", trans: "[신선한 공기] 제 이름은 헬레나 스밋이고, 93세입니다. 저는 지난 15년 동안 휴머니타스에서 살고 있어서, 우리가 젊은 사람들을 이웃으로 맞이하게 될 것이라는 소식을 처음 들었을 때를 기억합니다." },
+          { id: 23, text: "Believe me, not everyone was happy about it! But that quickly changed once they moved in. The students here are energetic, friendly, and caring. They make us laugh and create a joyful mood.", trans: "믿어주세요, 모두가 그것에 대해 기뻐했던 것은 아닙니다! 하지만 그들이 이사 오자마자 그것은 빨리 바뀌었습니다. 이곳 학생들은 에너지가 넘치고, 친절하며, 배려심이 많습니다. 그들은 우리를 웃게 하고 즐거운 분위기를 만듭니다." },
+          { id: 24, text: "Humanitas was already a decent place to live before the students arrived, but it has become a lot more fun since they moved in.", trans: "휴머니타스는 학생들이 도착하기 전에도 살기 괜찮은 곳이었지만, 그들이 이사 온 후 훨씬 더 재미있어 졌습니다." },
+          { id: 25, text: "Recently, the students held a pajama party and invited us to join them. They taught us how to play some new games, and we all had a great time. It was like we were in our 20s again.", trans: "최근에 학생들은 파자마 파티를 열고 우리를 초대했습니다. 그들은 우리에게 새로운 게임 하는 법을 가르쳐주었고, 우리 모두 즐거운 시간을 보냈습니다. 마치 우리가 다시 20대가 된 것 같았습니다." },
+          { id: 26, text: "I sometimes hear loud music from my young next-door neighbor’s apartment, but that is okay. It’s a small matter compared to what they’ve brought to our lives.", trans: "저는 때때로 젊은 옆집 이웃의 아파트에서 시끄러운 음악 소리를 듣지만, 괜찮습니다. 그것은 그들이 우리 삶에 가져다준 것들에 비하면 사소한 문제입니다." },
+          { id: 27, text: "Speaking of my young neighbor, she has been here for more than two years now. Last year, she went through a difficult time of grief after she lost her father, so I did what came naturally.", trans: "나의 젊은 이웃에 대해 말하자면, 그녀는 이곳에 온 지 2년이 넘었습니다. 작년에 그녀는 아버지를 잃고 힘든 슬픔의 시간을 보냈기 때문에, 저는 자연스럽게 다가오는 일을 했습니다." },
+          { id: 28, text: "I stayed with her, held her hands when she cried, and listened to what she said. She later told me that I was a great comfort during that difficult time, which made me feel very good.", trans: "저는 그녀와 함께 머물며, 그녀가 울 때 손을 잡아주고, 그녀가 하는 말을 들었습니다. 그녀는 나중에 제가 그 힘든 시간 동안 큰 위로가 되었다고 말했고, 그것은 제 기분을 매우 좋게 만들었습니다.", isHighlight: true, logicPoint: 3 },
+          { id: 29, text: "It always feels nice to be reminded that I’m still capable of doing things for others.", trans: "제가 여전히 다른 사람들을 위해 무언가를 할 능력이 있다는 것을 상기하게 되는 것은 언제나 기분 좋은 일입니다." },
+          { id: 30, text: "I am nearly 100 years old, and I have bad knees. There is nothing much the doctors can do about the pain. But having young, vibrant people around helps me forget about the pain and enjoy my life!", trans: "저는 거의 100살이고, 무릎이 안 좋습니다. 통증에 대해 의사들이 할 수 있는 일은 별로 없습니다. 하지만 젊고 활기찬 사람들이 주변에 있다는 것은 제가 통증을 잊고 내 삶을 즐기도록 도와줍니다!", logic: 'benefits' },
+          { id: 31, text: "There are currently six students living at Humanitas, with a long waiting list of others hoping to be offered a spot.", trans: "현재 휴머니타스에는 6명의 학생이 살고 있으며, 자리를 제안받기를 바라는 다른 사람들의 긴 대기 명단이 있습니다." },
+          { id: 32, text: "Humanitas is a great example of how people of different ages can help each other and share their lives with one another.", trans: "휴머니타스는 어떻게 다른 연령대의 사람들이 서로 돕고 자신들의 삶을 서로 나눌 수 있는지 보여주는 훌륭한 예입니다.", isHighlight: true, logicPoint: 4 },
+          { id: 33, text: "The older residents gain a more youthful perspective on life, while the younger residents receive valuable life lessons. More and more care homes around Europe are now trying intergenerational living, bringing the young and old together in harmony.", trans: "나이 든 거주자들은 삶에 대한 더 젊은 관점을 얻는 반면, 젊은 거주자들은 소중한 인생 교훈을 받습니다. 이제 유럽 전역의 점점 더 많은 요양원들이 젊은이와 노인을 조화롭게 모으는 세대 간 공존을 시도하고 있습니다.", logic: 'conclusion' }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "THE PROBLEM", desc: "Budget cuts led to loss of elderly care programs", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { point: 2, title: "THE SOLUTION", desc: "Intergenerational living: Free rent ↔ Spending time", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { point: 3, title: "MUTUAL BENEFITS", desc: "Youth: Life wisdom / Elderly: Vitality & Usefulness", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-arrows-left-right text-xl mb-2"></i> },
+          { point: 4, title: "ULTIMATE GOAL", desc: "Harmonious coexistence spreading across Europe", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          // 핵심 인터랙션: Logic Map 클릭 시 동작하는 핸들러 추가
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); // 구조도를 클릭하면 자동으로 본문 탭으로 이동하여 하이라이트를 보여줌
+          };
+          
+          // 불필요한 state 4~6 정리 완료
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-800">
+                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-blue-800"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-blue-600 font-bold mb-6 text-sm">Under a Shared Roof</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-cyan-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-cyan-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Under a Shared Roof</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">Intergenerational Living</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Under a Shared Roof</h1>
+                            <p className="text-cyan-300 text-xs">Intergenerational Living</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-blue-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The Problem (예산 삭감과 프로그램 축소)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 6).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ The Solution (세대 간 공존이라는 윈윈 전략)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(6, 9).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Jacob's View (청년이 얻는 우정과 삶의 지혜)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(9, 21).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Helena's View (노인이 얻는 활력과 유능감)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(21, 30).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (세대 간 공존의 확산)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(30, 33).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-blue-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 부대상황의 분사구문 (with + O + p.p)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[15] <span className="font-bold text-blue-600">With</span> so much experience <span className="font-bold text-blue-600">gathered</span> over a lifetime, they possess knowledge..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                「with + 명사(목적어) + 분사」 구조로 "~한 채로, ~되어서"라는 동시동작을 나타냅니다. 동사 gather의 행위자(주어)는 문맥상 they이고, 명사 experience는 그 행위의 대상이므로 <strong>수동 관계</strong>가 성립하여 <strong className="text-blue-800 print:text-black">과거분사(gathered)</strong>가 쓰였습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 명사절을 이끄는 접속사 What
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[26] It’s a small matter compared to <span className="font-bold text-blue-600">what</span> they’ve brought to our lives."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                전치사(to)의 목적어 역할을 하며 문장 내에서 명사절을 이끄는 관계대명사 <strong className="text-blue-800 print:text-black">what(~하는 것)</strong>입니다. 선행사를 포함하고 있으며 뒤에는 목적어가 빠진 불완전한 문장이 옵니다. 
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 조동사 관용표현 (used to)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[18] I <span className="font-bold text-cyan-600">used to</span> feel sorry for the elderly..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-cyan-800 print:text-black">「used to + 동사원형」</strong>은 "과거에는 ~하곤 했다(그러나 지금은 아니다)"라는 과거의 습관이나 상태를 나타냅니다. 현재는 청년(Jacob)의 생각이 완전히 바뀌었음을 강조해 줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 대조의 접속사 (while)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[33] The older residents gain a more youthful perspective on life, <span className="font-bold text-cyan-600">while</span> the younger residents receive valuable life lessons."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                접속사 while이 여기서는 시간의 의미가 아닌 <strong className="text-cyan-800 print:text-black">"~인 반면에, 한편"</strong>이라는 대조를 나타냅니다. 노인과 청년이 얻는 긍정적인 상호 이익을 명확하게 대조합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 간접의문문 (의문사 + 주어 + 동사)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[32] Humanitas is a great example of <span className="font-bold text-emerald-600">how people of different ages can help each other</span>..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                전치사(of)의 목적어 자리에 명사절이 온 형태로, <strong className="text-emerald-800 print:text-black">의문사(how) + 주어(people) + 동사(can help)</strong>의 어순을 취하는 간접의문문입니다. 세대 간의 협력을 나타내는 이 글의 궁극적인 핵심 주제를 요약하는 문장입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-blue-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            {/* 인터랙션 연결: onClick에 handleLogicClick 부착 */}
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-blue-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {idx === 0 && <div className="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-red-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Solved by</div>}
+                                                    {idx === 1 && <div className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-blue-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Leading to</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Ultimately</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-blue-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 일치/불일치</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "예산 삭감으로 인해 노인들을 위한 많은 필수 돌봄 프로그램들이 중단되었다." },
+                                                { id: 2, text: "학생들은 무료로 방을 제공받는 대신 한 달에 30시간 이상 노인들과 시간을 보내야 한다." },
+                                                { id: 3, text: "Jacob은 이 곳에서 생활하면서 노인들이 할 수 없는 것들에 더욱 초점을 맞추게 되었다.", isCorrect: true },
+                                                { id: 4, text: "젊은 사람들이 처음 이웃으로 온다는 소식에 노인 거주자 모두가 기뻐한 것은 아니었다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문의 18번 문장에서 Jacob은 예전에는 노인들이 '할 수 없는 것'에 초점을 맞췄지만, 지금은 그들이 '할 수 있는 모든 것'을 본다고 말했으므로 3번은 일치하지 않습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문맥상 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 밑줄 친 (A), (B), (C) 중 문맥상 알맞은 낱말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Humanitas needed to seek an <strong>(A) [ affordable / expensive ]</strong> solution to fill the gap left by the removal of these services. ... With so much experience gathered over a lifetime, they possess knowledge that I have yet to <strong>(B) [ lose / acquire ]</strong>. ... It’s a small matter compared to what they’ve brought to our lives. I’m <strong>(C) [ grateful / regretful ]</strong> every day that they have become part of our community.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) affordable — (B) acquire — (C) grateful", isCorrect: true },
+                                                { id: 2, text: "(A) affordable — (B) lose — (C) regretful" },
+                                                { id: 3, text: "(A) expensive — (B) acquire — (C) grateful" },
+                                                { id: 4, text: "(A) expensive — (B) lose — (C) regretful" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> (A) 예산이 삭감되었으므로 '감당할 수 있는(affordable)' 해결책을 찾아야 합니다. (B) 평생 쌓은 경험이므로 학생이 아직 '습득하지(acquire)' 못한 지식입니다. (C) 학생들이 가져온 긍정적 변화에 대해 '감사하게(grateful)' 생각하고 있습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 글의 제목 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 제목으로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "How to Decrease the Rent for University Students" },
+                                                { id: 2, text: "Intergenerational Living: A Win-Win for the Young and Old", isCorrect: true },
+                                                { id: 3, text: "The History of Care Homes in the Netherlands" },
+                                                { id: 4, text: "Why We Need More Care Programs for the Elderly" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz3Answered(choice.id)} disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 청년들은 무료 숙소와 삶의 지혜를 얻고, 노인들은 활력과 유능감을 얻는 '세대 간 공존(Intergenerational living)'을 통한 상호 이익(Win-Win)을 다루고 있으므로 2번이 가장 적절합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

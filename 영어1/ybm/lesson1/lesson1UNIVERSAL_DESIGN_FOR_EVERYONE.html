@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive App - Universal Design</title>
+    
+    <!-- PWA 설정 -->
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    <link rel="apple-touch-icon" href="https://via.placeholder.com/512/1e3a8a/ffffff.png?text=LOGIC">
+    <link rel="icon" type="image/png" sizes="512x512" href="https://via.placeholder.com/512/1e3a8a/ffffff.png?text=LOGIC">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                background-color: white !important;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+            .print-avoid-break {
+                break-inside: avoid;
+            }
+            /* 인쇄 시 모든 탭 내용을 다 보여주기 위한 강제 설정 */
+            .print-show-all {
+                display: block !important;
+            }
+            .print-hide {
+                display: none !important;
+            }
+            .print-page-break {
+                page-break-before: always;
+            }
+        }
+        .bg-pattern {
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#bae6fd 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .app-like {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .text-selectable {
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #60a5fa; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const textData = [
+          // Part 1: The Problem (1~6)
+          { id: 1, text: "Did you know that one out of every ten people in the world is left-handed?", trans: "세계 인구 10명 중 1명이 왼손잡이라는 사실을 알고 있었나요?" },
+          { id: 2, text: "They face challenges in a society designed for right-handed individuals.", trans: "그들은 오른손잡이를 위해 설계된 사회에서 어려움에 직면합니다." },
+          { id: 3, text: "It is inconvenient for them to use some right-handed products such as scissors, cameras, and computer mice.", trans: "가위, 카메라, 컴퓨터 마우스 등 일부 오른손잡이용 제품을 사용하는 것은 그들에게 불편합니다." },
+          { id: 4, text: "The world we live in is designed to be an environment suitable for what is considered “normal” for the majority of people, and it is filled with objects that are easy for them to use.", trans: "우리가 사는 세상은 대다수 사람들에게 '정상'으로 간주되는 것에 적합한 환경으로 설계되어 있으며, 그들이 사용하기 쉬운 물건들로 가득 차 있습니다." },
+          { id: 5, text: "Thus, those who do not belong to that category have no choice but to live with discomfort.", trans: "따라서 그 범주에 속하지 않는 사람들은 불편함을 안고 살아갈 수밖에 없습니다." },
+          { id: 6, text: "In other words, a minority of people with physical differences, such as the left-handed, the disabled, and the elderly, either endure inconvenience or deliberately seek objects designed especially for them, which are often difficult to find.", trans: "즉, 왼손잡이, 장애인, 노인 등 신체적 차이가 있는 소수의 사람들은 불편을 감수하거나 자신을 위해 특별히 고안된 물건을 일부러 찾지만, 그러한 물건들은 종종 찾기 어렵습니다.", isHighlight: true, logicPoint: 1, logic: 'problem' },
+
+          // Part 2: The Solution & Principles (7~15)
+          { id: 7, text: "Is it impossible to build an environment where everyone can use products and facilities conveniently and without limitations?", trans: "모든 사람이 제한 없이 편리하게 제품과 시설을 사용할 수 있는 환경을 만드는 것은 불가능할까요?" },
+          { id: 8, text: "It was Ronald Mace who sought the answer to this question.", trans: "이 질문에 대한 답을 찾은 사람이 바로 로널드 메이스였습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 9, text: "He contracted polio at the age of nine and spent the rest of his life in a wheelchair.", trans: "그는 9살 때 소아마비에 걸려 평생을 휠체어에서 보냈습니다." },
+          { id: 10, text: "When studying architecture at university, he struggled to access some campus facilities due to inaccessible building designs. This experience later inspired him to invent the term universal design, which refers to design for all.", trans: "대학에서 건축학을 공부할 때, 그는 접근하기 어려운 건물 설계 때문에 일부 캠퍼스 시설에 접근하는 데 어려움을 겪었습니다. 이 경험은 훗날 그가 '모두를 위한 디자인'을 의미하는 유니버설 디자인이라는 용어를 고안하도록 영감을 주었습니다." },
+          { id: 11, text: "As an architect and product designer, he pursued a world in which all products and environments were designed to be artistic and usable to the greatest extent possible by everyone, regardless of their age, size, disability, nationality, or language.", trans: "건축가이자 제품 디자이너로서, 그는 나이, 체격, 장애, 국적, 언어에 상관없이 모든 사람에 의해 최대한 예술적이고 사용 가능하도록 모든 제품과 환경이 설계된 세상을 추구했습니다." },
+          { id: 12, text: "According to the principles of universal design, the design must be able to be used equitably, flexibly, simply, and intuitively by a wide variety of people.", trans: "유니버설 디자인의 원칙에 따르면, 디자인은 매우 다양한 사람들에 의해 공평하고, 유연하며, 단순하고, 직관적으로 사용될 수 있어야 합니다." },
+          { id: 13, text: "In addition, it should be cognitively accessible and minimize users’ physical efforts. Finally, it requires the providing of sufficient space for all users while reducing potential hazards and adverse consequences from accidental or unintended actions.", trans: "또한 인지적으로 접근 가능해야 하며 사용자의 신체적 노력을 최소화해야 합니다. 마지막으로, 우발적이거나 의도하지 않은 행동으로 인한 잠재적 위험과 부정적인 결과를 줄이면서 모든 사용자에게 충분한 공간을 제공하는 것을 요구합니다." },
+          { id: 14, text: "A key feature of universal design is that this is not a special requirement only for the benefit of a minority of the population.", trans: "유니버설 디자인의 주요 특징은 이것이 소수의 인구에게만 혜택을 주기 위한 특별한 요구 사항이 아니라는 점입니다." },
+          { id: 15, text: "If an environment is accessible, usable, convenient, and a pleasure to use, everyone in the community benefits.", trans: "환경이 접근 가능하고, 사용 가능하며, 편리하고, 사용하기 즐겁다면 지역사회의 모든 사람이 혜택을 받습니다.", logic: 'concept' },
+
+          // Part 3: Applications (16~25)
+          { id: 16, text: "How has universal design been incorporated into modern architecture? One of the most representative examples of universal design being used to improve accessibility is the ramps installed in front of buildings.", trans: "유니버설 디자인은 현대 건축에 어떻게 통합되었을까요? 접근성을 개선하기 위해 유니버설 디자인이 사용된 가장 대표적인 예 중 하나는 건물 앞에 설치된 경사로입니다." },
+          { id: 17, text: "Ramps, not stairs, are necessary for people with disabilities who use wheelchairs, and they are also beneficial for parents pushing strollers and the elderly.", trans: "계단이 아닌 경사로는 휠체어를 사용하는 장애인들에게 필수적이며, 유모차를 미는 부모들과 노인들에게도 유익합니다." },
+          { id: 18, text: "Another example is automatic doors. They are invaluable for those who rely on assistive devices such as wheelchairs and crutches. They also provide convenience for adults who have their hands full and children who are not tall enough to open the doors themselves.", trans: "또 다른 예는 자동문입니다. 휠체어나 목발 같은 보조 기구에 의존하는 사람들에게 그것들은 매우 귀중합니다. 또한 양손에 짐을 가득 든 어른들이나 혼자서 문을 열 만큼 키가 크지 않은 아이들에게도 편리함을 제공합니다." },
+          { id: 19, text: "A further example is tactile paving. These textured surfaces, often found on sidewalks, steps, and crosswalks, assist visually impaired individuals by guiding them through urban spaces.", trans: "또 다른 예는 점자 블록입니다. 주로 인도, 계단, 횡단보도에서 흔히 볼 수 있는 이 질감 있는 표면들은 시각 장애인들이 도시 공간을 통과하도록 안내함으로써 그들을 돕습니다." },
+          { id: 20, text: "Universal design is not only applied in modern architecture but also extends to transportation systems.", trans: "유니버설 디자인은 현대 건축에만 적용되는 것이 아니라 교통 시스템으로도 확장됩니다.", isHighlight: true, logicPoint: 3 },
+          { id: 21, text: "For instance, buses have been designed with a floor closer to ground level to ease access for all passengers. Handles of various lengths are provided, another method by which universal design is implemented to accommodate passengers’ different heights.", trans: "예를 들어, 버스는 모든 승객의 접근을 쉽게 하기 위해 지면과 더 가까운 바닥을 갖도록 설계되었습니다. 다양한 길이의 손잡이가 제공되는데, 이는 승객들의 다양한 키를 수용하기 위해 유니버설 디자인이 구현된 또 다른 방법입니다.", isHighlight: true, logicPoint: 4 },
+          { id: 22, text: "Subway maps have also been designed for color-blind individuals to clearly distinguish between subway lines by adjusting the color and the brightness and by varying the thickness of lines that have similar colors.", trans: "지하철 노선도 역시 색맹인 사람들이 색상과 밝기를 조정하고 비슷한 색상의 선 두께를 다르게 함으로써 노선들을 명확하게 구별할 수 있도록 설계되었습니다." },
+          { id: 23, text: "Additionally, the use of pictograms can be seen frequently. Signs indicating the locations of subway or train stations assist international travelers who may not be familiar with the local language. Likewise, road signs indicating school zones, speed limits, and directions for turns and stops aid drivers in recognizing important information more easily.", trans: "게다가, 픽토그램의 사용도 자주 볼 수 있습니다. 기차역 위치를 나타내는 표지판은 현지어에 익숙하지 않은 여행객을 돕습니다. 마찬가지로 스쿨존, 제한 속도 등을 나타내는 도로 표지판은 운전자가 중요 정보를 쉽게 인식하게 돕습니다." },
+          { id: 24, text: "While universal design has been utilized in architecture and transportation systems for some time, a newer application is in the fashion industry.", trans: "한동안 유니버설 디자인이 건축과 교통 시스템에서 활용되어 온 반면, 더 새로운 적용 분야는 패션 산업입니다." },
+          { id: 25, text: "Clothing designed with universal design integrates stretchable and breathable materials, enhancing comfort and mobility. Other features include the use of magnets and Velcro in place of buttons, making it easier to put on and take off clothing.", trans: "유니버설 디자인으로 디자인된 의류는 신축성 있고 통기성 있는 소재를 통합하여 편안함과 이동성을 향상시킵니다. 다른 특징으로는 단추 대신 자석과 벨크로를 사용하여 옷을 입고 벗기 쉽게 만드는 것이 포함됩니다.", isHighlight: true, logicPoint: 5 },
+          { id: 26, text: "It also incorporates traits like stretchy waistbands and adjustable sleeves to allow individuals with disabilities to dress independently. This type of clothing is also beneficial for pregnant women, older adults who may experience mobility issues, and individuals with temporary injuries or medical conditions.", trans: "또한 장애가 있는 개인들이 독립적으로 옷을 입을 수 있도록 신축성 있는 허리 밴드와 조절 가능한 소매 같은 특징들을 통합합니다. 이러한 의류는 임산부, 거동이 불편한 노인, 일시적 부상자에게도 유익합니다." },
+          { id: 27, text: "Overall, universal design clothing promotes increased comfort, convenience, independence, and improved mobility and flexibility for wearers of all abilities.", trans: "전반적으로 유니버설 디자인 의류는 모든 능력의 착용자를 위해 향상된 편안함, 편리함, 독립성, 그리고 개선된 이동성과 유연성을 촉진합니다.", logic: 'apps' },
+
+          // Part 4: Conclusion (28~31)
+          { id: 28, text: "You may find it surprising that universal design can be found in more parts of society than you thought.", trans: "여러분은 생각보다 사회의 더 많은 부분에서 유니버설 디자인을 찾을 수 있다는 사실이 놀랍다고 생각할지도 모릅니다." },
+          { id: 29, text: "However, enough has not been done to accommodate everyone yet. Universal design should be implemented more extensively to promote full participation in the community for a wider range of people.", trans: "그러나 아직 모든 사람을 수용하기에 충분한 조치가 취해지지 않았습니다. 더 넓은 범위의 사람들의 완전한 지역사회 참여를 촉진하기 위해 유니버설 디자인이 더 광범위하게 실행되어야 합니다." },
+          { id: 30, text: "It is time to build more equitable environments that are accessible to everyone.", trans: "이제는 모든 사람이 접근할 수 있는 보다 공평한 환경을 구축할 때입니다.", isHighlight: true, logicPoint: 6, logic: 'conclusion' },
+          { id: 31, text: "So are you on board to create a universally designed world for all?", trans: "자, 여러분도 모두를 위한 유니버설 디자인 세상을 만드는 데 동참하시겠습니까?" }
+        ];
+
+        const logicMapSteps = [
+          { id: 'problem', title: "THE PROBLEM (문제 제기)", desc: "Society designed for the 'normal' majority", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { id: 'concept', title: "THE CONCEPT (개념 도입)", desc: "Ronald Mace's 'Design for All'", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { id: 'apps', title: "APPLICATIONS (적용의 확장)", desc: "Architecture → Transport → Fashion", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-circles-three-plus text-xl mb-2"></i> },
+          { id: 'conclusion', title: "ULTIMATE GOAL (최종 목표)", desc: "Build equitable environments for everyone", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          const [mapStep, setMapStep] = useState(0);
+          
+          // Quiz states
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+          const [quiz3Answered, setQuiz3Answered] = useState(null);
+          const [quiz4Answered, setQuiz4Answered] = useState(null);
+          const [quiz5Answered, setQuiz5Answered] = useState(null);
+          const [quiz6Answered, setQuiz6Answered] = useState(null);
+
+          const handleLogicClick = (point) => setActiveLogic(activeLogic === point ? null : point);
+          const nextMapStep = () => { if (mapStep < logicMapSteps.length) setMapStep(mapStep + 1); };
+          const resetMap = () => setMapStep(0);
+
+          const handlePrint = () => { window.print(); };
+
+          // 1. 잠금 화면(로그인) UI
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-800">
+                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-blue-800"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-blue-600 font-bold mb-6 text-sm">Universal Design for Everyone</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input 
+                      type="text" 
+                      placeholder="접근 암호 (예: Made by Lee)" 
+                      className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-center font-medium text-selectable"
+                      value={passwordInput} 
+                      onChange={(e) => setPasswordInput(e.target.value)} 
+                    />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button 
+                      type="submit" 
+                      className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2"
+                    >
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+
+                  <div className="mt-8 border-t border-slate-100 pt-4">
+                    <p className="text-xs text-slate-400 font-mono tracking-wider">© 2026. Made by Lee. All rights reserved.</p>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          // 2. 통합본 (All-in-One) UI
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                
+                {/* === 왼쪽 사이드바 (데스크톱 전용) === */}
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-cyan-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-cyan-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Universal Design</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">For Everyone</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                {/* === 메인 콘텐츠 영역 === */}
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    
+                    {/* 모바일용 상단 헤더 */}
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Universal Design</h1>
+                            <p className="text-cyan-300 text-xs">For Everyone</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ========================================================= */}
+                        {/* SECTION 1: 지문 분석 (Text Analysis)                      */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-blue-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    {/* Chunk 1 */}
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Problem (다수를 위한 세상의 불편함)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 6).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 2 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ The Solution & Principles (모두를 위한 디자인의 탄생)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(6, 15).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 3 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Applications (건축, 교통, 패션으로의 적용 확장)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(15, 27).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Chunk 4 */}
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">
+                                            ▶ Conclusion (공평한 환경 구축을 향한 최종 목표)
+                                        </div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(27, 31).map((item) => (
+                                                <div key={item.id} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 2: 핵심 구문 (Key Syntax)                         */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-blue-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    {/* P1 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 환언의 연결어: In other words
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[06] <span className="font-bold text-blue-600">In other words</span>, a minority of people... either endure inconvenience or deliberately seek..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "즉, 다시 말해서"라는 뜻으로, 앞 문장의 내용(정상 범주에 속하지 않는 사람들의 불편함)을 <strong className="text-blue-800 print:text-black">요약하고 재진술(Paraphrasing)</strong>하여 도입부의 문제 상황을 명확히 정리합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P2 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 강조 구문: It was ~ who
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[08] <span className="font-bold text-blue-600">It was</span> Ronald Mace <span className="font-bold text-blue-600">who</span> sought the answer..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "~한 것은 바로 ...였다"라는 뜻으로, 모든 사람을 위한 환경을 구축하려 했던 핵심 인물이 다름 아닌 <strong className="text-blue-800 print:text-black">'로널드 메이스'</strong>였음을 강력하게 강조합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P3 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 상관접속사: not only A but also B
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[20] Universal design is <span className="font-bold text-cyan-600">not only</span> applied in modern architecture <span className="font-bold text-cyan-600">but also</span> extends to transportation systems."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "A뿐만 아니라 B도"라는 의미로, 유니버설 디자인의 적용 범위가 단순히 건물(건축)에 머물지 않고 대중교통으로까지 <strong className="text-cyan-800 print:text-black">확장(Extend)</strong>되고 있음을 보여줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P4 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 전치사 + 관계대명사: by which
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[21] ... another method <span className="font-bold text-cyan-600">by which</span> universal design is implemented..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                관계대명사 앞의 전치사 by는 "그 방법을 통해서(by the method)"를 의미합니다. 뒤에 완전한 절(수동태)이 이어지며 선행사 method를 완벽하게 수식하는 어법 출제 포인트입니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P5 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 05. 능동의 분사구문: ~ing
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[25] Clothing... integrates stretchable and breathable materials, <span className="font-bold text-emerald-600">enhancing</span> comfort and mobility."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                접속사와 주어가 생략된 현재분사구문으로, "~하면서 / 그리고 ~하다"로 해석됩니다. 패션에 적용된 유니버설 디자인 소재들이 편안함과 이동성을 주도적으로 <strong className="text-emerald-800 print:text-black">향상시키는 긍정적 결과</strong>를 서술합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* P6 */}
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 06. 필자의 강력한 주장: It is time to V
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[30] <span className="font-bold text-emerald-600">It is time to</span> build more equitable environments that are accessible to everyone."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                "이제 ~할 때이다"라는 명확한 행동 촉구(Call to Action) 표현입니다. 모두가 접근할 수 있는 공평한 환경을 구축해야 한다는 이 글 전체의 <strong className="text-emerald-800 print:text-black">최종 결론이자 요지</strong>를 완벽하게 장식합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 3: 논리 구조도 (Logic Map)                        */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-blue-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.id}>
+                                            <div className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white print:border-slate-800 print:rounded-none print:text-black ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    {/* Transition Labels */}
+                                                    {idx === 0 && <div className="bg-slate-100 text-slate-600 text-xs font-bold px-3 py-1 rounded-full my-1 border border-slate-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Solved by</div>}
+                                                    {idx === 1 && <div className="bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-blue-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Expanded to</div>}
+                                                    {idx === 2 && <div className="bg-cyan-100 text-cyan-700 text-xs font-bold px-3 py-1 rounded-full my-1 border border-cyan-300 print:bg-white print:text-black print:border-slate-800 print:rounded-none">Leading to</div>}
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ========================================================= */}
+                        {/* SECTION 4: 실전 문제 (Challenge)                          */}
+                        {/* ========================================================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-blue-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    {/* Quiz 1 */}
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "세계 인구의 10%를 차지하는 왼손잡이들은 사회에서 불편함을 겪고 있다." },
+                                                { id: 2, text: "로널드 메이스는 대학 시절 건축물 접근의 어려움을 겪고 유니버설 디자인 용어를 고안했다." },
+                                                { id: 3, text: "유니버설 디자인은 신체적 차이를 가진 특정 소수만을 위해 특별히 설계된 요구 사항이다.", isCorrect: true },
+                                                { id: 4, text: "패션 산업에서는 자석, 벨크로, 신축성 있는 소재 등을 활용하여 유니버설 디자인을 구현하고 있다." }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz1Answered(choice.id)}
+                                                    disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설:</strong> 본문의 14번 문장에서 "이것이 소수의 인구에게만 혜택을 주기 위한 특별한 요구 사항이 <strong>아니다(not a special requirement only for...)</strong>"라고 분명히 밝히며, 환경이 편리해지면 <strong>모두가(everyone) 혜택을 받는다</strong>고 강조했으므로 3번은 틀린 설명입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 2 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 문장 삽입</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">글의 흐름으로 보아, 주어진 문장이 들어가기에 가장 적절한 곳을 고르시오.</p>
+                                            <div className="text-md font-bold text-center bg-white p-4 border border-slate-300 rounded mb-4 print:border-slate-400 print:rounded-none print:text-black">
+                                                However, enough has not been done to accommodate everyone yet.
+                                            </div>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Overall, universal design clothing promotes increased comfort, convenience, independence, and improved mobility and flexibility for wearers of all abilities. ( ① ) You may find it surprising that universal design can be found in more parts of society than you thought. ( ② ) Universal design should be implemented more extensively to promote full participation in the community for a wider range of people. ( ③ ) It is time to build more equitable environments that are accessible to everyone. ( ④ ) So are you on board to create a universally designed world for all?
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "①" }, { id: 2, text: "②", isCorrect: true }, { id: 3, text: "③" }, { id: 4, text: "④" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz2Answered(choice.id)}
+                                                    disabled={quiz2Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-bold transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> <strong>'However(그러나)'</strong>가 핵심입니다. 생각보다 사회 여러 곳에서 유니버설 디자인을 찾을 수 있다는 긍정적인 내용 뒤에, "그러나 아직 모든 사람을 수용하기엔 충분하지 않다"고 꼬집으며, 이어서 "더 광범위하게 실행되어야 한다(should be implemented more extensively)"고 주장하는 흐름이 자연스럽기 때문에 <strong>②번</strong>이 정답입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 3 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q3. 글의 제목 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">윗글의 제목으로 가장 적절한 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "The Architectural Revolution for the Disabled" },
+                                                { id: 2, text: "Why Left-Handed Products Are So Expensive" },
+                                                { id: 3, text: "Universal Design: Building an Equitable World for Everyone", isCorrect: true },
+                                                { id: 4, text: "The Latest Fashion Trends Using Smart Materials" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz3Answered(choice.id)}
+                                                    disabled={quiz3Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz3Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz3Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz3Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz3Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz3Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 이 글은 유니버설 디자인이 신체적 차이와 무관하게 모든 사람(everyone)을 위해 공평한(equitable) 세상을 만들기 위한 접근법임을 설명하고, 다양한 분야의 예시를 들어 이를 뒷받침하고 있으므로 3번이 가장 완벽한 제목입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Quiz 4 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q4. 요약문 완성</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 글의 내용을 한 문장으로 요약하고자 한다. 빈칸 (A), (B)에 들어갈 말로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Universal design, originally inspired by the need to help people with physical <span className="font-bold text-blue-700">( A )</span> like Ronald Mace, aims to create equitable environments where <span className="font-bold text-blue-700">( B )</span> can benefit from accessible products and facilities.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) strength —— (B) minorities" },
+                                                { id: 2, text: "(A) limitations —— (B) everyone", isCorrect: true },
+                                                { id: 3, text: "(A) limitations —— (B) professionals" },
+                                                { id: 4, text: "(A) beauty —— (B) everyone" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz4Answered(choice.id)}
+                                                    disabled={quiz4Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz4Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz4Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz4Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz4Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz4Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 유니버설 디자인은 로널드 메이스처럼 신체적 <strong>제약/한계(limitations)</strong>를 가진 사람들을 돕기 위한 필요에서 처음 영감을 받았지만, 궁극적으로는 소수만이 아닌 <strong>모두(everyone)</strong>가 접근 가능한 제품과 시설의 혜택을 누릴 수 있는 공평한 환경을 만드는 것을 목표로 합니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 5 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q5. 문맥상 어휘 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">문맥상 밑줄 친 단어 중 쓰임이 적절하지 <u>않은</u> 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                Those who do not belong to the "normal" category have no choice but to live with ①<u>discomfort</u>. When studying architecture at university, Ronald Mace struggled to access some campus facilities due to ②<u>inaccessible</u> building designs. According to universal design, it should be cognitively accessible and ③<u><span className="text-red-600 font-bold">maximize</span></u> users’ physical efforts. If an environment is accessible, usable, and convenient, everyone in the community ④<u>benefits</u>.
+                                            </p>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 print:grid-cols-4 print:gap-4">
+                                            {[
+                                                { id: 1, text: "① discomfort" }, 
+                                                { id: 2, text: "② inaccessible" }, 
+                                                { id: 3, text: "③ maximize", isCorrect: true }, 
+                                                { id: 4, text: "④ benefits" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz5Answered(choice.id)}
+                                                    disabled={quiz5Answered !== null}
+                                                    className={`w-full text-center p-3 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz5Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz5Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    {['①', '②', '③', '④'][choice.id - 1]} {choice.text.substring(2)}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz5Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz5Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz5Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설: ③ maximize $\rightarrow$ minimize</strong><br/>유니버설 디자인의 핵심 원칙 중 하나는 사용자가 들이는 신체적 노력을 '최대화(maximize)'하는 것이 아니라 <strong>'최소화(minimize)'</strong>하는 것입니다.</p>
+                                                <button onClick={() => setQuiz5Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                                                    다시 풀기
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Quiz 6 */}
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q6. 빈칸 추론</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">윗글의 내용을 바탕으로 빈칸에 들어갈 가장 적절한 말을 고르시오.</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                A key feature of universal design is that this is not a special requirement only for the benefit of a minority of the population. If an environment is accessible, usable, convenient, and a pleasure to use, <span className="inline-block w-48 border-b-2 border-slate-800 mx-1"></span>.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "only people with disabilities can feel comfortable" },
+                                                { id: 2, text: "it will cost too much to maintain the facilities" },
+                                                { id: 3, text: "everyone in the community benefits", isCorrect: true },
+                                                { id: 4, text: "it limits the artistic creativity of the designers" }
+                                            ].map((choice) => (
+                                                <button
+                                                    key={choice.id}
+                                                    onClick={() => setQuiz6Answered(choice.id)}
+                                                    disabled={quiz6Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz6Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz6Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}
+                                                    `}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz6Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz6Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz6Answered === 3 ? '🎉 정답입니다!' : '오답입니다. 다시 한번 생각해 보세요.'}</p>
+                                                <p><strong>해설:</strong> 유니버설 디자인의 핵심 특징은 소수만을 위한 특별한 조치가 아니라, 디자인이 모든 사람에게 편리해지면 결국 <strong>'지역 사회의 모든 사람(everyone in the community)이 혜택을 받는다'</strong>는 점입니다.</p>
+                                                <button onClick={() => setQuiz6Answered(null)} className="mt-3 text-sm underline opacity-70 hover:opacity-100">
+                                                    다시 풀기
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                    </div>
+                </main>
+
+                {/* === 모바일 하단 네비게이션 (Bottom Nav) === */}
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
