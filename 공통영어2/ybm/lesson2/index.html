@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - YBM 공통영어2 Lesson 2</title>
+    
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #eff6ff; background-image: radial-gradient(#bfdbfe 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: Intro (1~6)
+          { id: 1, text: "In Korea, nearly anything can be delivered within twenty-four hours.", trans: "한국에서는, 거의 모든 것이 24시간 이내에 배달될 수 있다." },
+          { id: 2, text: "Delivery is not limited to Korea; however, a unique culture has developed around the Korean delivery industry.", trans: "배달은 한국에만 국한된 것은 아니다. 그러나, 독특한 문화가 한국 배달 산업을 중심으로 발달하였다." },
+          { id: 3, text: "People in Korea can order whatever they want whenever they want and have it delivered wherever they want.", trans: "한국에 있는 사람들은 그들이 원하는 때라면 언제든지 그들이 원하는 것이 무엇이든 주문할 수 있고, 그들이 원하는 곳이라면 어디든지 그것을 배달 받을 수 있다." },
+          { id: 4, text: "Delivery apps rank stores by various standards: review scores, popularity, price, delivery fee, and distance, to name a few.", trans: "배달 애플리케이션은 다양한 기준으로 상점들의 순위를 매긴다. 예를 들자면, 후기 점수, 인기, 가격, 배달료, 그리고 거리 등." },
+          { id: 5, text: "The speedy delivery of purchased items to your house is literally at the tips of your fingers.", trans: "구매한 물건이 당신의 집으로 빠르게 배달 되는 것은 말 그대로 당신 손가락 끝에 달려 있다." },
+          { id: 6, text: "What is the history behind this culture?", trans: "이 문화 이면의 역사는 무엇일까?", isHighlight: true, logicPoint: 1 },
+
+          // Part 2: History - Joseon & Japanese Colonial (7~20)
+          { id: 7, text: "In 1768, Hwang Yun-seok, a scholar, made a diary entry after taking the gwageo, a public service entrance exam.", trans: "1768년에 학자인 황윤석은 관리 채용 시험인 과거에 응시한 후 일기 기록을 남겼다." },
+          { id: 8, text: "He wrote that he and his friends had ordered a delivery of naengmyeon for lunch.", trans: "그는 그와 그의 친구들이 점심 식사로 냉면 배달을 시켰다고 썼다." },
+          { id: 9, text: "Hwang's diary is the first historical document indicating Koreans have been delivering food for at least two and a half centuries.", trans: "황윤석의 일기는 한국인들이 최소한 두 세기 반 동안 음식을 배달해 왔음을 보여 주는 최초의 역사적 기록물이다." },
+          { id: 10, text: "During the Joseon period, specialized people called jeonin delivered letters for a fee.", trans: "조선 시대 동안, 전인이라고 불리는 전문화된 사람들이 돈을 받고 편지를 배달했다." },
+          { id: 11, text: "In the days before the modern address systems, letters were delivered by name and place of residence, so a jeonin had to know the local areas like the back of his hand.", trans: "현대 주소 시스템이 있기 이전 시대에 편지는 이름과 거주지에 따라 배달되었으므로 전인은 해당 지역을 매우 잘 알고 있어야만 했다." },
+          { id: 12, text: "Service prices were determined by schedule and distance.", trans: "서비스 가격은 일정과 거리에 따라 결정되었다." },
+          { id: 13, text: "During the Japanese colonial period, Seoul's streets were filled with delivery professionals called \"messengers,\" most working for a company named Yongdalsa.", trans: "일제 강점기 동안, 서울의 거리는 '메신저'라고 불리는 배달 전문인들로 가득 차 있었는데, 그들 대부분은 용달사라는 이름의 회사에서 일하고 있었다." },
+          { id: 14, text: "Many used bikes to speed up delivery.", trans: "많은 이들이 배달 속도를 높이기 위해서 자전거를 사용했다." },
+          { id: 15, text: "When customers contacted Yongdalsa, a messenger went to pick up the item and then delivered it.", trans: "고객들이 용달사에 연락을 취하면, 메신저가 물건을 가지러 와서는 그것을 배달했다." },
+          { id: 16, text: "Delivery mistakes were rare.", trans: "배달 실수는 드물었다." },
+          { id: 17, text: "Messengers were sometimes charged with carrying large bundles of cash, but they were unfailingly honest and accurate.", trans: "메신저들은 때때로 다량의 현금 배달을 담당하기도 했는데, 그들은 변함없이 정직하고 정확했다." },
+          { id: 18, text: "Customers trusted the messengers so much that they often did not check the items they received.", trans: "고객들은 메신저를 매우 믿었기에 종종 그들이 받은 물품을 확인하지도 않았다." },
+          { id: 19, text: "This messenger service was unique to Korea and was based on a culture of mutual trust and a hunger for speed.", trans: "이러한 메신저 서비스는 한국만의 독특한 것이었으며, 상호 간의 신뢰 문화와 속도에 대한 갈망에 기반한 것이었다.", isHighlight: true, logicPoint: 2 },
+          { id: 20, text: "It is possible that this paved the way for modern motorcycle delivery.", trans: "이것이 현대의 오토바이 배달의 토대를 닦았을 가능성이 있다." },
+
+          // Part 3: Post-war & Urbanization (21~30)
+          { id: 21, text: "After Korea's liberation from colonial rule, it was divided into two.", trans: "식민지 지배에서 한국이 해방된 후, 한국은 둘로 나뉘었다." },
+          { id: 22, text: "Then came the Korean War (1950-1953).", trans: "그리고는 한국 전쟁(1950-1953)이 발발했다." },
+          { id: 23, text: "During this series of upheavals, Korea's delivery system fell apart.", trans: "이 일련의 격변 동안, 한국의 배달 시스템은 무너졌다." },
+          { id: 24, text: "It was during the 1960s that delivery services grew again thanks to urbanization.", trans: "도시화 덕분에 배달 산업이 다시 성장한 것은 1960년대 동안이었다.", isHighlight: true, logicPoint: 3 },
+          { id: 25, text: "As economic development progressed, people flocked to urban areas, where labor became concentrated.", trans: "경제 발전이 진행됨에 따라, 사람들은 노동력이 집중되는 도시 지역으로 모여들었다." },
+          { id: 26, text: "This boosted the demand for delivery services.", trans: "이것이 배달 서비스에 대한 수요를 촉진시켰다." },
+          { id: 27, text: "Deliveries of newspapers and milk quickly became popular.", trans: "신문과 우유 배달이 빠르게 인기를 얻었다." },
+          { id: 28, text: "During lunchtime, city centers were filled with restaurant workers delivering trays full of food, stacked on top of each other.", trans: "점심시간 동안, 도시 중심부는 음식이 가득찬 차곡차곡 쌓아 올려진 쟁반을 배달하는 식당 직원들로 가득 찼다." },
+          { id: 29, text: "In the late 1980s and 1990s, caterers delivered homemade lunches in cloth bags to urban offices and returned later to collect empty dishes.", trans: "1980년대 후반과 1990년대에는, 음식 공급자들이 보자기에 싼 집에서 만든 점심을 도시의 사무실로 배달하였고 나중에 빈 그릇을 가져가기 위해 돌아왔다." },
+          { id: 30, text: "The delivery area grew rapidly.", trans: "배달 영역은 빠르게 성장했다." },
+
+          // Part 4: The Taekbae Revolution & Tech (31~39)
+          { id: 31, text: "In 1992, taekbae service, an express home delivery service through which a person receives an ordered item in at least a day or two, was introduced.", trans: "1992년에는 주문한 물건을 최소 하루 또는 이틀 만에 받을 수 있는 신속 가정 배달 서비스인 택배 서비스가 도입되었다." },
+          { id: 32, text: "On the first day, there were just two deliveries. Now, millions of items are delivered daily.", trans: "첫날에는 고작 두 건의 배달이 있었다. 이제 매일 수백만 개의 물건들이 배달된다." },
+          { id: 33, text: "On average, a South Korean uses taekbae sixty-five times per year.", trans: "평균적으로 한국인 한 명은 택배를 연간 65번 이용한다." },
+          { id: 34, text: "It was the development of digital and information technology that enabled the remarkable growth of taekbae.", trans: "택배의 놀랄 만한 성장을 가능하게 해준 것은 바로 디지털과 정보 기술의 발전이었다.", isHighlight: true, logicPoint: 4 },
+          { id: 35, text: "Logistics automation, GPS maps, and mobile applications have extended the range and scale of delivery services while keeping prices reasonable.", trans: "물류 자동화, GPS 지도, 그리고 모바일 애플리케이션은 가격을 적절하게 유지하면서도 배달의 범위와 규모를 넓혀 주었다." },
+          { id: 36, text: "The phenomenal growth of e-commerce has driven the need for delivery services.", trans: "전자 상거래의 놀랄 만한 성장이 배달 서비스의 필요를 이끌어 왔다." },
+          { id: 37, text: "A rule of thumb for taekbae is next-day delivery; if a person orders something today, it should arrive tomorrow.", trans: "택배의 원칙은 익일 배송이다. 누군가 오늘 무언가를 주문하면 내일 도착해야 한다." },
+          { id: 38, text: "Taekbae is changing so rapidly that now more and more items are delivered on the same day they are ordered.", trans: "택배는 매우 빠르게 변화하고 있어 이제는 점점 더 많은 물품들이 그것들이 주문된 당일에 배달되고 있다." },
+          { id: 39, text: "It is also possible to choose a specific date and time for delivery.", trans: "또한, 배송을 위한 특정 날짜와 시간을 선택할 수도 있다." },
+
+          // Part 5: Future Prospects & Conclusion (40~46)
+          { id: 40, text: "Taekbae services, beginning from foot-powered delivery, have grown by leaps and bounds thanks to advancements in technology.", trans: "발로 움직이는 배달에서 시작한 이래로, 택배 서비스는 기술의 발전 덕분에 비약적으로 성장했다." },
+          { id: 41, text: "Moreover, the services will likely be developed further due to continuing technological upheavals.", trans: "게다가 계속되는 기술적 격변으로 인해 이 서비스는 더 발달할 것 같다." },
+          { id: 42, text: "Drones and autonomous robots are being used to deliver items by logistics companies in foreign countries.", trans: "외국에서는 드론과 자동화 로봇들이 물류 회사에 의해 물건을 배달하기 위해 사용되고 있다." },
+          { id: 43, text: "In Korea, companies are testing the possibility of using advanced equipment such as autonomous vehicles, delivery robots, and drones for deliveries.", trans: "한국에서는 기업들이 자율 주행차, 배달 로봇, 그리고 드론과 같은 진보한 장비를 배달에 사용할 수 있는 가능성을 시험해 보고 있다." },
+          { id: 44, text: "It is fair to say that modern Korean life cannot function as it does without its delivery services.", trans: "현대 한국의 삶은 배달 서비스 없이는 지금처럼 기능할 수 없다고 말해도 과언이 아니다." },
+          { id: 45, text: "To maintain trust with customers, the Korean delivery industry prioritizes rapid, safe, and affordable transportation.", trans: "고객들과의 신뢰를 유지하기 위해, 한국 배달 산업은 빠르고, 안전하고, 적절한 가격의 운송을 최우선으로 삼고 있다." },
+          { id: 46, text: "These persistent efforts for reliability and the adoption of advanced delivery technology will continue being the driving forces that will move Korean delivery forward well into the future.", trans: "이러한 신뢰를 위한 꾸준한 노력과 진보한 배달 기술의 도입은 한국 배달을 미래로 훨씬 나아가게 할 원동력이 될 것이다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "INTRODUCTION", desc: "한국의 독특한 배달 문화와 현황", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-storefront text-xl mb-2"></i> },
+          { point: 2, title: "HISTORY (조선~일제강점기)", desc: "상호 신뢰와 속도에 대한 갈망의 뿌리", color: "bg-sky-100 border-sky-400 text-sky-800", icon: <i className="ph-fill ph-scroll text-xl mb-2"></i> },
+          { point: 3, title: "RE-EMERGENCE (1960s~)", desc: "도시화와 수요 촉진으로 인한 성장", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-buildings text-xl mb-2"></i> },
+          { point: 4, title: "TAEKBAE REVOLUTION (1992~)", desc: "디지털·정보기술 발전을 통한 폭발적 성장", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-device-mobile text-xl mb-2"></i> },
+          { point: 5, title: "FUTURE PROSPECTS", desc: "신뢰 유지와 첨단 기술의 도입 지속", color: "bg-purple-100 border-purple-400 text-purple-800", icon: <i className="ph-fill ph-rocket text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-800">
+                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-blue-800"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-blue-700 font-bold mb-6 text-sm">K-Delivery, Speedy and Reliable</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-blue-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-blue-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">K-Delivery</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">YBM 공통영어2 Lesson 2</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">K-Delivery</h1>
+                            <p className="text-blue-300 text-xs">YBM Lesson 2</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-blue-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Intro (한국의 독특한 배달 문화)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 6).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-sky-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ History (조선 시대와 일제 강점기의 배달)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(6, 20).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-sky-50 border border-sky-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-sky-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-indigo-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Re-emergence (도시화와 배달 산업의 재성장)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(20, 30).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Taekbae Revolution (IT 기술이 이끈 택배 혁명)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(30, 39).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-purple-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Future Prospects (첨단 기술과 신뢰의 지속)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(39, 46).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-purple-50 border border-purple-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-purple-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-blue-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 복합관계사 (whatever / whenever / wherever)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[03] ... order <span className="font-bold text-blue-600">whatever</span> they want <span className="font-bold text-blue-600">whenever</span> they want and have it delivered <span className="font-bold text-blue-600">wherever</span> they want."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                명사절을 이끄는 복합관계대명사(whatever)와 양보의 부사절을 이끄는 복합관계부사(whenever, wherever)가 연달아 사용되어, 한국 배달 문화의 <strong className="text-blue-800 print:text-black">'무엇이든, 언제든, 어디서든'</strong> 가능한 특성을 강력하게 강조하고 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-sky-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 분사구문 (과거분사의 수식)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[28] ... trays full of food, <span className="font-bold text-sky-600">stacked</span> on top of each other."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                음식이 가득 찬 쟁반(trays)이 스스로 쌓는 것이 아니라 누군가에 의해 '차곡차곡 쌓여진(수동)' 상태이므로 과거분사 <strong className="text-sky-800 print:text-black">stacked</strong>가 뒤에서 앞의 명사를 수식하고 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-indigo-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. It is ~ that 강조 구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[34] <span className="font-bold text-indigo-600">It was</span> the development of digital and information technology <span className="font-bold text-indigo-600">that</span> enabled the remarkable growth..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                'It was'와 'that' 사이에 강조하고 싶은 주어(the development of...)를 넣어, 택배의 놀라운 성장을 가능하게 한 것이 <strong>바로 IT 기술의 발전</strong>이었음을 선명하게 드러냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. so ~ that 구문 (원인과 결과)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[38] Taekbae is changing <span className="font-bold text-teal-600">so rapidly that</span> now more and more items are delivered on the same day..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong>'너무(so) ~해서 그 결과(that) ~하다'</strong>라는 의미입니다. 택배 서비스가 매우 빠르게 변하고 있는 원인(so rapidly)으로 인해, 당일 배송이 가능해졌다는 결과(that 이하)를 자연스럽게 이어줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-blue-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-blue-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-blue-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "황윤석의 일기는 한국인들이 최소 250년 동안 음식을 배달해 왔음을 보여주는 최초의 역사적 기록이다." },
+                                                { id: 2, text: "일제 강점기 시절의 '메신저'들은 종종 현금을 배달하기도 했으나 사고가 드물 만큼 정직했다." },
+                                                { id: 3, text: "한국 전쟁 기간 동안 배달 산업이 급격히 성장하여 현대식 택배의 기틀이 마련되었다.", isCorrect: true },
+                                                { id: 4, text: "디지털과 정보 기술의 발전이 택배 서비스의 규모와 범위를 넓히는 데 결정적인 역할을 했다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 3 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 3 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 22~23번 문장에 따르면, 한국 전쟁을 포함한 일련의 격변기 동안 한국의 배달 시스템은 무너졌다고(fell apart) 명시되어 있습니다. 배달 산업이 다시 성장한 것은 1960년대 도시화 덕분입니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) People in Korea can order <strong>[ however / whatever ]</strong> they want whenever they want.<br/><br/>
+                                                (B) City centers were filled with restaurant workers delivering trays full of food, <strong>[ stacking / stacked ]</strong> on top of each other.<br/><br/>
+                                                (C) It was the development of IT <strong>[ what / that ]</strong> enabled the remarkable growth of taekbae.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) however —— (B) stacking —— (C) what" },
+                                                { id: 2, text: "(A) whatever —— (B) stacked —— (C) that", isCorrect: true },
+                                                { id: 3, text: "(A) whatever —— (B) stacking —— (C) that" },
+                                                { id: 4, text: "(A) however —— (B) stacked —— (C) what" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) '그들이 원하는 것은 무엇이든'이라는 명사절 목적어가 필요하므로 복합관계대명사 whatever가 맞습니다.<br/>
+                                                (B) 쟁반(trays)은 차곡차곡 쌓여지는 수동의 대상이므로 과거분사 stacked가 맞습니다.<br/>
+                                                (C) 특정 명사구(IT의 발전)를 강조하는 'It is ~ that' 강조구문이므로 that이 맞습니다.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

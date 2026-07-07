@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - YBM 공통영어2 Lesson 1</title>
+    
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #eff6ff; background-image: radial-gradient(#bfdbfe 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #93c5fd; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Intro
+          { id: 1, text: "There are a lot of things that fill us with hope for the future: technology, science, accountable leaders, and nonprofit organizations committed to doing good.", trans: "우리를 미래에 대한 희망으로 채우는 많은 것들이 있다. 기술, 과학, 책임감 있는 지도자들, 그리고 선을 행하는 데 전념하는 비영리 단체들." },
+          { id: 2, text: "However, few things give us more hope for the future than young people.", trans: "그러나 젊은이들보다 우리에게 미래에 대한 더 많은 희망을 주는 것들은 거의 없다." },
+          { id: 3, text: "Some young people are already working toward solutions for the problems their communities and the world are facing.", trans: "일부 젊은이들은 이미 그들의 공동체와 세계가 직면하고 있는 문제들에 대한 해결책을 향해 노력하고 있다.", isHighlight: true, logicPoint: 1 },
+          { id: 4, text: "Let's look at three inspirational examples of these young people.", trans: "이 젊은이들의 세 가지 영감을 주는 예들을 살펴보자." },
+
+          // Story 1: Trisha Prabhu
+          { id: 5, text: "Combating Online Hate with ReThink", trans: "ReThink로 온라인 혐오와 맞서기" },
+          { id: 6, text: "Trisha Prabhu, a young computer scientist from the U.S., is fighting cyberbullying with her innovative application ReThink.", trans: "미국의 젊은 컴퓨터 과학자인 트리샤 프라부는 그녀의 혁신적인 애플리케이션인 ReThink로 사이버 폭력과 싸우고 있다." },
+          { id: 7, text: "ReThink is a virtual keyboard that uses artificial intelligence to detect potentially hurtful text messages before they are sent and prompts young people to pause and reconsider their words.", trans: "ReThink는 인공 지능을 사용하여 잠재적으로 상처를 주는 문자 메시지가 전송되기 전에 그것들을 감지하고 젊은이들이 잠시 멈추고 그들의 말을 재고하도록 촉구하는 가상 키보드이다." },
+          { id: 8, text: "When a user types a message that contains potentially offensive language, such as \"I hate you,\" ReThink prompts: \"Hold on! Are you sure you want to say that?\" or \"Remember. You are what you type!\"", trans: "사용자가 \"미워.\"와 같은 잠재적으로 공격적인 언어를 포함하는 메시지를 입력할 때 ReThink는 다음과 같이 프롬프트를 표시한다. \"잠깐만요! 정말 그렇게 말하고 싶나요?\" 또는 \"기억하세요. 당신은 당신이 입력한 것입니다!\"" },
+          { id: 9, text: "In 2014, when Trisha was just thirteen years old, she read the tragic news of a twelve-year-old girl who had been cyberbullied for over a year and a half.", trans: "2014년, 트리샤가 겨우 열세 살이었던 때 그녀는 일 년 반 이상 사이버 폭력을 당했던 열두 살 소녀의 비극적인 뉴스를 읽었다." },
+          { id: 10, text: "Shocked at the story, she decided to prevent cyberbullying by using technology and created ReThink.", trans: "그 이야기에 충격을 받고 그녀는 기술을 사용하여 사이버 폭력을 막기로 결심하고 ReThink를 만들었다.", isHighlight: true, logicPoint: 2 },
+          { id: 11, text: "ReThink has been used by schools and organizations worldwide and has successfully raised awareness on cyberbullying.", trans: "ReThink는 전 세계의 학교와 단체에 의해 사용되어 왔고 성공적으로 사이버 폭력에 대한 인식을 높였다." },
+          { id: 12, text: "It has helped young people make better decisions in digital space where people could easily be unkind toward each other.", trans: "그것은 사람들이 서로에게 쉽사리 불친절할 수 있는 디지털 공간에서 젊은이들이 더 나은 결정을 내릴 수 있도록 도왔다." },
+          { id: 13, text: "In fact, it has been found that when using ReThink, adolescents change their minds 93% of the time and decide not to post offensive messages.", trans: "실제로 ReThink를 사용할 때 청소년들은 93%의 경우 마음을 바꾸고 공격적인 메시지를 게시하지 않기로 결정하는 것으로 밝혀졌다." },
+
+          // Story 2: Kelvin Doe
+          { id: 14, text: "Inventing with Discarded Electronic Parts", trans: "버려진 전자 부품으로 발명하기" },
+          { id: 15, text: "Kelvin Doe, a self-taught inventor and engineer from Sierra Leone, has been fascinated with electronics since childhood.", trans: "시에라리온 출신의 독학한 발명가이자 공학자인 켈빈 도는 어린 시절부터 전자 기기에 매료되어 왔다." },
+          { id: 16, text: "He would often do experiments with discarded electronics he found in trash cans to create his own inventions.", trans: "그는 종종 자신의 발명품을 만들기 위해 쓰레기통에서 발견한 버려진 전자 기기로 실험을 하곤 했다." },
+          { id: 17, text: "In 2009, at the young age of thirteen, Kelvin built his own FM radio station by using a transmitter he made from discarded electronic parts.", trans: "2009년, 열세 살의 어린 나이에, 켈빈은 버려진 전자 부품으로 만든 송신기를 사용하여 자신만의 FM 라디오 방송국을 만들었다." },
+          { id: 18, text: "In 2014, during the time when an Ebola outbreak affected Africa, Kelvin's radio station proved to be invaluable.", trans: "2014년, 에볼라 발병이 아프리카에 영향을 미쳤던 시기에, 켈빈의 라디오 방송국은 귀중한 것으로 증명되었다." },
+          { id: 19, text: "With schools closed, his radio station provided educational programs to students over the radio.", trans: "학교가 문을 닫은 가운데, 그의 라디오 방송국은 학생들에게 라디오를 통해 교육 프로그램을 제공했다.", isHighlight: true, logicPoint: 3 },
+          { id: 20, text: "This was especially important in his country, where the radio was the main source of media.", trans: "이것은 라디오가 미디어의 주요 공급원이었던 그의 나라에서 특히 중요했다." },
+          { id: 21, text: "Kelvin also improved the lives of people around him by providing affordable resources.", trans: "켈빈은 또한 적당한 가격의 자원을 제공함으로써 그의 주변 사람들의 삶을 향상시켰다." },
+          { id: 22, text: "He invented a battery capable of powering homes and small businesses, designed a generator that runs on salt water, and constructed a windmill to supply electricity to his community.", trans: "그는 가정과 소규모 사업체에 전력을 공급할 수 있는 배터리를 발명했고, 소금물로 작동하는 발전기를 설계했으며, 그의 지역 사회에 전기를 공급하기 위해 풍차를 건설했다." },
+
+          // Story 3: John Michael Stagliano
+          { id: 23, text: "Helping Homeless People Rebuild Their Lives", trans: "노숙자들의 삶의 재건을 돕기" },
+          { id: 24, text: "John Michael Stagliano is a young social activist from the U.S. who founded Home Again in 2016.", trans: "존 마이클 스타글리아노는 2016년 Home Again을 설립한 미국 출신의 젊은 사회 활동가이다." },
+          { id: 25, text: "It is a nonprofit organization that offers furniture and household essentials to families and individuals transitioning from homelessness to stable housing.", trans: "그것은 노숙에서 안정적인 주거로 전환하는 가족과 개인에게 가구와 가정 필수품을 제공하는 비영리 단체이다." },
+          { id: 26, text: "He says, \"For people who have lived in their cars, in and out of shelters, and in the woods, to be home again is a triumph, a sense of peace, and something to be celebrated.\"", trans: "그는 \"그들의 차 안에서, 쉼터를 오가며, 그리고 숲에서 생활해 온 사람들에게 다시 집으로 돌아오는 것은 승리이며, 평화로움이며, 축하할 일입니다.\"라고 말한다." },
+          { id: 27, text: "John's journey began in 2015. At the age of twelve, he volunteered at a local shelter where people in need were staying.", trans: "존의 여정은 2015년에 시작되었다. 열두 살 때 그는 도움이 필요한 사람들이 머물고 있는 지역 쉼터에서 자원봉사를 했다." },
+          { id: 28, text: "He learned that many of the shelter residents worked hard to rent houses and trailers but faced difficulties in furnishing their new homes upon moving in.", trans: "그는 쉼터 거주자 중 많은 사람들이 집과 트레일러를 빌리려고 열심히 일하지만 이사를 하자마자 새 집을 가구로 꾸미는 데 어려움을 겪는다는 것을 알게 되었다." },
+          { id: 29, text: "This prompted John to decide to do something for those transitioning out of homelessness.", trans: "이것은 존이 노숙 생활에서 벗어나는 사람들을 위해 무언가를 하기로 결심하게 했다." },
+          { id: 30, text: "Needing donations to gather essential items to help them, John reached out to his family, friends, and neighbors.", trans: "그들을 돕기 위한 필수 물품을 모으기 위해 기부가 필요했기에 존은 가족, 친구, 이웃들에게 도움을 요청했다.", isHighlight: true, logicPoint: 4 },
+          { id: 31, text: "As word of his efforts spread, donations began to rush in. So John was able to help more people get settled.", trans: "그의 노력에 대한 소문이 퍼지면서 기부가 쇄도하기 시작했다. 그래서 존은 더 많은 사람들이 정착할 수 있도록 도울 수 있었다." },
+          { id: 32, text: "He said, \"I never knew the impact that a simple couch or a kitchen table could have. Furniture can restore the dignity of a family.\"", trans: "그는 \"저는 단순한 소파나 식탁이 미칠 수 있는 영향을 전혀 몰랐습니다. 가구는 가족의 존엄성을 회복시킬 수 있습니다.\"라고 말했다." },
+
+          // Conclusion
+          { id: 33, text: "Trisha Prabhu, Kelvin Doe, and John Michael Stagliano are all examples of young social activists who have made significant contributions to society.", trans: "트리샤 프라부, 켈빈 도, 존 마이클 스타글리아노는 모두 사회에 상당한 공헌을 한 젊은 사회 활동가의 예이다." },
+          { id: 34, text: "Their innovative efforts to solve social problems demonstrate the power of technology, commitment, and individual initiative.", trans: "사회 문제를 해결하기 위한 그들의 혁신적인 노력은 기술, 헌신, 개인 주도성의 힘을 보여 준다." },
+          { id: 35, text: "Their stories serve as an inspiration for young people around the world to pursue their passions and make a difference in their communities.", trans: "그들의 이야기는 전 세계 젊은이들이 자신의 열정을 추구하고 공동체에 변화를 일으키는 데 영감을 준다." },
+          { id: 36, text: "As young innovators and social activists keep appearing, they will undoubtedly make the world a better place.", trans: "젊은 혁신가들과 사회 활동가들이 계속 등장하므로, 그들은 틀림없이 세상을 더 나은 곳으로 만들 것이다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "INTRO", desc: "해결책을 향해 노력하는 젊은이들", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-users-three text-xl mb-2"></i> },
+          { point: 2, title: "STORY 1. Trisha Prabhu", desc: "사이버 폭력 예방 앱 (ReThink) 개발", color: "bg-sky-100 border-sky-400 text-sky-800", icon: <i className="ph-fill ph-shield-check text-xl mb-2"></i> },
+          { point: 3, title: "STORY 2. Kelvin Doe", desc: "버려진 부품으로 라디오 방송국·발전기 제작", color: "bg-indigo-100 border-indigo-400 text-indigo-800", icon: <i className="ph-fill ph-radio text-xl mb-2"></i> },
+          { point: 4, title: "STORY 3. John Michael Stagliano", desc: "노숙자 주거 자립을 돕는 가구 기부 단체 설립", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-house-line text-xl mb-2"></i> },
+          { point: 5, title: "CONCLUSION", desc: "개인 주도성과 헌신이 만드는 더 나은 세상", color: "bg-purple-100 border-purple-400 text-purple-800", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-blue-700">
+                  <div className="mx-auto bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-blue-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-blue-600 font-bold mb-6 text-sm">Young Change-Makers</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-blue-800 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-blue-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-blue-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Young Change-Makers</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">YBM 공통영어2 Lesson 1</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Change-Makers</h1>
+                            <p className="text-blue-300 text-xs">YBM Lesson 1</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-blue-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Intro (세상을 바꾸는 젊은이들)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 4).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-sky-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Story 1 (Trisha Prabhu: 사이버 폭력 방지)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(4, 13).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-sky-50 border border-sky-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-sky-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-indigo-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Story 2 (Kelvin Doe: 폐부품으로 발명하기)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(13, 22).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-indigo-50 border border-indigo-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-indigo-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Story 3 (John Michael Stagliano: 노숙자 자립 지원)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(22, 32).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-purple-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (그들이 주는 영감과 희망)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(32, 36).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-purple-50 border border-purple-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-blue-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-purple-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-blue-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-blue-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 과거완료 수동태 (had been p.p.)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[09] ... she read the tragic news of a twelve-year-old girl who <span className="font-bold text-blue-600">had been cyberbullied</span> for over a year and a half."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                트리샤가 뉴스를 읽은 시점(과거: read)보다 소녀가 사이버 폭력을 당한 시점이 '더 먼저 일어난 일(대과거)'임을 나타냅니다. 소녀가 폭력을 '당한' 것이므로 수동태(be+p.p)가 결합되어 <strong className="text-blue-800 print:text-black">had been cyberbullied</strong> 형태가 되었습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-sky-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 분사구문 (수동과 능동)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[10] <span className="font-bold text-sky-600">Shocked</span> at the story, she decided to..."<br/>"[30] <span className="font-bold text-sky-600">Needing</span> donations to gather essential items..., John reached out to..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                [10]번은 트리샤가 충격을 '받은' 것이므로 과거분사(Shocked)로 시작되었고(앞에 Being 생략), [30]번은 존이 기부를 '필요로 하는' 능동의 상황이므로 현재분사(Needing)가 사용되었습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-indigo-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 부대상황의 with 분사구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[19] <span className="font-bold text-indigo-600">With schools closed</span>, his radio station provided educational programs..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-indigo-800 print:text-black">[with + 명사 + 분사/형용사]</strong> 구조로 "~한 채로, ~한 상태로"라는 동시동작이나 상황을 나타냅니다. 학교(schools)가 문을 '닫은(수동)' 상태이므로 과거분사 closed가 쓰였습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 5형식 동사 prompt
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[29] This <span className="font-bold text-teal-600">prompted</span> John <span className="font-bold text-teal-600">to decide</span> to do something..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                동사 prompt는 목적어가 ~하도록 부추기거나 촉구할 때 쓰이며, 목적격 보어 자리에 반드시 <strong className="text-teal-800 print:text-black">to부정사(to decide)</strong>를 취합니다. (해석: 이것이 존으로 하여금 결심하도록 촉구했다.)
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-blue-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-blue-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-blue-900 border-b-2 border-blue-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-blue-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "Trisha Prabhu가 만든 앱은 메시지 전송 전에 상처가 될 수 있는 말을 스스로 재고하게 만든다." },
+                                                { id: 2, text: "Kelvin Doe는 학교에서 정규 공학 교육을 받아 라디오 방송국과 발전기를 만들었다.", isCorrect: true },
+                                                { id: 3, text: "John Michael Stagliano는 쉼터 사람들이 새 집을 가구로 꾸미는 데 어려움을 겪는 것을 보았다." },
+                                                { id: 4, text: "ReThink 앱을 사용할 때 청소년의 대다수가 공격적인 메시지를 올리지 않기로 마음을 바꾸었다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 15번 문장에서 Kelvin Doe는 "a self-taught inventor(독학한 발명가)"라고 명시되어 있습니다. 따라서 정규 공학 교육을 받았다는 설명은 일치하지 않습니다.</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) <strong>[ Shocked / Shocking ]</strong> at the story, Trisha decided to prevent cyberbullying.<br/><br/>
+                                                (B) With schools <strong>[ closed / closing ]</strong>, his radio station provided educational programs.<br/><br/>
+                                                (C) This prompted John <strong>[ decide / to decide ]</strong> to do something for those transitioning out of homelessness.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) Shocked —— (B) closed —— (C) to decide", isCorrect: true },
+                                                { id: 2, text: "(A) Shocked —— (B) closing —— (C) decide" },
+                                                { id: 3, text: "(A) Shocking —— (B) closed —— (C) decide" },
+                                                { id: 4, text: "(A) Shocking —— (B) closing —— (C) to decide" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-blue-400 hover:bg-blue-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) 주어(she)가 충격을 받은 것이므로 과거분사 Shocked가 맞습니다.<br/>
+                                                (B) 학교가 문이 닫힌 상태이므로 [with 명사 + p.p.] 구문인 closed가 맞습니다.<br/>
+                                                (C) 동사 prompt는 목적격 보어로 to부정사를 취하므로 to decide가 맞습니다.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-blue-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

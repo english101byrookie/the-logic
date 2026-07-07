@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC — 강의 포털</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f8f7f4; --surface: #ffffff;
+            --navy: #1a2b4a; --gold: #b8862a; --green: #2d7a52; --blue: #3a6bb5;
+            --muted: #6b7280; --border: #e5e2db; --faint: #f3f1ec;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+        #progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--navy), var(--gold)); z-index: 100; }
+        .page { max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+        .topbar { padding: 24px 0 20px; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+        .brand-link { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; letter-spacing: .08em; color: var(--navy); text-decoration: none; }
+        .header { padding: 64px 0 48px; border-bottom: 1px solid var(--border); }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; color: var(--navy); }
+        .header h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+        .header-sub { margin-top: 14px; font-size: 15px; font-weight: 300; color: var(--muted); max-width: 520px; line-height: 1.7; }
+        .section { padding: 48px 0 32px; }
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+        .section-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+        .section-line { flex: 1; height: 1px; background: var(--border); }
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+        .subject-card { display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 22px 20px; position: relative; overflow: hidden; min-height: 220px; transition: all .24s ease; }
+        .subject-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); opacity: .7; transition: opacity .24s; }
+        .subject-card.active:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); }
+        .subject-card.active:hover::before { opacity: 1; }
+        .subject-card.active:hover .sc-arrow { color: var(--navy); transform: translateX(4px); }
+        .subject-card.inactive { opacity: .45; cursor: default; pointer-events: none; }
+        .sc-year { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        .sc-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+        .sc-books { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 20px; flex: 1; align-content: flex-start; }
+        .sc-book { font-size: 11px; color: var(--muted); background: var(--faint); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); }
+        .sc-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--faint); pt: 12px; margin-top: auto; padding-top: 12px; }
+        .sc-status { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+        .sc-status.live { color: var(--accent); font-weight: 500; }
+        .sc-arrow { font-size: 14px; color: #ccc; transition: all .24s ease; }
+        footer { padding: 40px 0 52px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-size: 14px; color: #bbb; }
+        .footer-note { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #ccc; text-transform: uppercase; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fi { animation: fadeUp .45s ease forwards; opacity: 0; }
+        .fi:nth-child(1) { animation-delay: .05s; } .fi:nth-child(2) { animation-delay: .10s; } .fi:nth-child(3) { animation-delay: .15s; } .fi:nth-child(4) { animation-delay: .20s; }
+        @media (max-width: 600px) { .subject-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="page">
+    <nav class="topbar">
+        <a href="index.html" class="brand-link">THE LOGIC</a>
+    </nav>
+    <header class="header fi">
+        <h1>THE LOGIC <em>Portal</em></h1>
+        <p class="header-sub">구조와 패턴을 통해 지문의 이면을 분석합니다. 교과 과정을 선택하여 고효율 인터랙티브 학습을 시작하세요.</p>
+    </header>
+    <section class="section">
+        <div class="section-header"><span class="section-title">과정 선택</span><div class="section-line"></div></div>
+        <div class="subject-grid">
+            
+            <a href="공통영어1/index.html" class="subject-card active fi" style="--accent:var(--gold);">
+                <div>
+                    <div class="sc-year">2025년 제공</div>
+                    <div class="sc-name">공통영어 1</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(민병천)</span>
+                        <span class="sc-book">YBM(김은형)</span>
+                        <span class="sc-book">비상(황종배)</span>
+                        <span class="sc-book">천재(강상구)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <!-- 🔥 새로 추가된 공통영어 2 카드 -->
+            <a href="공통영어2/index.html" class="subject-card active fi" style="--accent:var(--blue);">
+                <div>
+                    <div class="sc-year">2025년 제공</div>
+                    <div class="sc-name">공통영어 2</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(민병천)</span>
+                        <span class="sc-book">YBM(김은형)</span>
+                        <span class="sc-book">천재(강상구)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--blue);">● 업로드 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="영어1/index.html" class="subject-card active fi" style="--accent:var(--green);">
+                <div>
+                    <div class="sc-year">2026년 제공</div>
+                    <div class="sc-name">영어 I</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(오선영)</span>
+                        <span class="sc-book">YBM(박준언)</span>
+                        <span class="sc-book">동아(박용예)</span>
+                        <span class="sc-book">비상(홍민표)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--green);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <div class="subject-card inactive fi" style="--accent:#6b7280;">
+                <div>
+                    <div class="sc-year">추후 제공</div>
+                    <div class="sc-name">영어 독해와 작문</div>
+                    <div class="sc-books">
+                        <span class="sc-book">시중 핵심 교재 수록 예정</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status">준비 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    <footer>
+        <div class="footer-brand">THE LOGIC</div>
+        <div class="footer-note">Interactive English Lecture Portal · 2026</div>
+    </footer>
+</div>
+<script>
+    window.addEventListener('scroll', () => {
+        const el = document.getElementById('progress');
+        const total = document.body.scrollHeight - window.innerHeight;
+        el.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+    });
+</script>
+</body>
+</html>

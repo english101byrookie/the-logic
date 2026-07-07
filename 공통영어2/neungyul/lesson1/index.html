@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - NE능률 공통영어2 Lesson 1</title>
+    
+    <meta name="theme-color" content="#166534">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #f0fdf4; background-image: radial-gradient(#bbf7d0 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Part 1: The Incident
+          { id: 1, text: "A missing hiker named Rene Compean was found safe on Tuesday by a rescue team in Angeles National Forest.", trans: "Rene Compean이라는 실종된 등산객이 화요일 Angeles National Forest(앤젤레스 국유림)에서 구조팀에 의해 안전한 상태로 발견되었습니다." },
+          { id: 2, text: "It turns out that a photo played a key role in saving his life.", trans: "그의 생명을 구하는 데 한 장의 사진이 중요한 역할을 한 것으로 밝혀졌습니다." },
+          { id: 3, text: "Let's go over to Marissa Reynolds for more details on this story.", trans: "이 사건에 대한 더욱 자세한 내용을 위해 Marissa Reynolds를 연결해 보겠습니다." },
+          { id: 4, text: "Thank you, Thomas. I'm standing here at the entrance of Angeles National Forest.", trans: "고마워요, Thomas. 저는 여기 Angeles National Forest 입구에 서 있습니다." },
+          { id: 5, text: "As you just heard, Rene Compean was recently rescued from this forest.", trans: "여러분이 방금 들으셨듯이, Rene Compean은 최근 이 숲에서 구조되었습니다." },
+          { id: 6, text: "Compean, an experienced hiker who knew the area well, went on a hike alone on April 12.", trans: "Compean은 이 지역을 잘 알던 숙련된 등산객으로, 4월 12일 홀로 등산에 나섰습니다." },
+          { id: 7, text: "However, a recent forest fire had destroyed some signs, which caused him to take a wrong turn and get lost.", trans: "그러나, 최근의 산불이 몇몇 표지판을 망가뜨렸고, 그것이 그가 길을 잘못 들어 길을 잃게 했습니다.", isHighlight: true, logicPoint: 1 },
+          { id: 8, text: "He tried shouting for help and even wrote SOS on the ground in case a plane or helicopter passed by.", trans: "그는 도움을 청하기 위해 소리를 지르기도 하고 심지어 비행기나 헬리콥터가 지나갈 경우를 대비하여 땅에 SOS를 쓰기도 했습니다." },
+          { id: 9, text: "He had planned to hike for only about two hours, but night was coming. It started getting very windy and the temperature was dropping quickly.", trans: "그는 약 2시간 정도만 등산할 계획이었으나, 밤이 찾아오고 있었습니다. 강한 바람이 불기 시작했고 기온은 급격히 떨어지고 있었습니다." },
+
+          // Part 2: A Desperate Message
+          { id: 10, text: "Compean was deep in the forest, so his cell phone couldn't get a signal.", trans: "Compean은 숲속 깊은 곳에 있었고, 그래서 그의 휴대폰은 신호를 받지 못했습니다." },
+          { id: 11, text: "To make matters worse, its battery was nearly dead.", trans: "설상가상으로, 그것의 배터리는 거의 방전되었습니다." },
+          { id: 12, text: "He climbed up to a higher spot and found a weak signal.", trans: "그는 더 높은 곳으로 올라갔고 약한 신호를 찾았습니다." },
+          { id: 13, text: "He used the last of his battery to send a text message to his friend.", trans: "그는 그의 마지막 (남은) 배터리를 그의 친구에게 문자 메시지를 보내기 위해 사용했습니다." },
+          { id: 14, text: "In the message, he said that he was lost and needed help.", trans: "메시지에, 그는 그가 길을 잃었으며 도움이 필요하다고 말했습니다." },
+          { id: 15, text: "He also sent a picture to show his surroundings.", trans: "그는 또한 그의 주변 환경을 보여 주기 위해 사진 한 장을 보냈습니다.", isHighlight: true, logicPoint: 2 },
+          { id: 16, text: "Compean's friend shared the message and the picture with the local police.", trans: "Compean의 친구는 그 메시지와 사진을 지역 경찰에게 공유했습니다." },
+
+          // Part 3: The Search & The Problem with the Picture
+          { id: 17, text: "When the local police were informed of the missing hiker, they immediately sent a rescue team.", trans: "지역 경찰이 실종된 등산객에 대해 보고받았을 때, 그들은 즉시 구조팀을 보냈습니다." },
+          { id: 18, text: "Despite searching through the night, they still didn't have any idea where Compean was.", trans: "밤샘 수색에도 불구하고, 그들은 여전히 Compean이 어디에 있는지 아무 짐작도 하지 못했습니다." },
+          { id: 19, text: "In the picture, his legs were hanging over the edge of a canyon with rocks and green trees.", trans: "사진에서, 그의 다리는 바위와 푸른 나무들이 있는 협곡의 가장자리에 걸쳐 있었습니다." },
+          { id: 20, text: "His legs were covered in black ash from the recent forest fires.", trans: "그의 다리는 최근의 산불로 생긴 검은 재로 덮여 있었습니다." },
+          { id: 21, text: "However, the picture didn't help the police much because the quality was poor due to the weak signal, and his location settings were turned off.", trans: "그러나, 그 사진은 경찰에게 크게 도움이 되지 못했는데 왜냐하면 약한 신호로 인해 화질이 나빴고, 그의 위치 설정도 꺼져 있었기 때문이었습니다.", isHighlight: true, logicPoint: 3 },
+
+          // Part 4: Crowdsourcing the Search (Ben Kuo)
+          { id: 22, text: "As Compean had already spent one night in difficult conditions, the police worried about his spending a second night.", trans: "Compean은 이미 힘든 환경에서 하룻밤을 보냈기 때문에, 경찰은 그가 두 번째 밤을 보낼 것에 대해 걱정했습니다." },
+          { id: 23, text: "So they decided to use social media to find out if anyone could find clues in the picture.", trans: "그래서 그들은 누군가 사진 속에서 단서를 찾을 수 있는지 알아보기 위해 소셜 미디어를 사용하기로 결정했습니다." },
+          { id: 24, text: "They posted the picture and asked if anyone recognized the scenery.", trans: "그들은 그 사진을 게시하고 누군가 그 풍경을 알아차릴 수 있는지 물었습니다." },
+          { id: 25, text: "The picture shared by the police was seen by a Californian named Ben Kuo.", trans: "경찰에 의해 공유된 그 사진은 Ben Kuo라는 이름의 한 캘리포니아 사람에게 목격되었습니다." },
+          { id: 26, text: "One of his hobbies is examining satellite images to track forest fires and informing people of potential dangers.", trans: "그의 취미 중 하나는 산불을 추적하기 위해 위성 이미지를 조사하고 사람들에게 잠재적 위험에 대해 알리는 것입니다." },
+          { id: 27, text: "He also enjoys determining where pictures were taken and where movies were filmed.", trans: "그는 또한 어디서 사진이 찍혔는지와 영화가 어디서 촬영되었는지를 알아내는 것을 즐겼습니다." },
+          { id: 28, text: "When he saw the picture of Compean, he was immediately interested.", trans: "그가 Compean의 사진을 보았을 때, 그는 바로 흥미를 느꼈습니다.", isHighlight: true, logicPoint: 4 },
+
+          // Part 5: Solving the Puzzle
+          { id: 29, text: "When Kuo saw the black ash on Compean's legs, it reminded him of a recent forest fire.", trans: "Kuo가 Compean의 다리에 있는 검은 재를 보았을 때, 그것은 그에게 최근의 산불을 떠올리게 했습니다." },
+          { id: 30, text: "This helped him to infer Compean's approximate location.", trans: "이것은 그가 Compean의 거의 정확한 위치를 추론하도록 도와주었습니다." },
+          { id: 31, text: "Kuo was very familiar with the area because he had tracked the fire before and had checked the features of the area in satellite images.", trans: "Kuo는 이 지역이 매우 익숙했는데 왜냐하면 그가 이전에 그 화재를 추적했었고 위성 이미지에서 그 지역의 특징을 확인했었기 때문입니다." },
+          { id: 32, text: "From the plants and trees in Compean's picture, Kuo guessed that it must be the south side of the mountain.", trans: "Compean의 사진 속 식물과 나무들로부터, Kuo는 그곳이 산의 남쪽 부분이 틀림없다고 추측했습니다." },
+          { id: 33, text: "The north side does not have any green valleys like those in the picture.", trans: "북쪽 부분에는 사진 속의 것들과 같은 푸른 골짜기들이 없습니다." },
+
+          // Part 6: Rescue & Conclusion
+          { id: 34, text: "As a final step, Kuo compared the view in Compean's picture with more satellite images.", trans: "마지막 단계로, Kuo는 Compean의 사진 속 풍경을 더 많은 위성 이미지와 비교했습니다." },
+          { id: 35, text: "Finally, he found a match and provided the police with Compean's probable location.", trans: "마침내 그는 일치하는 곳을 찾았고 경찰에게 Compean이 있을 법한 위치를 제공했습니다." },
+          { id: 36, text: "The police sent a rescue helicopter to the location and found Compean less than a mile away from the area indicated by Kuo.", trans: "경찰은 그 위치에 구조 헬리콥터를 보냈고 Kuo에 의해 지목된 지역으로부터 1마일도 채 떨어지지 않은 곳에서 Compean을 발견했습니다.", isHighlight: true, logicPoint: 5 },
+          { id: 37, text: "Thanks to Kuo's unusual skills, Compean was rescued unharmed.", trans: "Kuo의 이례적인 기술로, Compean은 다치지 않은 채로 구조되었습니다." },
+          { id: 38, text: "He later thanked Kuo on a video call.", trans: "그는 나중에 Kuo에게 영상 통화로 감사를 전했습니다." },
+          { id: 39, text: "The local police are now reminding hikers who hike alone to inform others of their planned route and to always bring a paper map.", trans: "이제 지역 경찰은 혼자 등산하는 등산객들에게 자신들의 계획된 경로를 다른 사람들에게 알리고 언제나 종이 지도를 가져오라고 상기시키고 있습니다." },
+          { id: 40, text: "This is Marissa Reynolds from LA. Now back to the studio.", trans: "지금까지 LA에서 Marissa Reynolds 입니다. 이제 다시 스튜디오로 연결합니다." }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "CRISIS", desc: "산불로 표지판 훼손 및 조난", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-warning-circle text-xl mb-2"></i> },
+          { point: 2, title: "SOS", desc: "약한 신호로 사진 전송", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-broadcast text-xl mb-2"></i> },
+          { point: 3, title: "LIMITATION", desc: "나쁜 화질과 꺼진 위치 설정", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-prohibit text-xl mb-2"></i> },
+          { point: 4, title: "CROWDSOURCING", desc: "위성 전문가 Ben Kuo의 개입", color: "bg-blue-100 border-blue-400 text-blue-800", icon: <i className="ph-fill ph-users-three text-xl mb-2"></i> },
+          { point: 5, title: "RESCUE", desc: "사진 단서 추론으로 성공적인 구조", color: "bg-green-100 border-green-400 text-green-800", icon: <i className="ph-fill ph-helicopter text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-green-700">
+                  <div className="mx-auto bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-green-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-green-600 font-bold mb-6 text-sm">An Unusual Rescue Effort</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-green-800 hover:bg-green-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-green-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-green-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Unusual Rescue</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">NE능률 공통영어2 Lesson 1</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-green-600 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Unusual Rescue</h1>
+                            <p className="text-green-300 text-xs">NE능률 Lesson 1</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-green-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Part 1 (산불로 인한 조난)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 9).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-orange-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Part 2 (필사적인 구조 요청)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(9, 16).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-slate-600 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Part 3 (수색 난항과 사진의 한계)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(16, 21).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-blue-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Part 4 (소셜 미디어와 전문가의 등장)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(21, 33).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-blue-50 border border-blue-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-blue-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-green-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Part 5 (단서 분석과 극적인 구조)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(33, 40).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-green-100 border border-green-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-green-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-green-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-green-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-green-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 계속적 용법의 관계대명사 (which)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[07] ... a recent forest fire had destroyed some signs, <span className="font-bold text-green-600">which</span> caused him to take a wrong turn and get lost."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤에 쓰인 관계대명사 <strong className="text-green-800 print:text-black">which</strong>는 앞 문장의 내용 전체(산불이 표지판을 망가뜨린 것)를 선행사로 받습니다. "그리고 그것이(and it) 그가 길을 잃게 만들었다"라는 결과의 의미를 이끌어냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-emerald-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. in case (접속사)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[08] ... wrote SOS on the ground <span className="font-bold text-emerald-600">in case</span> a plane or helicopter passed by."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-emerald-800 print:text-black">in case</strong>는 "~할 경우를 대비하여"라는 의미의 접속사로 쓰이며, 뒤에는 반드시 '주어+동사' 형태의 절이 따라옵니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 동명사의 의미상 주어
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[22] ... the police worried about <span className="font-bold text-teal-600">his</span> spending a second night."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                전치사 about의 목적어인 동명사(spending)의 주체가 문장의 주어(the police)와 다를 때, 동명사 바로 앞에 <strong className="text-teal-800 print:text-black">소유격(his)</strong>이나 목적격(him)을 써서 의미상 주어를 나타냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 과거완료 (had p.p.)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[31] Kuo was very familiar with the area because he <span className="font-bold text-cyan-600">had tracked</span> the fire before and <span className="font-bold text-cyan-600">had checked</span> the features..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                Kuo가 그 지역에 익숙했던 시점(과거: was familiar)보다 산불을 추적하고 특징을 확인한 시점이 <strong className="text-cyan-800 print:text-black">더 먼저 일어난 과거(대과거)</strong>의 경험이기 때문에 과거완료 형태가 사용되었습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-green-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-green-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-green-900 border-b-2 border-green-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-green-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "Compean은 배터리가 거의 닳은 상태에서 높은 곳으로 올라가 약한 신호를 잡았다." },
+                                                { id: 2, text: "경찰은 밤샘 수색을 통해 Compean이 있는 대략적인 위치를 스스로 파악해냈다.", isCorrect: true },
+                                                { id: 3, text: "Ben Kuo는 사진 속 Compean의 다리에 묻은 검은 재를 보고 최근의 산불을 떠올렸다." },
+                                                { id: 4, text: "경찰은 혼자 등산하는 사람들에게 종이 지도를 꼭 챙길 것을 상기시키고 있다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-green-400 hover:bg-green-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 18번 문장에 따르면, 경찰은 밤새워 수색을 했음에도 불구하고 Compean이 어디에 있는지 아무런 짐작도 하지 못했습니다. (didn't have any idea where Compean was)</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) A recent forest fire had destroyed some signs, <strong>[ what / which ]</strong> caused him to take a wrong turn.<br/><br/>
+                                                (B) The police worried about <strong>[ he / his ]</strong> spending a second night in difficult conditions.<br/><br/>
+                                                (C) The local police are now reminding hikers <strong>[ informing / to inform ]</strong> others of their planned route.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) what —— (B) he —— (C) informing" },
+                                                { id: 2, text: "(A) which —— (B) his —— (C) to inform", isCorrect: true },
+                                                { id: 3, text: "(A) which —— (B) he —— (C) informing" },
+                                                { id: 4, text: "(A) what —— (B) his —— (C) to inform" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-green-400 hover:bg-green-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) 앞 문장 전체를 선행사로 받는 계속적 용법의 관계대명사 which가 맞습니다.<br/>
+                                                (B) 동명사 spending의 의미상 주어이므로 소유격 his가 맞습니다.<br/>
+                                                (C) 동사 remind는 'remind A to B' 형태로 쓰이므로 to inform이 맞습니다.
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-green-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
