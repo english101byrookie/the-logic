@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC — 영어 II</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f8f7f4; --surface: #ffffff;
+            --navy: #1a2b4a; --gold: #b8862a; --purple: #7c3aed;
+            --teal: #0f766e; --blue: #3a6bb5; --rose: #be123c; --slate: #64748b;
+            --muted: #6b7280; --border: #e5e2db; --faint: #f3f1ec;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+        #progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--purple), var(--navy)); z-index: 100; }
+        .page { max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+        
+        .topbar { padding: 24px 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .brand-link { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; letter-spacing: .08em; color: var(--navy); text-decoration: none; }
+        .back-link { font-size: 13px; font-weight: 500; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
+        .back-link:hover { color: var(--navy); }
+        
+        .header { padding: 64px 0 48px; border-bottom: 1px solid var(--border); }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; color: var(--navy); }
+        .header h1 em { font-style: italic; font-weight: 400; color: var(--purple); }
+        .header-sub { margin-top: 14px; font-size: 15px; font-weight: 300; color: var(--muted); max-width: 520px; line-height: 1.7; }
+        
+        .section { padding: 48px 0 32px; }
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+        .section-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+        .section-line { flex: 1; height: 1px; background: var(--border); }
+        
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+        .publisher-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 22px 20px; position: relative; overflow: hidden; transition: all .24s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.01); }
+        .publisher-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); opacity: .8; transition: opacity .24s; }
+        .publisher-card:hover { border-color: var(--accent); box-shadow: 0 12px 32px rgba(0,0,0,.06); transform: translateY(-4px); }
+        
+        .pc-pub { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        .pc-name { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--navy); margin-bottom: 24px; display: flex; align-items: baseline; gap: 8px; }
+        .pc-author { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+        
+        .lesson-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; flex: 1; }
+        .lesson-btn { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; background: var(--faint); border-radius: 10px; text-decoration: none; color: var(--navy); font-size: 14px; font-weight: 600; border: 1px solid transparent; transition: all 0.2s ease; }
+        .lesson-btn:hover { border-color: var(--accent); background: var(--surface); transform: translateX(4px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); color: var(--accent); }
+        .lesson-btn span.arr { font-size: 16px; opacity: 0.3; transition: all 0.2s ease; }
+        .lesson-btn:hover span.arr { opacity: 1; transform: translateX(2px); }
+        
+        .lesson-btn.disabled { opacity: 0.6; pointer-events: none; background: transparent; border: 1px dashed var(--border); font-weight: 400; color: var(--muted); }
+        .lesson-btn.disabled .badge { font-family: 'DM Sans', sans-serif; font-size: 10px; background: var(--border); padding: 3px 8px; border-radius: 4px; color: var(--muted); font-weight: 600; }
+        
+        .pc-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--faint); padding-top: 16px; margin-top: auto; }
+        .pc-status { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+        .pc-status.pending { color: var(--muted); font-weight: 500; }
+        
+        footer { padding: 40px 0 52px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-size: 14px; color: #bbb; }
+        .footer-note { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #ccc; text-transform: uppercase; }
+        
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        .fi { animation: fadeUp .45s ease forwards; opacity: 0; }
+        .fi:nth-child(1) { animation-delay: .05s; } .fi:nth-child(2) { animation-delay: .10s; } .fi:nth-child(3) { animation-delay: .15s; } .fi:nth-child(4) { animation-delay: .20s; }
+        
+        @media (max-width: 600px) { .subject-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div id="progress"></div>
+<div class="page">
+    <nav class="topbar">
+        <a href="../index.html" class="brand-link">THE LOGIC</a>
+        <a href="../index.html" class="back-link">← 메인 포털로 돌아가기</a>
+    </nav>
+    <header class="header fi">
+        <h1>English <em>II</em></h1>
+        <p class="header-sub">2026년 적용 개정 교육과정 영어 II. 해당 학교의 출판사를 선택하여 지문 구조와 핵심 구문 학습을 시작하세요.</p>
+    </header>
+    
+    <section class="section">
+        <div class="section-header"><span class="section-title">출판사 선택</span><div class="section-line"></div></div>
+        <div class="subject-grid">
+            
+            <!-- NE능률 (오선영) -->
+            <div class="publisher-card fi" style="--accent: var(--teal);">
+                <div>
+                    <div class="pc-pub">Publisher</div>
+                    <div class="pc-name">NE능률 <span class="pc-author">(오선영)</span></div>
+                    <div class="lesson-list">
+                        <a href="ne-neungyul/lesson1/index.html" class="lesson-btn">Lesson 1 <span class="arr">→</span></a>
+                        <a href="ne-neungyul/lesson2/index.html" class="lesson-btn">Lesson 2 <span class="arr">→</span></a>
+                        <a href="ne-neungyul/lesson3/index.html" class="lesson-btn">Lesson 3 <span class="arr">→</span></a>
+                        <div class="lesson-btn disabled">Lesson 4 <span class="badge">업로드 예정</span></div>
+                    </div>
+                </div>
+                <div class="pc-footer">
+                    <span class="pc-status">● 서비스 중</span>
+                </div>
+            </div>
+
+            <!-- YBM (박준언) -->
+            <div class="publisher-card fi" style="--accent: var(--blue);">
+                <div>
+                    <div class="pc-pub">Publisher</div>
+                    <div class="pc-name">YBM <span class="pc-author">(박준언)</span></div>
+                    <div class="lesson-list">
+                        <a href="ybm/lesson1/index.html" class="lesson-btn">Lesson 1 <span class="arr">→</span></a>
+                        <a href="ybm/lesson2/index.html" class="lesson-btn">Lesson 2 <span class="arr">→</span></a>
+                        <div class="lesson-btn disabled">Lesson 3 <span class="badge">업로드 예정</span></div>
+                        <div class="lesson-btn disabled">Lesson 4 <span class="badge">업로드 예정</span></div>
+                    </div>
+                </div>
+                <div class="pc-footer">
+                    <span class="pc-status">● 서비스 중</span>
+                </div>
+            </div>
+
+            <!-- 천재 (강상구) -->
+            <div class="publisher-card fi" style="--accent: var(--rose);">
+                <div>
+                    <div class="pc-pub">Publisher</div>
+                    <div class="pc-name">천재 <span class="pc-author">(강상구)</span></div>
+                    <div class="lesson-list">
+                        <a href="chunjae/lesson1/index.html" class="lesson-btn">Lesson 1 <span class="arr">→</span></a>
+                        <a href="chunjae/lesson2/index.html" class="lesson-btn">Lesson 2 <span class="arr">→</span></a>
+                        <div class="lesson-btn disabled">Lesson 3 <span class="badge">업로드 예정</span></div>
+                        <div class="lesson-btn disabled">Lesson 4 <span class="badge">업로드 예정</span></div>
+                    </div>
+                </div>
+                <div class="pc-footer">
+                    <span class="pc-status">● 서비스 중</span>
+                </div>
+            </div>
+
+            <!-- 비상 (홍민표) -->
+            <div class="publisher-card fi" style="--accent: var(--slate);">
+                <div>
+                    <div class="pc-pub">Publisher</div>
+                    <div class="pc-name">비상 <span class="pc-author">(홍민표)</span></div>
+                    <div class="lesson-list">
+                        <div class="lesson-btn disabled">Lesson 1 <span class="badge">준비 중</span></div>
+                        <div class="lesson-btn disabled">Lesson 2 <span class="badge">준비 중</span></div>
+                        <div class="lesson-btn disabled">Lesson 3 <span class="badge">준비 중</span></div>
+                        <div class="lesson-btn disabled">Lesson 4 <span class="badge">준비 중</span></div>
+                    </div>
+                </div>
+                <div class="pc-footer">
+                    <span class="pc-status pending">○ 데이터 컴파일 중</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    
+    <footer>
+        <div class="footer-brand">THE LOGIC</div>
+        <div class="footer-note">Interactive English Lecture Portal · 2026</div>
+    </footer>
+</div>
+<script>
+    window.addEventListener('scroll', () => {
+        const el = document.getElementById('progress');
+        const total = document.body.scrollHeight - window.innerHeight;
+        el.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+    });
+</script>
+</body>
+</html>

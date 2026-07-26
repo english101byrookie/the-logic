@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - NE능률 영어II Lesson 2</title>
+    
+    <meta name="theme-color" content="#047857">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #ecfdf5; background-image: radial-gradient(#a7f3d0 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #34d399; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Intro
+          { id: 1, text: "When we think about science, we might consider it as a domain reserved exclusively for scientists in long, white lab coats who spend their days conducting experiments and analyzing data.", trans: "과학에 대해서 생각할 때, 우리는 그것을 실험을 하고 데이터를 분석하는 데 나날을 보내는 길고 흰 실험실 가운을 입은 과학자들에게 독점적으로 지정된 영역이라고 생각할 수 있다." },
+          { id: 2, text: "They seem to have very little in common with ordinary people like us.", trans: "그들은 우리와 같은 평범한 사람들과 공통점이 거의 없는 것 같이 보인다." },
+          { id: 3, text: "However, this perception is far from the truth. In reality, science belongs to everyone, and we all have the ability to play a role in the advancement of science.", trans: "그러나 이러한 인식은 사실과 거리가 멀다. 사실은, 과학은 모두의 것이며, 우리는 모두 과학의 발전에 일조할 수 있는 능력이 있다." },
+          { id: 4, text: "There have been numerous citizen science projects in which ordinary people have made contributions to remarkable scientific accomplishments. Let's take a look at two of them.", trans: "평범한 사람들이 놀라운 과학적 업적에 기여한 수많은 시민 과학 프로젝트들이 있었다. 그중 두 가지를 살펴보자.", isHighlight: true, logicPoint: 1 },
+
+          // Classifying Galaxies
+          { id: 5, text: "Classifying Galaxies", trans: "은하 분류하기" },
+          { id: 6, text: "Kevin Schawinski was a young astronomy researcher studying black holes and the evolution of galaxies at the University of Oxford.", trans: "Kevin Schawinski는 옥스퍼드 대학에서 블랙홀과 은하의 진화를 연구하는 젊은 천문학 연구원이었다." },
+          { id: 7, text: "This might sound exciting, but his job there was dull and time-consuming.", trans: "이것이 흥미롭게 들릴지도 모르지만, 그곳에서 그의 일은 따분하고 시간이 많이 걸리는 일이었다." },
+          { id: 8, text: "He had to classify around one million images of galaxies according to their shape.", trans: "그는 약 백만 장의 은하 이미지를 모양에 따라 분류해야 했다." },
+          { id: 9, text: "Since they all looked similar but were actually shaped slightly differently, the best way to do this was to sort them while looking at each one individually.", trans: "그것들은 모두 비슷해 보이지만 사실 모양이 조금씩 달랐기 때문에, 그것을 해내는 가장 좋은 방법은 하나하나를 개별적으로 보면서 분류하는 것이었다." },
+          { id: 10, text: "Of course, this would require a tremendous amount of time. It took Schawinski a whole week to classify just 50,000 galaxies.", trans: "물론, 이것은 엄청난 시간이 필요할 것이었다. Schawinski가 고작 5만 개의 은하를 분류하는 데 꼬박 일주일이 걸렸다." },
+          { id: 11, text: "He thought, \"But what about the remaining 950,000?\"", trans: "그는 '하지만 남아 있는 95만 개는 어쩌지?'라고 생각했다." },
+          { id: 12, text: "One evening after work, Schawinski met a friend named Chris Lintott and complained about the situation.", trans: "어느 날 퇴근 후 저녁, Schawinski는 Chris Lintott이라는 이름의 친구를 만나서 그 상황에 대해 불평했다." },
+          { id: 13, text: "Lintott suggested that he turn to the Internet to ask other people for help.", trans: "Lintott은 다른 사람들에게 도움을 요청하기 위해 인터넷에 의지할 것을 제안했다." },
+          { id: 14, text: "Eventually, the two men ended up launching a crowdsourced online project known as Galaxy Zoo.", trans: "결국, 그 두 남자는 Galaxy Zoo라고 알려진 대중을 참여시키는 온라인 프로젝트를 시작하게 되었다.", isHighlight: true, logicPoint: 2 },
+          { id: 15, text: "The website was kept as simple as possible, with a very basic design and an easy-to-use interface. This allowed those who wanted to participate to get started quickly.", trans: "그 웹사이트는 매우 기본적인 디자인과 사용하기 쉬운 인터페이스로 최대한 단순하게 유지되었다. 이것은 참여하기를 원하는 사람들이 빠르게 시작할 수 있게 했다." },
+          { id: 16, text: "New visitors were greeted with a brief tutorial that explained the project.", trans: "신규 방문자들은 프로젝트에 대해 설명하는 간단한 사용 지침과 함께 환영받았다." },
+          { id: 17, text: "Then they were shown an image of a galaxy and asked to click buttons that described its features. Is the galaxy smooth and rounded? Is its shape an oval or a spiral?", trans: "그런 다음 그들에게 은하 이미지가 보여졌고, 그것의 특징을 설명하는 버튼을 클릭하도록 요청받았다. 은하가 매끄럽고 둥근가? 그것의 모양은 타원형인가 아니면 나선형인가?" },
+          { id: 18, text: "After completion of the tutorial and a little bit of practice, the participants were able to classify galaxies effectively.", trans: "사용 지침의 완료와 약간의 연습 후에, 참가자들은 효과적으로 은하를 분류할 수 있었다." },
+          { id: 19, text: "It was online media that helped spread the word about Galaxy Zoo, bringing more and more participants to the website.", trans: "Galaxy Zoo에 대한 소문을 퍼뜨리는 데 도움을 준 것은 바로 온라인 미디어였고, 그 웹사이트에 점점 더 많은 참여자를 불러 모았다." },
+          { id: 20, text: "Shortly after the website was launched, nearly 70,000 classifications were being made per hour.", trans: "웹사이트가 개설된 지 얼마 지나지 않아, 시간당 약 7만 건의 분류가 이루어지고 있었다." },
+          { id: 21, text: "In a year and a half, more than 80,000 individuals participated, and they made more than 75 million classifications.", trans: "일년 반 만에, 8만 명 이상의 개인이 참여하였고, 그들은 7천5백만 건 이상의 분류를 해냈다." },
+          { id: 22, text: "If it had not been for those participants, Schawinski couldn't have classified that many images. In fact, it would have taken him decades on his own.", trans: "그 참여자들이 없었다면, Schawinski는 그렇게 많은 이미지를 분류할 수 없었을 것이다. 사실, 그 혼자서는 수십 년이 걸렸을 것이다.", isHighlight: true, logicPoint: 3 },
+          { id: 23, text: "More than 15 years have passed since the project first began in 2007.", trans: "그 프로젝트가 2007년에 처음 시작된 이래로 15년 이상이 지났다." },
+          { id: 24, text: "Galaxy Zoo has now grown into Zooniverse, which is one of the most popular platforms on the Internet for ordinary people who want to participate in science projects.", trans: "Galaxy Zoo는 이제 Zooniverse로 성장했는데, 이것은 과학 프로젝트에 참여하고 싶어 하는 일반인들을 위한 인터넷에서 가장 인기 있는 플랫폼 중 하나이다." },
+          { id: 25, text: "It is more active than ever before, with about 2 million registered users worldwide. It now offers a wide range of projects in astronomy, biology, physics, and more.", trans: "전 세계적으로 약 2백만 명의 등록된 사용자가 있는 그것은 그 어느 때보다 더 왕성하다. 현재 그것은 천문학, 생물학, 물리학 등에서 광범위한 프로젝트들을 제공하고 있다." },
+          { id: 26, text: "If you want to get involved, you should definitely check it out!", trans: "만약 당신이 참여하고 싶다면, 반드시 확인해 보아라!" },
+
+          // Chasing Steve
+          { id: 27, text: "Chasing Steve", trans: "Steve 추적하기" },
+          { id: 28, text: "In Alberta, Canada, there were some \"aurora chasers\" who formed an informal group online.", trans: "캐나다 앨버타주에는 온라인상에서 비공식 단체를 결성한 '오로라 추적자들'이 있었다." },
+          { id: 29, text: "They would leave their homes at night and try to get exceptional photographs of auroras. Then they would share them with the rest of the group.", trans: "그들은 밤에 집을 나서 특별한 오로라 사진을 찍으려고 하곤 했다. 그런 다음 그들은 단체의 나머지 사람들과 그것들을 공유하곤 했다." },
+          { id: 30, text: "In the summer of 2014, the group members began to notice something strange appearing in the night sky.", trans: "2014년 여름, 그 단체 구성원들은 밤하늘에 이상한 무언가가 나타나는 것을 알아채기 시작했다." },
+          { id: 31, text: "There were unusual ribbons of green and purple light, some of which seemed to stretch for thousands of kilometers.", trans: "녹색과 보라색의 특이한 빛의 띠가 있었는데, 그중 일부는 수천 킬로미터에 걸쳐 뻗어 있는 것처럼 보였다." },
+          { id: 32, text: "Sometimes they lasted for just a few minutes, while other times they remained in the sky for a whole hour.", trans: "그것들은 어떤 때에는 단 몇 분간 지속되었지만, 다른 때에는 한 시간 내내 하늘에 머무르기도 했다." },
+          { id: 33, text: "They were similar in appearance to auroras, yet they possessed some notably different features.", trans: "그것들은 오로라와 생김새가 비슷했지만, 몇 가지 현저하게 다른 특징들을 지니고 있었다." },
+          { id: 34, text: "Unsure of what they were, the group decided to name the phenomenon \"Steve,\" based on a scene from an animated movie where some characters give that name to an unfamiliar object.", trans: "그것들이 무엇인지 확신하지 못한 그 단체는 등장인물들이 낯선 물체에 Steve라는 이름을 붙이는 한 애니메이션 영화의 장면을 바탕으로 이 현상을 'Steve'라고 이름 짓기로 결정했다.", isHighlight: true, logicPoint: 4 },
+          { id: 35, text: "After photographing Steve for several years and discussing what it might be, the group members decided to get help from experts.", trans: "몇 년 동안 Steve의 사진을 찍고 그것이 무엇일지에 대해 논의한 후에, 그 단체 구성원들은 전문가들로부터 도움을 받기로 결정했다." },
+          { id: 36, text: "They showed their photos of Steve to a professor of astronomy at a local university and a scientist at NASA.", trans: "그들은 Steve의 사진들을 지역 대학의 천문학 교수와 NASA의 과학자에게 보여주었다." },
+          { id: 37, text: "Surprisingly, neither of them had any idea what Steve was.", trans: "놀랍게도, 둘 중 누구도 Steve가 무엇인지 전혀 알지 못했다." },
+          { id: 38, text: "They confirmed that it was not an aurora, but it did not resemble anything they had seen before. They realized that the group had discovered a new type of phenomenon that had never been properly studied.", trans: "그들은 그것이 오로라가 아니라는 것은 확인했지만, 그것은 그들이 이전에 보았던 어느 것과도 비슷하지 않았다. 그들은 그 단체가 제대로 연구된 적이 없는 새로운 유형의 현상을 발견했다는 것을 깨달았다." },
+          { id: 39, text: "In order to learn more about it, NASA funded a citizen science project involving the public. The project asked ordinary people to gather photos of Steve and send them to NASA. It is still in progress today.", trans: "이에 대해 더 자세히 알아보기 위해, NASA는 대중이 참여하는 시민 과학 프로젝트에 자금을 제공했다. 그 프로젝트는 일반인들에게 Steve의 사진을 모아서 NASA에 보내달라고 요청했다. 그것은 오늘날에도 여전히 진행 중이다." },
+          { id: 40, text: "In honor of the aurora chasers who first discovered the phenomenon, the name \"Steve\" has been kept.", trans: "이 현상을 처음 발견한 오로라 추적자들에게 경의를 표하여 'Steve'라는 이름은 유지되었다." },
+          { id: 41, text: "However, it is now written in all capital letters and stands for \"Strong Thermal Emission Velocity Enhancement.\"", trans: "그러나, 그것은 이제 모두 대문자로 쓰이며, '속도 증가에 따른 강한 열 방출'을 의미한다." },
+          { id: 42, text: "Experts have acknowledged that it is the dedicated members of the aurora chasers group that deserve the credit for discovering STEVE.", trans: "전문가들은 STEVE를 발견한 공로를 인정받아야 할 사람들은 바로 오로라 추적자 단체의 헌신적인 구성원들임을 인정했다." },
+          { id: 43, text: "If it had not been for them, it might have remained unnoticed forever.", trans: "만약 그들이 아니었다면, 그것은 영원히 알려지지 못한 상태로 남았을지도 모른다." },
+          { id: 44, text: "There are many interesting theories about STEVE, but none of them have been proven for certain. Scientists and citizens continue to collaborate to solve this mystery, and they are learning more and more about STEVE every day.", trans: "STEVE에 대한 흥미로운 이론들은 많지만, 그들 중 어느 것도 확실하게 증명된 것은 없다. 과학자들과 시민들은 이 수수께끼를 풀기 위해 계속 협력하며, 매일 STEVE에 대해 점점 더 많은 것을 알아가고 있다." },
+
+          // Conclusion
+          { id: 45, text: "Most of the individuals involved in these two projects are not professional scientists.", trans: "이 두 프로젝트에 참여한 대부분의 개인들은 전문 과학자가 아니다." },
+          { id: 46, text: "Instead, they are citizen scientists—ordinary people who desire to help advance science in areas that they are interested in.", trans: "대신, 그들은 시민 과학자들인데, 그들은 자신이 관심 있는 분야에서 과학의 발전을 돕고자 하는 평범한 사람들이다." },
+          { id: 47, text: "Even though citizen scientists may not have science degrees or long, white lab coats, they are still capable of making valuable contributions to science.", trans: "시민 과학자들에게 과학 학위나 길고 흰 가운은 없을 수 있지만, 그들은 여전히 과학에 귀중한 기여를 할 수 있다." },
+          { id: 48, text: "You can become one as well if you have curiosity and an interest in taking part in scientific research.", trans: "과학 연구에 참여하는 것에 대한 호기심과 관심이 있다면 당신도 시민 과학자가 될 수 있다." },
+          { id: 49, text: "The next great scientific achievement could be made by citizen scientists volunteering their time for the purpose of better understanding the world.", trans: "다음 위대한 과학적 업적은 세상을 더 잘 이해하기 위한 목적으로 자신의 시간을 자발적으로 제공하는 시민 과학자들에 의해 이루어질 수도 있다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "INTRODUCTION", desc: "과학에 대한 편견과 시민 과학의 대두", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-users-three text-xl mb-2"></i> },
+          { point: 2, title: "PROJECT 1: GALAXY ZOO", desc: "수많은 은하 이미지를 대중이 분류하는 크라우드소싱", color: "bg-emerald-100 border-emerald-400 text-emerald-800", icon: <i className="ph-fill ph-planet text-xl mb-2"></i> },
+          { point: 3, title: "EXPANSION: ZOONIVERSE", desc: "다양한 과학 분야로 확장된 거대 시민 플랫폼", color: "bg-green-100 border-green-400 text-green-800", icon: <i className="ph-fill ph-circles-three-plus text-xl mb-2"></i> },
+          { point: 4, title: "PROJECT 2: STEVE", desc: "오로라 추적자들이 발견한 미지의 대기 현상", color: "bg-teal-100 border-teal-400 text-teal-800", icon: <i className="ph-fill ph-camera text-xl mb-2"></i> },
+          { point: 5, title: "CONCLUSION", desc: "호기심을 가진 누구나 시민 과학자가 될 수 있다", color: "bg-cyan-100 border-cyan-400 text-cyan-800", icon: <i className="ph-fill ph-globe-hemisphere-east text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-emerald-700">
+                  <div className="mx-auto bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-emerald-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-emerald-600 font-bold mb-6 text-sm">Science Is for Everyone</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-emerald-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-emerald-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Science Is for Everyone</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">NE능률 영어II Lesson 2</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-emerald-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-emerald-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-emerald-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-emerald-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Science Is for Everyone</h1>
+                            <p className="text-emerald-300 text-xs">NE능률 Lesson 2</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-emerald-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Intro (시민 과학 프로젝트의 의의)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 4).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-emerald-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Project 1 (Galaxy Zoo와 Zooniverse)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(4, 26).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-emerald-50 border border-emerald-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-emerald-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-teal-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Project 2 (Chasing Steve)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(26, 44).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-teal-50 border border-teal-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-teal-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-cyan-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (누구나 될 수 있는 시민 과학자)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(44, 49).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-cyan-50 border border-cyan-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-emerald-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-cyan-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-emerald-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-emerald-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 전치사 + 관계대명사
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[04] There have been numerous citizen science projects <span className="font-bold text-emerald-700">in which</span> ordinary people have made contributions..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                관계대명사 앞의 전치사는 관계사절 안에서 목적어 역할을 했던 전치사가 앞으로 이동한 형태입니다. <strong className="text-emerald-900 print:text-black">전치사 + 관계대명사</strong> 뒤에는 완전한 구조의 절이 이어집니다[cite: 5].
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-green-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 가정법 과거완료
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[22] <span className="font-bold text-green-700">If it had not been for</span> those participants, Schawinski <span className="font-bold text-green-700">couldn't have classified</span> that many images."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="font-bold">과거 사실의 반대</strong>를 가정합니다. "만약 ~이 없었더라면"의 의미를 나타내는 표현으로 쓰였으며, 주절에는 조동사의 과거형 + have p.p. 형태가 옵니다[cite: 5].
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-teal-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 부분 부정과 전체 부정
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[37] Surprisingly, <span className="font-bold text-teal-700">neither of them</span> had any idea what Steve was."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-teal-900 print:text-black">neither</strong>는 둘 중 어느 쪽도 아님을 나타내는 전체 부정 대명사입니다. 교수와 과학자, 둘 다 Steve가 무엇인지 전혀 알지 못했다는 뜻입니다[cite: 5].
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-cyan-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. It is ~ that 강조 구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[42] ... <span className="font-bold text-cyan-700">it is</span> the dedicated members of the aurora chasers group <span className="font-bold text-cyan-700">that</span> deserve the credit..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                문장의 주어(the dedicated members...)를 강조하기 위해 <strong className="text-cyan-800 print:text-black">It is ~ that</strong> 사이에 넣었습니다. "공로를 인정받아야 할 사람들은 다름 아닌 바로 오로라 추적자 단체의 헌신적인 구성원들이다"라고 해석합니다[cite: 5].
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-emerald-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-emerald-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-emerald-900 border-b-2 border-emerald-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-emerald-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "Kevin Schawinski는 혼자서 백만 개의 은하 이미지를 일주일 만에 분류했다.", isCorrect: true },
+                                                { id: 2, text: "Galaxy Zoo 참가자들은 간단한 사용 지침을 읽고 은하의 특징을 분류했다." },
+                                                { id: 3, text: "오로라 추적자들은 전문가들이 모르는 새로운 형태의 현상을 발견했다." },
+                                                { id: 4, text: "시민 과학자가 되기 위해 반드시 과학 학위나 전문 가운이 필요한 것은 아니다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 10번 문장에서 Kevin Schawinski가 꼬박 일주일에 걸쳐 분류한 은하의 개수는 100만 개가 아니라 <strong className="font-bold">5만 개(50,000 galaxies)</strong>입니다[cite: 5].</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) There have been numerous citizen science projects <strong>[ which / in which ]</strong> ordinary people have made contributions...<br/><br/>
+                                                (B) If it <strong>[ has not been / had not been ]</strong> for those participants, Schawinski couldn't have classified that many images.<br/><br/>
+                                                (C) Experts have acknowledged that it is the dedicated members of the aurora chasers group <strong>[ what / that ]</strong> deserve the credit...
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) which —— (B) has not been —— (C) what" },
+                                                { id: 2, text: "(A) in which —— (B) had not been —— (C) that", isCorrect: true },
+                                                { id: 3, text: "(A) in which —— (B) has not been —— (C) that" },
+                                                { id: 4, text: "(A) which —— (B) had not been —— (C) what" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-emerald-400 hover:bg-emerald-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) 관계사 뒤에 완전한 구조의 절이 이어지므로 '전치사 + 관계대명사'인 in which가 알맞습니다.<br/>
+                                                (B) 과거 사실의 반대를 가정하는 가정법 과거완료이므로 If it had not been for가 적절합니다.<br/>
+                                                (C) 주어(the dedicated members)를 강조하는 It is ~ that 강조 구문이 쓰였습니다[cite: 5].
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-emerald-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
