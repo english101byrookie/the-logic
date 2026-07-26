@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - 천재 영어II Lesson 2</title>
+    
+    <meta name="theme-color" content="#be123c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #fff1f2; background-image: radial-gradient(#fecdd3 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #fb7185; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Intro
+          { id: 1, text: "You have probably received a notification from your smartphone telling you that it is time to exercise or move.", trans: "스마트폰에서 이제 운동하거나 움직일 시간이라는 알림을 받아 본 적이 있을 것이다." },
+          { id: 2, text: "These devices lead people to move by sending notifications when they have been inactive for a set amount of time.", trans: "이러한 기기는 사람이 일정 시간 동안 활동하지 않으면 알림을 보내서 움직이도록 이끈다." },
+          { id: 3, text: "You may not have realized it, but this is an example of a nudge.", trans: "여러분은 인식하지 못했을 수도 있겠지만, 이는 너지의 한 예이다." },
+          { id: 4, text: "A nudge is an intervention that gently guides individuals toward a desired action, without forbidding any options.", trans: "너지는 어떤 선택지도 금지하지 않으면서 원하는 행동으로 개인을 부드럽게 안내하는 개입이다." },
+          { id: 5, text: "For example, if a school wants to reduce the amount of sugary drinks that students consume, then making them less visible than bottled water counts as a nudge, while banning them altogether does not.", trans: "예를 들어, 학교가 학생들이 마시는 단 음료의 양을 줄이고 싶을 경우, 이를 생수보다 덜 눈에 띄게 배치하는 것은 너지에 해당하지만, 이를 완전히 금지하는 것은 너지가 아니다." },
+          { id: 6, text: "Having been studied in the domain of behavioral economics and marketing, nudging can be applied to inducing people to make better or ideal decisions.", trans: "행동경제학과 마케팅 분야에서 연구되어온 것으로, 너지는 사람들이 더 나은 또는 이상적인 결정을 내리도록 유도하는 데 적용될 수 있다." },
+          { id: 7, text: "Here are some ways nudges have succeeded in bringing about positive changes by tweaking people's choices.", trans: "여기 너지가 사람들의 선택을 조정하여 긍정적인 변화를 유발하는 데 성공한 몇 가지 방법이 있다.", isHighlight: true, logicPoint: 1 },
+
+          // Through Designs
+          { id: 8, text: "Through Designs", trans: "디자인 활용" },
+          { id: 9, text: "Changes in visual designs can markedly affect behaviors of people, especially on streets.", trans: "시각 디자인의 변화는 사람들의 행동에 뚜렷이 영향을 미칠 수 있는데, 길거리에서 특히 그렇다." },
+          { id: 10, text: "Two artists, mother and daughter, painted a 3D crosswalk on several roads in Ahmedabad, India.", trans: "모녀 사이인 두 예술가가 인도 아메다바드의 여러 도로에 3차원 횡단보도를 그렸다." },
+          { id: 11, text: "To motorists, the painted lines look like roadblocks, causing them to slow down without braking too suddenly.", trans: "이렇게 그려진 선들은 운전자들에게 노상 장애물처럼 보여 너무 급작스럽게 브레이크를 밟지 않고 속도를 줄이게 만들었다." },
+          { id: 12, text: "The scheme was also adopted in Delhi, India.", trans: "이 계획은 인도의 델리에서도 채택되었다." },
+          { id: 13, text: "This, in turn, inspired Ralf Trylla, an environmental commissioner in Iceland, to head a similar project.", trans: "이는 결국, 아이슬란드의 환경 위원 Ralf Trylla에게 영감을 주어 비슷한 사업을 이끌게 했다." },
+          { id: 14, text: "As a result, drivers were being more careful at intersections, which reduced accidents and elevated the safety of pedestrians.", trans: "그 결과, 운전자들은 교차로에서 더 조심하게 되었고, 사고가 줄어들면서 보행자의 안전은 향상되었다." },
+          { id: 15, text: "The idea has been well received and mirrored in cities of China, the U.S., Canada, and the UK as well.", trans: "이 아이디어는 중국, 미국, 캐나다, 영국의 여러 도시에서도 좋은 반응을 얻고 반영되었다." },
+          { id: 16, text: "Likewise, traffic engineers design pavement markings on the roads that drive people to change their behavior without realizing it.", trans: "마찬가지로, 교통 공학 전문가들은 사람들이 인식하지 못한 채 자신의 행동을 변화시키도록 하는 도로상의 노면 표시를 설계한다." },
+          { id: 17, text: "Chicago was one of the first U.S. cities to experiment with this idea.", trans: "시카고는 미국에서 이 아이디어를 가장 먼저 실험한 도시 중 하나였다." },
+          { id: 18, text: "In 2006, it painted a series of lines across the road ahead of a dangerous curve on North Lake Shore Drive.", trans: "2006년, 시카고는 North Lake Shore Drive의 위험한 커브 길 앞의 도로에 일련의 선들을 그렸다." },
+          { id: 19, text: "The lines are spaced in such a way that as the road nears the curve, the gaps between the lines get smaller and smaller.", trans: "선들은 도로가 커브 길에 가까워질수록 그 사이 간격이 점점 더 좁아지게 되어 있다." },
+          { id: 20, text: "This gives drivers approaching the curve an illusion that they are speeding up, which prompts them to step on the brakes.", trans: "이것은 커브 길에 접근하는 운전자들에게 속도를 내고 있다는 착각을 주고, 그것은 그들이 브레이크를 밟도록 유도한다." },
+          { id: 21, text: "Chicago traffic engineers reported a 36% reduction in crashes at the North Lake Shore Drive curve in the first six months after painting the lines.", trans: "시카고의 교통 공학 전문가들은 이 선들을 그린 후 첫 6개월 동안 North Lake Shore Drive의 커브 길에서 추돌 사고가 36% 감소했다고 보고했다." },
+          { id: 22, text: "Since then, the Chicago Department of Transportation has painted the gapped lines at similar curves.", trans: "그 후, 시카고 교통부는 유사한 커브 길에 간격을 둔 선들을 그렸다.", isHighlight: true, logicPoint: 2 },
+
+          // Through Peer Pressure
+          { id: 23, text: "Through Peer Pressure", trans: "동조 압력 활용" },
+          { id: 24, text: "If you are told what other people do, you might do it too, because you think it is probably a good idea to do what they do.", trans: "다른 사람들이 무엇을 하는지 듣게 되면, 여러분도 그들이 하는 것이 아마 좋은 생각일 것이라 여기기 때문에 똑같이 하게 될 수 있다." },
+          { id: 25, text: "And even if you aren't sure, you might not want to disobey social norms, so you will go along.", trans: "확신이 없더라도, 사회적 규범을 어기고 싶지 않기 때문에 따르게 된다." },
+          { id: 26, text: "Highlighting the right decisions of others can lead one to do the right thing.", trans: "타인의 올바른 결정을 강조하는 것은 개인이 올바른 행위를 하도록 이끌 수 있다." },
+          { id: 27, text: "While the sign saying \"Take your trash home or get a $100 fine.\" pushes people, the one saying \"Take your trash home. Other people do.\" nudges them.", trans: "\"쓰레기를 집으로 가져가지 않으면 100달러의 벌금을 부과합니다.\"라고 쓰인 표지판이 사람들을 압박하는 것이라면, \"쓰레기를 집으로 가져가세요. 다른 사람들은 그렇게 합니다.\"라고 되어 있는 표지판은 슬쩍 찌르는 것이다." },
+          { id: 28, text: "Many people feel compelled to match their behavior with that of the majority.", trans: "많은 사람들이 자신의 행동을 대다수의 행동에 맞출 것을 강요받는 기분을 느낀다." },
+          { id: 29, text: "The decision is theirs, but they have been nudged.", trans: "자신이 내린 결정이지만 사실은 살며시 영향을 받은 것이다." },
+          { id: 30, text: "However, nudging people into making good choices does not always go as planned.", trans: "하지만 너지로 사람들이 좋은 선택을 하도록 만드는 것이 반드시 계획대로 되지는 않는다." },
+          { id: 31, text: "For instance, in a study of household energy conservation, the researchers provided the residents with information about their neighbors' average energy use.", trans: "예를 들어 가정의 에너지 절약에 대한 연구에서 조사원들은 주민들에게 이웃들의 평균 에너지 사용량에 대한 정보를 제공했다." },
+          { id: 32, text: "As expected, those who had consumed more energy than the average reduced their use later, however, households with low levels of energy consumption increased their use after learning that their consumption had been lower than their neighbors'.", trans: "예상대로, 평균보다 더 많은 에너지를 소비한 가정은 이후 사용량을 줄였지만, 에너지 소비 정도가 낮은 가정은 이웃보다 소비량이 낮다는 것을 알고 나서 에너지 사용량을 늘렸다." },
+          { id: 33, text: "The researchers inferred that the lack of a reminder about the environmental benefits of saving energy could have caused the information to have an opposite effect.", trans: "조사원들은 에너지 절감의 환경 편익을 상기시키지 않은 것이 해당 정보의 역효과를 초래했다고 추론했다." },
+          { id: 34, text: "Later, they added a smiley face to the information sent to those who used less energy than the average, and found that it neutralized the opposite effect.", trans: "이후, 그들은 평균보다 에너지를 적게 쓰는 가정에게 보내는 정보에 웃는 얼굴 이모티콘을 추가했고, 그것이 그 역효과를 상쇄했음을 발견했다.", isHighlight: true, logicPoint: 3 },
+
+          // Through Defaults
+          { id: 35, text: "Through Defaults", trans: "디폴트 활용" },
+          { id: 36, text: "A default is defined as an option that applies if the chooser does nothing.", trans: "디폴트는 선택하는 사람이 아무것도 하지 않을 경우 적용되는 선택지라고 정의된다." },
+          { id: 37, text: "Of course, the chooser has the freedom to opt out of the default.", trans: "물론 선택하는 사람은 디폴트에서 빠져나올 자유가 있다." },
+          { id: 38, text: "Defaults are effective at nudging people toward more desirable behaviors.", trans: "디폴트는 사람들을 보다 바람직한 행동 쪽으로 유도하는 데 효과적이다." },
+          { id: 39, text: "Human beings are subject to a powerful desire to stick with what they already have because making a change requires a conscious effort.", trans: "인간은 이미 갖고 있는 것을 고수하려는 강력한 성향이 있는데, 변화하는 것은 의식적인 노력이 필요하기 때문이다." },
+          { id: 40, text: "Furthermore, because a default also gives the impression that someone is recommending this choice, if people choose to opt out, they might feel they are not being good citizens, particularly in the case of green defaults.", trans: "게다가 디폴트는 누군가가 해당 선택지를 추천한다는 인상을 주기 때문에, 특히 환경친화적 디폴트의 경우, 이와 다른 선택을 할 경우 올바른 시민처럼 행동하고 있지 않다고 느낄 수 있다." },
+          { id: 41, text: "Setting greener choices as defaults can automatically nudge people into more sustainable behaviors.", trans: "환경친화적 선택을 디폴트로 두는 것은 사람들을 보다 지속 가능한 행동으로 자연스럽게 이끌 수 있다." },
+          { id: 42, text: "In 2008, Rutgers University instituted a new student printing policy to save on paper waste: it established printing on both sides of paper as the default setting for all its printers.", trans: "2008년 Rutgers 대학은 종이 낭비를 줄이기 위해 새로운 학생 출력 정책을 시행했는데, 모든 출력 장치에서 양면 출력을 디폴트 설정으로 지정한 것이었다." },
+          { id: 43, text: "As a result of that simple change, the university saved about 62 million sheets of paper in about three years.", trans: "이 간단한 변화의 결과로 대학은 약 3년 동안 6천 2백만 장의 종이를 절약했다." },
+          { id: 44, text: "Nudging through defaults can also apply to a food delivery app.", trans: "디폴트를 활용한 너지는 음식 배달 앱에도 적용할 수 있다." },
+          { id: 45, text: "A company recently announced an update for its app where it would change the default settings for the optional items, such as forks, spoons, and straws.", trans: "최근 한 업체는 포크, 숟가락, 빨대와 같은 선택 품목의 디폴트 설정을 바꾸는 앱 업데이트를 발표했다." },
+          { id: 46, text: "Users would have to opt out of the default to get them.", trans: "이 품목들을 받으려면 사용자가 디폴트 설정을 변경해야 한다." },
+          { id: 47, text: "The company mentioned in an online post that having surveyed many of its customers, they found that more than 90% of them didn't really need disposable plastic items with their orders.", trans: "해당 업체는 많은 고객들을 상대로 설문 조사를 실시한 결과, 90% 이상이 주문할 때 실제로는 일회용 플라스틱 제품이 필요하지 않다고 한 것을 발견했다고 온라인 게시물을 통해 밝혔다.", isHighlight: true, logicPoint: 4 },
+
+          // Conclusion
+          { id: 48, text: "Are you interested in changing certain people's behavior?", trans: "사람들의 특정 행동을 변화시키는 데 관심이 있는가?" },
+          { id: 49, text: "Then why not nudge them in the right direction?", trans: "그렇다면 올바른 방향으로 이들을 넌지시 유도해 보는 것은 어떨까?" },
+          { id: 50, text: "There are many ways to subtly influence people to make better decisions.", trans: "사람들이 더 나은 결정을 내리도록 미묘하게 영향을 주는 방법은 많다." },
+          { id: 51, text: "As we are all choice architects every now and then, it pays to know how to set people on the right path.", trans: "우리 모두가 때때로 선택 설계자이기 때문에, 사람들을 올바른 길에 놓는 방법을 아는 것은 도움이 된다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "INTRODUCTION", desc: "선택을 강요하지 않는 부드러운 개입", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-hand-pointing text-xl mb-2"></i> },
+          { point: 2, title: "THROUGH DESIGNS", desc: "착시를 활용한 3D 횡단보도와 차선 간격 축소", color: "bg-rose-100 border-rose-400 text-rose-800", icon: <i className="ph-fill ph-paint-brush-broad text-xl mb-2"></i> },
+          { point: 3, title: "THROUGH PEER PRESSURE", desc: "다수의 행동 제시 및 이모티콘을 통한 역효과 상쇄", color: "bg-pink-100 border-pink-400 text-pink-800", icon: <i className="ph-fill ph-users text-xl mb-2"></i> },
+          { point: 4, title: "THROUGH DEFAULTS", desc: "초기 설정 변경을 통한 양면 인쇄 및 일회용품 절감", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-sliders text-xl mb-2"></i> },
+          { point: 5, title: "CONCLUSION", desc: "선택 설계자로서 타인을 올바른 길로 유도하는 지혜", color: "bg-stone-200 border-stone-500 text-stone-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-rose-700">
+                  <div className="mx-auto bg-rose-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-rose-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-rose-600 font-bold mb-6 text-sm">Nudging Toward a Better Society</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-rose-800 hover:bg-rose-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-rose-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-rose-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Nudging</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">천재 영어II Lesson 2</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-rose-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-rose-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-rose-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-rose-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Nudging</h1>
+                            <p className="text-rose-300 text-xs">천재 Lesson 2</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-rose-600 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Intro (너지의 개념과 적용)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 7).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-rose-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-rose-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Through Designs (디자인을 활용한 너지)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(7, 23).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-rose-50 border border-rose-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-rose-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-rose-900 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-pink-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Through Peer Pressure (동조 압력을 활용한 너지)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(23, 35).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-pink-50 border border-pink-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-rose-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-pink-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-red-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Through Defaults (디폴트를 활용한 너지)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(35, 48).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-red-50 border border-red-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-rose-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-red-900 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-stone-600 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (선택 설계자로서의 삶)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(48, 52).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-stone-100 border border-stone-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-rose-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-stone-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-rose-600 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-rose-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 완료 수동 분사구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[06] <span className="font-bold text-rose-700">Having been studied</span> in the domain of behavioral economics... nudging can be applied..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                주절의 시제(can be applied)보다 먼저 일어난 일을 나타내는 완료 분사구문(Having p.p.)에 수동의 의미(been p.p.)가 더해진 <strong className="text-rose-900 print:text-black">Having been p.p.</strong> 형태입니다. '과거부터 연구되어 오면서'로 해석합니다[cite: 10].
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-pink-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 불완전 타동사 (make)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[05] ... <span className="font-bold text-pink-700">making</span> them less <span className="font-bold text-pink-700">visible</span> than bottled water counts as a nudge..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                동명사 주어(making ~) 내에서 동사 <strong className="text-pink-900 print:text-black">make</strong>가 목적어(them) 뒤에 목적격 보어로 형용사(<strong className="text-pink-900 print:text-black">visible</strong>)를 취하는 5형식 불완전 타동사 구조입니다. '단 음료를 덜 눈에 띄게 만드는 것'으로 해석됩니다[cite: 10].
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-red-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 계속적 용법의 관계대명사
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[20] This gives drivers ... an illusion that they are speeding up<span className="font-bold text-red-700">, which</span> prompts them to step on the brakes."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤의 <strong className="text-red-900 print:text-black">which</strong>는 앞의 문장 일부나 전체 내용을 선행사로 받는 계속적 용법의 관계대명사입니다. 속도를 내고 있다는 착각, '그리고 그것은' 운전자들이 브레이크를 밟도록 유도한다는 의미를 더해줍니다[cite: 10].
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-stone-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 완료 분사구문
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[47] ... <span className="font-bold text-stone-700">having surveyed</span> many of its customers, they found that..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                주절의 동사(found)보다 이전에 일어난 사실을 나타내기 위해 <strong className="text-stone-800 print:text-black">having p.p.</strong> 형태의 완료 분사구문이 쓰였습니다. '설문 조사를 먼저 실시했고', 그 결과로 발견했다는 시간적 전후 관계를 명확히 해줍니다[cite: 10].
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-rose-600 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-rose-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-rose-900 border-b-2 border-rose-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-rose-600 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "학교에서 단 음료를 아예 판매 금지하는 것은 학생을 통제하는 매우 강력한 너지이다.", isCorrect: true },
+                                                { id: 2, text: "시카고의 도로에 커브에 가까워질수록 간격이 좁아지는 선을 그린 결과 추돌 사고가 감소했다." },
+                                                { id: 3, text: "이웃보다 에너지를 적게 쓴 가정에 이모티콘을 보낸 것은 에너지 사용을 늘리는 역효과를 상쇄하기 위함이었다." },
+                                                { id: 4, text: "배달 앱에서 일회용품을 제공하지 않는 것을 디폴트로 설정하면 플라스틱 사용을 줄일 수 있다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-rose-400 hover:bg-rose-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 1 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 1 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 5번 문장에서 단 음료를 눈에 덜 띄게 배치하는 것은 너지이지만, 이를 "완전히 금지하는 것은 너지가 아니다(while banning them altogether does not)"라고 명시되어 있습니다[cite: 10].</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) <strong>[ Have / Having ]</strong> been studied in the domain of behavioral economics, nudging can be applied...<br/><br/>
+                                                (B) This gives drivers ... an illusion that they are speeding up, <strong>[ what / which ]</strong> prompts them to step on the brakes.<br/><br/>
+                                                (C) The company mentioned ... that <strong>[ surveyed / having surveyed ]</strong> many of its customers, they found that...
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) Have —— (B) which —— (C) surveyed" },
+                                                { id: 2, text: "(A) Having —— (B) which —— (C) having surveyed", isCorrect: true },
+                                                { id: 3, text: "(A) Having —— (B) what —— (C) surveyed" },
+                                                { id: 4, text: "(A) Have —— (B) what —— (C) having surveyed" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-rose-400 hover:bg-rose-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) 주절의 주어를 꾸미며 주절 시제보다 이전 사실을 나타내는 완료 수동 분사구문이므로 Having이 적절합니다.<br/>
+                                                (B) 앞의 내용을 선행사로 받는 계속적 용법의 관계대명사 which가 맞습니다.<br/>
+                                                (C) 조사를 한 것이 발견한 것(found)보다 먼저 일어난 일이므로 완료 분사구문인 having surveyed가 적절합니다[cite: 10].
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-rose-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-rose-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-rose-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-rose-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
