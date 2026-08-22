@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE LOGIC Interactive - 천재 공통영어2 Lesson 2</title>
+    
+    <meta name="theme-color" content="#92400e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LOGIC App">
+    
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: white !important; }
+            ::-webkit-scrollbar { display: none; }
+            .print-show-all { display: block !important; }
+            .print-hide { display: none !important; }
+            .print-page-break { page-break-before: always; }
+        }
+        .bg-pattern { background-color: #fffbeb; background-image: radial-gradient(#fde68a 1px, transparent 1px); background-size: 20px 20px; }
+        .app-like { -webkit-user-select: none; user-select: none; }
+        .text-selectable { -webkit-user-select: text; user-select: text; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f8fafc; }
+        ::-webkit-scrollbar-thumb { background: #fcd34d; border-radius: 4px; }
+    </style>
+</head>
+<body class="app-like bg-slate-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const textData = [
+          // Intro
+          { id: 1, text: "At least one billion people, or 15% of the world's population, experience some form of disability.", trans: "최소 10억 명, 즉 세계 인구의 15%가 어떤 형태의 장애를 겪고 있다." },
+          { id: 2, text: "In order to fully function in everyday life, they need to have the same physical and social access to the places, goods, and services in their communities as everyone else.", trans: "일상생활에서 온전히 기능하기 위해, 그들은 다른 모든 사람들과 마찬가지로 지역 사회의 장소, 상품, 그리고 서비스에 대한 동일한 물리적, 사회적 접근성을 가질 필요가 있다." },
+          { id: 3, text: "For many of them, however, access still remains an issue.", trans: "그러나 그들 중 많은 이들에게 접근성은 여전히 문제로 남아 있다." },
+          { id: 4, text: "Here are two teenagers who presented new inventions to tackle the issue at an international science competition.", trans: "여기 국제 과학 대회에서 그 문제를 해결하기 위해 새로운 발명품을 제시한 두 명의 십 대들이 있다.", isHighlight: true, logicPoint: 1 },
+
+          // 3D Braille Map
+          { id: 5, text: "3D Braille Map", trans: "3D 점자 지도" },
+          { id: 6, text: "While thinking about her homework, Seoyoung Jun closed one eye and successfully picked up her pencil holder.", trans: "숙제에 대해 생각하던 중, 전서영은 한쪽 눈을 감고도 연필꽂이를 성공적으로 집어 들었다." },
+          { id: 7, text: "At that moment, she realized that orienting herself in a 3D space didn't require both eyes. This surprised her.", trans: "그 순간, 그녀는 3D 공간에서 자신의 위치를 파악하는 데 두 눈이 다 필요한 것은 아니라는 사실을 깨달았다. 이것은 그녀를 놀라게 했다." },
+          { id: 8, text: "With research, she learned that the brain can process 3D information without any vision at all.", trans: "연구를 통해, 그녀는 뇌가 시각이 전혀 없이도 3D 정보를 처리할 수 있다는 것을 알게 되었다." },
+          { id: 9, text: "And with that, the idea for a new device for people with visual disabilities was born.", trans: "그리고 그것으로, 시각 장애가 있는 사람들을 위한 새로운 기기에 대한 아이디어가 탄생했다.", isHighlight: true, logicPoint: 2 },
+          { id: 10, text: "Those who have lost sight get their spatial information mainly from touch, not vision.", trans: "시력을 잃은 사람들은 시각이 아닌 주로 촉각에서 공간 정보를 얻는다." },
+          { id: 11, text: "She based her new navigation device on this fact.", trans: "그녀는 이 사실에 기초하여 새로운 내비게이션 기기를 만들었다." },
+          { id: 12, text: "This little device sends a beam of infrared light to gather 3D information about what may lie around the user, including walls and furniture.", trans: "이 작은 기기는 벽과 가구를 포함하여 사용자 주변에 있을 수 있는 것에 대한 3D 정보를 수집하기 위해 적외선 광선을 보낸다." },
+          { id: 13, text: "The bounced beam conveys that information to the device, which then raises little pins to indicate where those obstacles are.", trans: "반사된 광선은 그 정보를 기기에 전달하고, 그러면 기기는 작은 핀들을 들어 올려 그 장애물들이 어디에 있는지 나타낸다." },
+          { id: 14, text: "By \"reading\" the positions and heights of those pins, the user can understand the arrangement of structures and objects lying ahead and navigate around them.", trans: "그 핀들의 위치와 높이를 '읽음'으로써, 사용자는 앞에 놓인 구조물과 물체의 배열을 이해하고 그 주변을 탐색할 수 있다." },
+          { id: 15, text: "The heart of this device is a 3D depth sensor connected to a small computer.", trans: "이 기기의 핵심은 소형 컴퓨터에 연결된 3D 심도 센서이다." },
+          { id: 16, text: "Seoyoung coded the computer to control the nine motors lined up in three rows of three so that each motor could move a pin up and down.", trans: "서영은 각 모터가 핀을 위아래로 움직일 수 있도록 3열로 3개씩 늘어선 9개의 모터를 제어하도록 컴퓨터를 코딩했다." },
+          { id: 17, text: "The sensor can scan eighteen blocks of space before it, each 0.06m² in size.", trans: "센서는 그 앞에 있는 각각 크기가 0.06m²인 18개의 공간 블록을 스캔할 수 있다." },
+          { id: 18, text: "When it detects an obstacle in any of these blocks, the corresponding pin rises to either the middle or high position, depending on the height of the obstacle.", trans: "이러한 블록들 중 어느 곳에서든 장애물을 감지하면, 장애물의 높이에 따라 해당하는 핀이 중간 또는 높은 위치로 솟아오른다." },
+          { id: 19, text: "By running your hand over the nine pins, you can tell where the obstacles are and how high they are.", trans: "9개의 핀 위로 손을 움직여보면, 장애물이 어디에 있고 얼마나 높은지 알 수 있다.", isHighlight: true, logicPoint: 3 },
+          { id: 20, text: "When Seoyoung's device worked for the first time, she didn't believe it.", trans: "서영의 기기가 처음으로 작동했을 때, 그녀는 그것을 믿지 않았다." },
+          { id: 21, text: "To be sure it wasn't a mistake, she shut it off and rebooted it. When it worked again, she started screaming with joy.", trans: "그것이 실수가 아님을 확실히 하기 위해, 그녀는 기기를 끄고 재부팅했다. 그것이 다시 작동했을 때, 그녀는 기쁨의 비명을 지르기 시작했다." },
+          { id: 22, text: "It had been seven long months of research, building, and testing.", trans: "그것은 연구, 제작, 테스트의 길고 긴 7개월이었다." },
+          { id: 23, text: "She imagines a future version that could be connected to a smartphone, with more pins and more height positions.", trans: "그녀는 더 많은 핀과 더 많은 높이 위치를 갖추고 스마트폰에 연결될 수 있는 미래 버전을 상상한다." },
+
+          // Sign Language-to-Speech App
+          { id: 24, text: "Sign Language-to-Speech App", trans: "수어 음성 번역 앱" },
+          { id: 25, text: "As a coder, Nand Vinchhi wanted to invent something that didn't require a mechanical device.", trans: "코더로서, Nand Vinchhi는 기계 장치를 필요로 하지 않는 무언가를 발명하고 싶었다." },
+          { id: 26, text: "One day, he was brainstorming with friends, and the group came up with an idea for an app that could translate sign language.", trans: "어느 날, 그는 친구들과 브레인스토밍을 하고 있었고, 그 그룹은 수어를 번역할 수 있는 앱에 대한 아이디어를 떠올렸다." },
+          { id: 27, text: "In the end, they decided not to develop it, but Nand couldn't stop thinking about the translator.", trans: "결국, 그들은 그것을 개발하지 않기로 결정했지만, Nand는 그 번역기에 대한 생각을 멈출 수 없었다." },
+          { id: 28, text: "In just a few months, he developed an app based on artificial intelligence for translating American Sign Language (ASL) in real time.", trans: "단 몇 달 만에, 그는 인공 지능을 기반으로 미국 수어(ASL)를 실시간으로 번역하는 앱을 개발했다." },
+          { id: 29, text: "Nand's app was basically a speech-to-text app for sign language, where hand movements corresponded to speech.", trans: "Nand의 앱은 기본적으로 손의 움직임이 음성에 해당하는 수어를 위한 음성 변환 앱이었다.", isHighlight: true, logicPoint: 4 },
+          { id: 30, text: "The hardest part was figuring out how to make the app recognize hand gestures.", trans: "가장 어려운 부분은 앱이 손짓을 인식하도록 만드는 방법을 알아내는 것이었다." },
+          { id: 31, text: "At times, he felt he was stuck. When that happened, he would go to sleep.", trans: "가끔, 그는 막혔다고 느꼈다. 그런 일이 일어났을 때, 그는 잠을 자러 가곤 했다." },
+          { id: 32, text: "For Nand, sleeping on it paid off.", trans: "Nand에게 하룻밤 자면서 생각하는 것은 결실을 맺었다." },
+          { id: 33, text: "He decided to focus on the body parts which are important in signing, such as individual fingertips.", trans: "그는 개별 손가락 끝과 같이 수어에서 중요한 신체 부위에 집중하기로 결정했다." },
+          { id: 34, text: "Using a machine-learning program, he then taught the app to identify those key points in the videos he took.", trans: "그런 다음 기계 학습 프로그램을 사용하여 촬영한 비디오에서 그 핵심 지점을 식별하도록 앱을 가르쳤다." },
+          { id: 35, text: "When the user runs the app, gestures are captured by the camera.", trans: "사용자가 앱을 실행하면 제스처가 카메라에 캡처된다." },
+          { id: 36, text: "Then, the app uses an algorithm to match the movements with words in ASL, which are turned into text and then spoken aloud.", trans: "그러면, 앱은 알고리즘을 사용하여 그 움직임을 ASL의 단어와 일치시키고, 그것들은 텍스트로 변환된 다음 큰 소리로 말해진다." },
+          { id: 37, text: "According to Nand, his system now translates signs with 90.4% accuracy, and the delay from signing to translation is only about three-tenths of a second.", trans: "Nand에 따르면, 그의 시스템은 이제 90.4%의 정확도로 수어를 번역하며, 수어에서 번역까지의 지연은 약 10분의 3초에 불과하다." },
+          { id: 38, text: "He imagines the technology could someday become part of existing communication platforms.", trans: "그는 그 기술이 언젠가 기존 커뮤니케이션 플랫폼의 일부가 될 수 있을 것이라고 상상한다." },
+          { id: 39, text: "That could help ASL speakers communicate with those who don't know the language.", trans: "그것은 ASL 사용자가 그 언어를 모르는 사람들과 의사소통하는 데 도움이 될 수 있다." },
+          
+          // Conclusion
+          { id: 40, text: "What these inventions have in common is a creative use of technology to enhance the daily lives of people with disabilities.", trans: "이러한 발명품들의 공통점은 장애인의 일상생활을 향상시키기 위한 기술의 창의적인 사용이다." },
+          { id: 41, text: "Their efforts will go a long way toward a more accessible world for all.", trans: "그들의 노력은 모두를 위해 더 접근하기 쉬운 세상을 향해 나아가는 데 큰 도움이 될 것이다.", isHighlight: true, logicPoint: 5 }
+        ];
+
+        const logicMapSteps = [
+          { point: 1, title: "THE ISSUE", desc: "장애인의 사회적/물리적 접근성 문제", color: "bg-slate-100 border-slate-400 text-slate-800", icon: <i className="ph-fill ph-wheelchair text-xl mb-2"></i> },
+          { point: 2, title: "INVENTION 1 (IDEA)", desc: "시각 외의 감각을 통한 3D 정보 처리 인식", color: "bg-amber-100 border-amber-400 text-amber-800", icon: <i className="ph-fill ph-lightbulb text-xl mb-2"></i> },
+          { point: 3, title: "INVENTION 1 (DEVICE)", desc: "적외선과 핀을 이용한 3D 점자 지도", color: "bg-orange-100 border-orange-400 text-orange-800", icon: <i className="ph-fill ph-map-pin text-xl mb-2"></i> },
+          { point: 4, title: "INVENTION 2 (APP)", desc: "머신러닝 기반 실시간 수어 번역 앱", color: "bg-red-100 border-red-400 text-red-800", icon: <i className="ph-fill ph-device-mobile-speaker text-xl mb-2"></i> },
+          { point: 5, title: "CONCLUSION", desc: "창의적 기술 활용을 통한 접근성 향상", color: "bg-stone-200 border-stone-400 text-stone-800", icon: <i className="ph-fill ph-globe-hemisphere-west text-xl mb-2"></i> }
+        ];
+
+        function App() {
+          const [isAuthenticated, setIsAuthenticated] = useState(false);
+          const [passwordInput, setPasswordInput] = useState("");
+          const [loginError, setLoginError] = useState("");
+          
+          const CORRECT_PASSWORD = "Made by Lee";
+          const itemRefs = useRef({});
+
+          const handleLoginSubmit = (e) => {
+            e.preventDefault();
+            if (passwordInput === CORRECT_PASSWORD) {
+              setIsAuthenticated(true);
+              setLoginError("");
+            } else {
+              setLoginError("올바르지 않은 암호입니다. 다시 확인해 주세요.");
+              setPasswordInput("");
+            }
+          };
+
+          const [activeTab, setActiveTab] = useState('text');
+          const [activeLogic, setActiveLogic] = useState(null);
+          
+          const handleLogicClick = (point) => {
+              setActiveLogic(activeLogic === point ? null : point);
+              setActiveTab('text'); 
+          };
+
+          useEffect(() => {
+              if (activeTab === 'text' && activeLogic !== null) {
+                  const targetItem = textData.find(item => item.logicPoint === activeLogic);
+                  if (targetItem && itemRefs.current[targetItem.id]) {
+                      setTimeout(() => {
+                          itemRefs.current[targetItem.id].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      }, 150);
+                  }
+              }
+          }, [activeLogic, activeTab]);
+
+          const [quiz1Answered, setQuiz1Answered] = useState(null);
+          const [quiz2Answered, setQuiz2Answered] = useState(null);
+
+          const handlePrint = () => { window.print(); };
+
+          if (!isAuthenticated) {
+            return (
+              <div className="min-h-screen bg-pattern flex items-center justify-center p-4">
+                <div className="bg-white p-8 md:p-10 rounded-2xl shadow-2xl max-w-md w-full text-center border-t-8 border-amber-700">
+                  <div className="mx-auto bg-amber-100 w-16 h-16 rounded-full flex items-center justify-center mb-6">
+                    <i className="ph-fill ph-lock-key text-3xl text-amber-700"></i>
+                  </div>
+                  <h2 className="text-2xl font-serif font-bold text-slate-800 mb-2">THE LOGIC INTERACTIVE</h2>
+                  <p className="text-amber-700 font-bold mb-6 text-sm">Tech for Improving Access</p>
+                  
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-6">
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      이 콘텐츠는 <strong>Lee 선생님</strong>이 기획하고 제작한<br/>교육용 창작물입니다. (무단 배포 금지)<br/>
+                      <span className="inline-block mt-2 font-medium text-slate-700">열람을 위해 선생님이 안내한 암호를 입력해 주세요.</span>
+                    </p>
+                  </div>
+
+                  <form onSubmit={handleLoginSubmit} className="flex flex-col gap-3">
+                    <input type="text" placeholder="접근 암호 (예: Made by Lee)" className="border border-slate-300 p-3 rounded-lg focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition-all text-center font-medium text-selectable" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} />
+                    {loginError && <p className="text-red-500 text-sm font-medium animate-pulse">{loginError}</p>}
+                    <button type="submit" className="bg-amber-800 hover:bg-amber-700 text-white font-bold py-3 rounded-lg transition-colors mt-2 shadow-md flex items-center justify-center gap-2">
+                      <i className="ph-bold ph-key"></i> 잠금 해제
+                    </button>
+                  </form>
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div className="flex h-screen overflow-hidden bg-slate-50 font-sans text-slate-800 print:h-auto print:bg-white">
+                <aside className="hidden md:flex flex-col w-72 bg-slate-900 text-white shadow-2xl z-20 print:hidden">
+                    <div className="p-6 bg-slate-800 border-b border-slate-700">
+                        <div className="flex items-center gap-2 mb-2 opacity-80">
+                            <i className="ph-fill ph-brain text-xl text-amber-400"></i>
+                            <span className="text-xs font-bold tracking-wider text-amber-300">THE LOGIC INTERACTIVE</span>
+                        </div>
+                        <h1 className="text-2xl font-serif font-bold leading-tight">Improving Access</h1>
+                        <p className="text-slate-400 text-sm mt-2 italic">천재 공통영어2 Lesson 2</p>
+                    </div>
+                    
+                    <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-2">Navigation</p>
+                        <button onClick={() => setActiveTab('text')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'text' ? 'bg-amber-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-book-open text-xl"></i> 1. 지문 분석
+                        </button>
+                        <button onClick={() => setActiveTab('syntax')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'syntax' ? 'bg-amber-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-highlighter-circle text-xl"></i> 2. 핵심 구문
+                        </button>
+                        <button onClick={() => setActiveTab('map')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'map' ? 'bg-amber-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-git-merge text-xl"></i> 3. 논리 구조도
+                        </button>
+                        <button onClick={() => setActiveTab('quiz')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-all ${activeTab === 'quiz' ? 'bg-amber-700 text-white font-bold shadow-md' : 'text-slate-300 hover:bg-slate-800'}`}>
+                            <i className="ph-fill ph-check-square-offset text-xl"></i> 4. 실전 문제
+                        </button>
+                    </nav>
+
+                    <div className="p-4 border-t border-slate-700">
+                        <button onClick={handlePrint} className="w-full flex items-center justify-center gap-2 bg-slate-700 hover:bg-slate-600 py-3 rounded-lg font-medium transition-colors">
+                            <i className="ph-bold ph-printer"></i> 전체 인쇄하기
+                        </button>
+                    </div>
+                </aside>
+
+                <main className="flex-1 overflow-y-auto print:overflow-visible relative pb-20 md:pb-0">
+                    <header className="md:hidden bg-slate-900 text-white p-4 sticky top-0 z-20 shadow-md print:hidden flex justify-between items-center">
+                        <div>
+                            <h1 className="text-xl font-serif font-bold">Improving Access</h1>
+                            <p className="text-amber-300 text-xs">천재 Lesson 2</p>
+                        </div>
+                        <button onClick={handlePrint} className="bg-slate-800 p-2 rounded-lg">
+                            <i className="ph-bold ph-printer text-lg"></i>
+                        </button>
+                    </header>
+
+                    <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-8 print:p-0 print:space-y-6">
+                        
+                        {/* ================= SECTION 1 ================= */}
+                        <section className={`print-show-all ${activeTab === 'text' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0 text-selectable">
+                                <h2 className="text-2xl font-bold text-amber-900 border-b-2 border-amber-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-book-open text-amber-700 print:text-black"></i> PART 1. Text Analysis
+                                </h2>
+                                
+                                <div className="space-y-10 print:space-y-6">
+                                    
+                                    <div>
+                                        <div className="inline-block bg-slate-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Intro (장애인의 접근성 문제와 발명품들)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(0, 4).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-slate-100 border border-slate-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-slate-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-amber-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ 3D Braille Map (시각장애인을 위한 3D 점자 지도)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(4, 23).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-amber-50 border border-amber-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-amber-900 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black print-page-break">
+                                        <div className="inline-block bg-orange-800 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Sign Language-to-Speech App (청각장애인을 위한 수어 번역 앱)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(23, 39).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-orange-50 border border-orange-200 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-orange-900 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="border-t border-dashed border-slate-300 pt-6 print:border-black">
+                                        <div className="inline-block bg-stone-700 text-white text-sm font-bold px-3 py-1 rounded mb-4 print:bg-slate-200 print:text-black print:border print:border-slate-800">▶ Conclusion (접근성 향상을 위한 기술의 창의적 활용)</div>
+                                        <div className="space-y-3 print:space-y-2">
+                                            {textData.slice(39, 41).map((item) => (
+                                                <div key={item.id} ref={el => itemRefs.current[item.id] = el} className={`p-3 rounded-lg transition-all duration-300 group cursor-pointer print:p-0 print:mb-2 ${activeLogic === item.logicPoint ? 'bg-stone-100 border border-stone-300 shadow-inner print:bg-transparent print:border-none print:shadow-none' : 'hover:bg-slate-50 border border-transparent print:border-none'}`}>
+                                                    <p className="text-lg leading-relaxed print:text-base print:text-black">
+                                                        <span className="font-bold text-amber-900 mr-2 text-sm print:text-black">[{item.id.toString().padStart(2, '0')}]</span>
+                                                        <span className={`${activeLogic === item.logicPoint ? 'font-bold text-stone-800 print:text-black print:underline print:underline-offset-4' : ''}`}>{item.text}</span>
+                                                    </p>
+                                                    <p className="text-sm text-slate-500 mt-2 ml-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300 print:hidden">{item.trans}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 2 ================= */}
+                        <section className={`print-show-all ${activeTab === 'syntax' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-amber-900 border-b-2 border-amber-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-highlighter-circle text-amber-700 print:text-black"></i> PART 2. Key Syntax
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 print:grid-cols-2 print:gap-6">
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-amber-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 01. 목적을 나타내는 표현 (In order to)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[02] <span className="font-bold text-amber-700">In order to fully function</span> in everyday life, they need to have the same physical and social access..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-amber-900 print:text-black">In order to + 동사원형</strong>은 "~하기 위하여"라는 목적을 분명하게 나타내는 구문입니다. 일상생활에서 온전히 기능하는 '목적'을 달성하기 위해 접근성이 필요함을 강조합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-orange-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 02. 관계부사 (where)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[29] ... a speech-to-text app for sign language, <span className="font-bold text-orange-700">where</span> hand movements corresponded to speech."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                콤마(,) 뒤의 계속적 용법으로 쓰인 관계부사 <strong className="text-orange-800 print:text-black">where</strong>는 앞의 app(앱)을 공간적/상황적 배경으로 받아, "그리고 그 앱에서 ~하다"라고 부연 설명을 더해줍니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none">
+                                        <div className="bg-red-700 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 03. 사역동사 (make)
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[30] ... figuring out how to <span className="font-bold text-red-700">make</span> the app <span className="font-bold text-red-700">recognize</span> hand gestures."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                사역동사 make는 목적어(the app) 뒤에 목적격 보어로 <strong className="text-red-900 print:text-black">동사원형(recognize)</strong>을 취하여 "앱이 손짓을 인식하게 만들다"라는 의미를 나타냅니다.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="border border-slate-200 rounded-xl overflow-hidden shadow-sm print:border-black print:rounded-none print:shadow-none md:col-span-2">
+                                        <div className="bg-stone-600 text-white font-bold px-4 py-2 print:bg-slate-200 print:text-black print:border-b print:border-black">
+                                            POINT 04. 관계대명사 What이 이끄는 명사절
+                                        </div>
+                                        <div className="p-4 bg-white">
+                                            <p className="text-sm text-slate-500 mb-2 italic print:text-black">"[40] <span className="font-bold text-stone-700">What these inventions have in common</span> is a creative use of technology..."</p>
+                                            <p className="text-slate-700 leading-relaxed print:text-black">
+                                                <strong className="text-stone-800 print:text-black">"~하는 것"</strong>으로 해석되는 관계대명사 What이 문장의 전체 주어 역할을 하는 명사절을 이끌고 있습니다. "이 발명품들이 공통으로 가지고 있는 것"이라는 뜻이 됩니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 3 ================= */}
+                        <section className={`print-show-all ${activeTab === 'map' ? 'block animate-fade-in' : 'hidden print:block print-page-break'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-amber-900 border-b-2 border-amber-100 pb-3 mb-8 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-git-merge text-amber-700 print:text-black"></i> PART 3. Logic Map
+                                </h2>
+                                
+                                <div className="flex flex-col items-center gap-2 py-4">
+                                    {logicMapSteps.map((step, idx) => (
+                                        <React.Fragment key={step.point}>
+                                            <div onClick={() => handleLogicClick(step.point)} className={`w-full max-w-md border-2 rounded-xl p-5 flex flex-col items-center text-center bg-white cursor-pointer hover:shadow-md transition-shadow print:border-slate-800 print:rounded-none print:text-black ${activeLogic === step.point ? 'ring-4 ring-amber-300 scale-105 transition-transform' : ''} ${step.color}`}>
+                                                <div className="print:hidden">{step.icon}</div>
+                                                <span className="font-bold text-base mb-1 print:text-black">{step.title}</span>
+                                                <span className="text-sm font-medium opacity-90 print:text-black">{step.desc}</span>
+                                                <span className="text-[10px] mt-2 opacity-50 print:hidden">(클릭하여 본문 확인)</span>
+                                            </div>
+                                            
+                                            {idx < logicMapSteps.length - 1 && (
+                                                <div className="flex flex-col items-center">
+                                                    <div className="w-0.5 h-8 bg-slate-300 print:bg-slate-800"></div>
+                                                    <i className="ph-bold ph-arrow-down text-lg text-slate-400 print:text-slate-800"></i>
+                                                </div>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* ================= SECTION 4 ================= */}
+                        <section className={`print-show-all ${activeTab === 'quiz' ? 'block animate-fade-in' : 'hidden print:block'}`}>
+                            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 print:shadow-none print:border-none print:p-0">
+                                <h2 className="text-2xl font-bold text-amber-900 border-b-2 border-amber-100 pb-3 mb-6 flex items-center gap-2 print:text-black print:border-black">
+                                    <i className="ph-fill ph-check-square-offset text-amber-700 print:text-black"></i> PART 4. Challenge
+                                </h2>
+                                
+                                <div className="space-y-12 print:space-y-8">
+                                    <div>
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q1. 내용 불일치 파악</p>
+                                            <p className="text-sm text-slate-600 print:text-black">본문의 내용과 일치하지 <u>않는</u> 것은?</p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "서영이는 3D 공간의 정보를 처리하는 데 시각이 전부 필요한 것은 아님을 깨달았다." },
+                                                { id: 2, text: "서영이가 고안한 기기는 초음파를 발사하여 사용자 주변의 장애물 위치를 파악한다.", isCorrect: true },
+                                                { id: 3, text: "Nand는 손가락 끝과 같은 주요 신체 부위에 초점을 맞춰 기계 학습으로 제스처를 식별하게 했다." },
+                                                { id: 4, text: "Nand의 시스템은 미국 수어(ASL)를 높은 정확도로 거의 실시간에 가깝게 번역해 낸다." }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz1Answered(choice.id)} disabled={quiz1Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz1Answered === null ? 'border-slate-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz1Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz1Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz1Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz1Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong> 본문 12번 문장에서 서영이가 고안한 기기는 초음파가 아니라 <strong className="font-bold">적외선(a beam of infrared light)</strong>을 보내 주변에 대한 3D 정보를 수집한다고 명시되어 있습니다[cite: 10].</p>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 pt-8 print:border-black print:pt-4">
+                                        <div className="bg-slate-50 border border-slate-200 p-5 rounded-lg mb-4 print:bg-white print:border-none print:p-0 print:mb-4">
+                                            <p className="font-bold text-slate-800 mb-2 print:text-black">Q2. 어법 판단</p>
+                                            <p className="text-sm text-slate-600 mb-4 print:text-black">다음 (A), (B), (C)의 각 네모 안에서 어법에 맞는 표현으로 가장 적절한 것은?</p>
+                                            <p className="text-md leading-relaxed bg-white p-4 border border-slate-200 rounded print:border-slate-400 print:rounded-none print:text-black">
+                                                (A) In order to fully <strong>[ function / functioning ]</strong> in everyday life, they need physical and social access.<br/><br/>
+                                                (B) The hardest part was figuring out how to make the app <strong>[ recognize / to recognize ]</strong> hand gestures.<br/><br/>
+                                                (C) <strong>[ What / That ]</strong> these inventions have in common is a creative use of technology.
+                                            </p>
+                                        </div>
+                                        <div className="space-y-2 print:space-y-3">
+                                            {[
+                                                { id: 1, text: "(A) functioning —— (B) to recognize —— (C) That" },
+                                                { id: 2, text: "(A) function —— (B) recognize —— (C) What", isCorrect: true },
+                                                { id: 3, text: "(A) function —— (B) to recognize —— (C) That" },
+                                                { id: 4, text: "(A) functioning —— (B) recognize —— (C) What" }
+                                            ].map((choice) => (
+                                                <button key={choice.id} onClick={() => setQuiz2Answered(choice.id)} disabled={quiz2Answered !== null}
+                                                    className={`w-full text-left p-4 rounded-lg border font-medium transition-all duration-200 print:border-none print:p-1 print:text-black
+                                                        ${quiz2Answered === null ? 'border-slate-200 hover:border-amber-400 hover:bg-amber-50' : 
+                                                        (choice.isCorrect ? 'border-green-500 bg-green-50 text-green-800 shadow-sm' : 
+                                                        (quiz2Answered === choice.id ? 'border-red-400 bg-red-50 text-red-600' : 'border-slate-100 text-slate-400 opacity-50'))}`}
+                                                >
+                                                    <span className="w-8 inline-block font-mono text-slate-500 print:text-black">{['①', '②', '③', '④'][choice.id - 1]}</span> {choice.text}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        {quiz2Answered !== null && (
+                                            <div className={`mt-4 p-4 rounded-lg text-sm leading-relaxed print:hidden ${quiz2Answered === 2 ? 'bg-green-50 text-green-900 border border-green-200' : 'bg-red-50 text-red-900 border border-red-200'}`}>
+                                                <p className="font-bold mb-1">{quiz2Answered === 2 ? '🎉 정답입니다!' : '오답입니다.'}</p>
+                                                <p><strong>해설:</strong><br/>
+                                                (A) 'In order to' 다음에는 동사원형인 function이 와야 합니다.<br/>
+                                                (B) 사역동사 make는 목적격 보어로 동사원형 recognize를 취합니다.<br/>
+                                                (C) '~하는 것'의 의미로 명사절의 주어 역할을 하는 관계대명사 What이 와야 합니다[cite: 10].
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </main>
+
+                <nav className="md:hidden fixed bottom-0 w-full bg-white border-t border-slate-200 flex justify-around p-2 pb-safe z-30 shadow-[0_-5px_10px_rgba(0,0,0,0.05)] print:hidden">
+                    <button onClick={() => setActiveTab('text')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'text' ? 'text-amber-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'text' ? 'ph-fill' : 'ph'} ph-book-open text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">지문 분석</span>
+                    </button>
+                    <button onClick={() => setActiveTab('syntax')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'syntax' ? 'text-amber-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'syntax' ? 'ph-fill' : 'ph'} ph-highlighter-circle text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">핵심 구문</span>
+                    </button>
+                    <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'map' ? 'text-amber-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'map' ? 'ph-fill' : 'ph'} ph-git-merge text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">논리 구조도</span>
+                    </button>
+                    <button onClick={() => setActiveTab('quiz')} className={`flex flex-col items-center p-2 min-w-[64px] transition-colors ${activeTab === 'quiz' ? 'text-amber-700' : 'text-slate-400 hover:text-slate-600'}`}>
+                        <i className={`${activeTab === 'quiz' ? 'ph-fill' : 'ph'} ph-check-square-offset text-2xl mb-1`}></i>
+                        <span className="text-[10px] font-bold">실전 문제</span>
+                    </button>
+                </nav>
+            </div>
+          );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
