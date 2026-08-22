@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Mosquito: The Worst Bug on the Planet? - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">공통영어2 천재(강상구) 1과</span>
+      <h1 class="header-title">The Mosquito: The Worst Bug on the Planet?</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish">영어 본문 텍스트 (줄바꿈 지원)</label>
+        <textarea id="inpPassageEnglish" class="form-textarea" style="min-height: 160px; font-family: 'Lora', Georgia, serif; font-size: 1.05rem;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpPassageKorean">한국어 전문 해석 (줄바꿈 지원)</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.95rem;"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "PART 1 THE NUISANCE", "title": "캠핑의 평화와 성가신 모기의 윙윙거림", "bullets": ["등산 후 캠핑 의자에서 편안한 휴식을 취하는 완벽한 순간", "평화를 깨뜨리는 성가시고 익숙한 모기의 윙윙거리는 소리(buzzing sound) 등장"], "english": "PART 1 THE NUISANCE\n\nYou are on a camping trip with your family or friends. After a long day of hiking, you take a quick shower, sit in your favorite camping chair, pick up a soda, and let out a deep, contented sigh. Right at that moment, you hear that annoying and familiar buzzing sound.", "korean": "1부 - 성가신 존재\n\n당신은 가족 또는 친구들과 캠핑 여행 중이다. 등산으로 긴 하루를 보낸 뒤, 간단히 샤워를 하고 당신이 제일 좋아하는 캠핑용 의자에 앉아 탄산음료를 집어 들고 깊고 흡족한 숨을 내쉰다. 바로 그때, 성가시고 익숙한 윙윙거리는 그 소리가 들린다.", "vocab": [{"word": "nuisance", "meaning": "성가신 존재, 골칫거리", "desc": "= annoyance, bother"}, {"word": "let out a sigh", "meaning": "한숨을 내쉬다", "desc": "let out a deep, contented sigh"}, {"word": "contented", "meaning": "만족해하는, 흡족한", "desc": "= satisfied, pleased"}, {"word": "buzzing sound", "meaning": "윙윙거리는 소리", "desc": "날갯짓으로 인한 소음"}], "nuance": [{"title": "현재 시제를 활용한 생생한 현장감 연출", "content": "You are ..., you take ..., sit ..., pick up ..., and let out... : 독자가 실제 캠핑 현장에 있는 것처럼 생생한 몰입감을 부여하는 묘사적 현재 시제."}, {"title": "지각동사 hear + 목적어 (you hear that annoying ... sound)", "content": "청각적 자극을 도입하여 평화로운 분위기에서 모기의 불쾌한 등장으로 극적 전환을 유도."}]}, {"id": 2, "section": "PART 1 THE NUISANCE", "title": "초당 600회 날갯짓, 흡혈과 가려운 혹의 메커니즘", "bullets": ["초당 600회 날갯짓으로 몰래 접근 $\\rightarrow$ 빨대 모양 주둥이로 피부를 뚫고 흡혈", "모기 타액(Saliva)에 대한 알레르기 반응으로 붉은 혹 발생 (긁을수록 더 가려움)"], "english": "Beating its wings as fast as 600 times per second, a mosquito sneaks in and pierces your skin with its straw-like mouthparts. Next, it fills its belly with blood and then escapes quickly, leaving behind an itchy red bump. This is a mild allergic reaction to the mosquito's saliva. The more you scratch the bump, the more it itches.", "korean": "초당 600번의 빠른 속도로 날갯짓을 하면서 모기가 몰래 들어와 빨대처럼 생긴 주둥이로 당신의 피부를 뚫는다. 그런 다음, 피로 배를 채우고는 재빨리 달아나며 가려운 빨간 혹을 남겨 둔다. 이것은 모기의 침에 대한 가벼운 알레르기 반응이다. 당신이 혹을 긁으면 긁을수록 그것은 더 가렵다.", "vocab": [{"word": "beat its wings", "meaning": "날갯짓을 하다", "desc": "초당 600회의 고속 진동"}, {"word": "sneak in", "meaning": "몰래 들어오다/스며들다", "desc": "은밀한 접근"}, {"word": "pierce", "meaning": "뚫다, 관통하다", "desc": "= penetrate, puncture"}, {"word": "saliva", "meaning": "침, 타액", "desc": "가려움을 유발하는 모기 분비물"}, {"word": "allergic reaction", "meaning": "알레르기 반응", "desc": "면역계의 과민 반응"}], "nuance": [{"title": "The + 비교급 ..., the + 비교급 ... (비례 구문)", "content": "• The more you scratch the bump, the more it itches.\n• 당신이 혹을 긁으면 긁을수록, 그것은 점점 더 가려워진다 (긁는 행위와 가려움의 비례적 악화 관계)."}, {"title": "분사구문 Beating its wings... / leaving behind...", "content": "• Beating its wings as fast as... : 동시 동작을 나타내는 분사구문 (= While it beats its wings...).\n• leaving behind an itchy red bump : 결과·연속 동작의 분사구문 (= and it leaves behind...)."}]}, {"id": 3, "section": "PART 1 THE NUISANCE", "title": "모기의 먹잇감 탐색 3대 단서: CO2, 땀의 화학물질, 체온", "bullets": ["호흡을 통해 배출되는 이산화탄소(CO2): 원거리 감지 핵심 유인 신호", "땀에 포함된 특정 화학물질 분비 및 상승된 체온 감지를 통해 목표물 특정"], "english": "But how do mosquitoes find their victims anyway? Carbon dioxide, which humans and other animals breathe out, is actually a key signal to mosquitoes that a nice meal is near. They are highly sensitive to CO2 and can detect it from far away. That's not the only cue they use to find their victims. When you sweat, you release certain chemicals that attract them. Moreover, they can easily notice that your body temperature has risen.", "korean": "그런데 모기는 대체 어떻게 먹잇감을 찾는 걸까? 이산화 탄소는 인간과 다른 동물들이 숨으로 내뿜는 것인데, 사실 모기에게는 좋은 먹을거리가 가까이 있다는 핵심적인 신호가 된다. 모기는 이산화 탄소에 아주 민감해서 멀리서도 이를 감지할 수 있다. 그것이 모기가 먹잇감을 찾는 데 이용하는 유일한 단서는 아니다. 당신이 땀을 흘리면 모기를 유인하는 특정한 화학 물질을 분비하게 된다. 게다가, 모기는 당신의 체온이 상승한 것을 쉽게 알아챌 수 있다.", "vocab": [{"word": "breathe out", "meaning": "(숨을) 내뿜다, 내쉬다", "desc": "= exhale (↔ breathe in: 들이쉬다)"}, {"word": "cue", "meaning": "단서, 신호", "desc": "= clue, signal, hint"}, {"word": "release", "meaning": "분비하다, 방출하다", "desc": "= emit, discharge"}, {"word": "sensitive to ~", "meaning": "~에 민감한/예민한", "desc": "감각의 예민도"}], "nuance": [{"title": "동격의 접속사 that (a key signal ... that a nice meal is near)", "content": "a key signal 뒤에 완전한 절을 이끌며 신호의 구체적 내용을 설명하는 동격의 접속사 that."}, {"title": "현재완료 시제 (that your body temperature has risen)", "content": "운동이나 활동으로 체온이 상승해 있는 '완료된 상태'를 알아차림을 나타냄 (rise는 자동사, raise는 타동사)."}]}, {"id": 4, "section": "PART 1 THE NUISANCE", "title": "암컷 모기가 흡혈하는 이유: 알 성숙 단백질과 중력 수분 배출", "bullets": ["흡혈 이유: 암컷 모기만 물며, 알 생산을 위한 필수 단백질 섭취 목적", "체중 3배 흡혈 후 수직 표면 착석 $\\rightarrow$ 중력으로 수분 배출 후 농축 혈액으로 약 200개 산란"], "english": "Why do they want our blood in the first place? It turns out that only females bite us; they need protein to produce eggs. If our blood did not contain protein, they would not bother us. After the mosquito successfully takes a blood meal of up to three times her own body weight, she quickly lands on the nearest vertical surface. With the aid of gravity, she drains off the water from the blood she took. Using this concentrated blood, she develops her eggs over the next few days. She then lays roughly 200 floating eggs on the surface of a small pool of water.", "korean": "우선 모기는 왜 우리의 혈액을 원하는 걸까? 사실은 암컷 모기만 우리를 무는데, 알을 낳기 위해 단백질이 필요하기 때문이다. 우리의 혈액이 단백질을 포함하고 있지 않다면, 그들은 우리를 귀찮게 하지 않을 것이다. 자기 체중의 최대 세 배에 달하는 혈액을 성공적으로 섭취하고 나면, 모기는 재빨리 가장 가까운 수직 표면에 앉는다. 중력의 도움을 받아, 모기는 자신이 취한 혈액에서 수분을 빼낸다. 이렇게 농축된 혈액을 사용해 모기는 그로부터 며칠간 알을 성숙시킨다. 그런 다음 작은 물웅덩이 표면에 물에 뜨는 약 200개의 알을 낳는다.", "vocab": [{"word": "in the first place", "meaning": "애초에, 우선", "desc": "근본적인 이유 질문"}, {"word": "bother", "meaning": "괴롭히다, 귀찮게 하다", "desc": "= annoy, trouble"}, {"word": "drain off ~", "meaning": "~을 빼내다/배출하다", "desc": "수분을 분리 배출함"}, {"word": "concentrated", "meaning": "농축된", "desc": "수분이 빠져 순수 영양분만 남은"}, {"word": "with the aid of ~", "meaning": "~의 도움을 받아", "desc": "= with the help of"}], "nuance": [{"title": "가정법 과거 구문 (현재 사실의 반대)", "content": "• If our blood [did not contain] protein, they [would not bother] us.\n• 만약 우리 혈액에 단백질이 없다면, 모기들은 우리를 귀찮게 하지 않을 것이다 (실제로는 혈액에 단백질이 풍부하여 흡혈한다는 사실을 반대로 가정)."}, {"title": "분사구문 Using this concentrated blood...", "content": "수단을 나타내는 분사구문 (= By using this concentrated blood...)."}]}, {"id": 5, "section": "PART 2 THE PREDATOR", "title": "지구상 최악의 포식자: 역사상 520억 명을 사망케 한 모기", "bullets": ["자연계 최대의 인간 포식자: 상어, 사자가 아닌 '모기' (말라리아, 황열 등 치명적 전염병 매개)", "역사학자 Timothy Winegard 추정: 인류 역사상 전체 사망자의 절반에 달하는 약 520억 명 희생"], "english": "PART 2 THE PREDATOR\n\nIf you had to choose our greatest predator in nature, which would you pick? Sharks, lions, or bears? According to history professor Timothy Winegard, it is actually the mosquito. Mosquitoes can pass on deadly diseases like malaria and yellow fever. Over a million people worldwide die of these diseases every year. Throughout history, Winegard estimates that mosquitoes have killed more people than any other single cause about fifty-two billion people, nearly half of all humans who have ever lived.", "korean": "2부 - 포식자\n\n자연에서 인간의 가장 강력한 포식자를 꼽으라면 당신은 무엇을 고르겠는가? 상어? 사자? 아니면, 곰일까? 역사학 교수 Timothy Winegard에 따르면, 그것은 사실 모기이다. 모기는 말라리아와 황열 같은 치명적인 질병을 옮길 수 있다. 매년 전 세계를 통틀어 백만 명이 넘는 사람들이 이런 질병으로 사망한다. Winegard는 모기가 역사상 다른 어느 단일 요인보다 더 많은 인간을 죽였다고 추정하는데, 이는 520억 명가량으로, 지금까지 존재했던 모든 인간의 거의 절반에 가깝다.", "vocab": [{"word": "predator", "meaning": "포식자, 육식 동물", "desc": "인간의 생명을 앗아가는 존재"}, {"word": "pass on ~", "meaning": "~을 전달하다/옮기다", "desc": "= transmit, spread"}, {"word": "deadly", "meaning": "치명적인", "desc": "= fatal, lethal"}, {"word": "estimate", "meaning": "추정하다, 어림잡다", "desc": "= calculate roughly"}, {"word": "single cause", "meaning": "단일 요인/원인", "desc": "독립된 사망 원인"}], "nuance": [{"title": "비교급을 이용한 최상급 표현 (more people than any other single cause)", "content": "• killed [more people than any other single cause]\n• '다른 어떤 단일 원인보다 더 많은 사람을 죽였다' $\\rightarrow$ 모기가 역사상 인류를 가장 많이 죽인 제1의 원인임을 강조 (any other + 단수명사 cause)."}, {"title": "who have ever lived (현재완료 경험)", "content": "지구상에 지금까지 살아온 모든 인류 전체(all humans)를 수식하는 관계대명사절."}]}, {"id": 6, "section": "PART 2 THE PREDATOR", "title": "역사를 바꾼 모기 1: 로마 제국의 습지와 말라리아 창궐", "bullets": ["서로마 제국의 몰락 원인: 외세 침략, 경제난, 부패뿐만 아니라 '말라리아' 창궐 기여", "로마 주변 거대 습지: 외세 침략 방어막 역할도 했으나, 결국 제국 전체로 질병 확산하여 인구 궤멸"], "english": "Winegard claims that mosquitoes also played a role in shaping the history of several countries. Take the Roman Empire, for example. The fall of the Western Roman Empire was gradual, spanning over centuries. Here are commonly cited reasons for the fall of the empire: invasions by outside forces, economic troubles, and corruption. Diseases like malaria, however, also contributed. Rome, the capital of the empire, was once surrounded by a huge stretch of wetland. This was an ideal breeding ground for mosquitoes and hence a hot spot for malaria. On the one hand, mosquitoes helped protect the city against the armies coming to attack it. However, they eventually spread the disease not only throughout the city, but also throughout the empire, crushing much of the population.", "korean": "Winegard는 모기가 여러 나라의 역사를 바꾸는 데에도 한몫을 했다고 주장한다. 로마 제국을 예로 들어보자. 서로마 제국의 몰락은 여러 세기에 걸쳐 서서히 일어났다. 제국의 몰락 이유로 흔히 드는 것이 외세의 침략, 경제적 문제, 부패이다. 그러나 말라리아와 같은 질병도 기여한 바가 있다. 이 제국의 수도였던 로마는 한때 길게 펼쳐진 습지로 둘러싸여 있었다. 이는 모기에게 이상적인 번식지였고, 따라서 말라리아의 창궐지였다. 한편으로 모기는 공격하러 오는 군대로부터 로마를 보호하는 데 도움이 되었다. 하지만, 그들은 결국 도시 전역은 물론 제국 전체에 질병을 퍼뜨려 인구의 상당수를 궤멸시켰다.", "vocab": [{"word": "play a role in -ing", "meaning": "~하는 데 역할을 하다", "desc": "역사 형성의 동인"}, {"word": "gradual", "meaning": "점진적인, 서서히 일어나는", "desc": "↔ sudden, abrupt"}, {"word": "span (동사)", "meaning": "(기간·범위에) 걸치다", "desc": "수세기에 걸친 몰락"}, {"word": "wetland", "meaning": "습지대", "desc": "모기의 이상적 서식지"}, {"word": "breeding ground", "meaning": "번식지, 온상", "desc": "개체 수가 급증하는 장소"}, {"word": "crush", "meaning": "짓밟다, 궤멸시키다", "desc": "인구를 극심하게 감소시킴"}], "nuance": [{"title": "not only A but also B (not only throughout the city, but also...)", "content": "도시 내부뿐만 아니라 제국 전체로 말라리아가 퍼져나간 범위를 전치사구 병렬로 강조."}, {"title": "분사구문 spanning over centuries / crushing much of the population", "content": "• spanning over centuries : 몰락의 기간을 부연 설명하는 분사구문.\n• crushing much of the population : 질병 확산의 참혹한 결과를 나타내는 결과 분사구문."}]}, {"id": 7, "section": "PART 2 THE PREDATOR", "title": "역사를 바꾼 모기 2: 스코틀랜드 다리엔 계획의 참담한 좌절", "bullets": ["1698년 스코틀랜드의 파나마 다리엔 식민지 개척 야심 (식량난 극복 및 무역 거점 구축)", "풍토병(황열·말라리아)에 대한 면역 부재로 6개월 만에 절반 사망 $\\rightarrow$ 식민지 포기 및 도주"], "english": "Here is another reason why Winegard considers the mosquito a powerful agent of historical change. In 1698, five ships set sail from Scotland, carrying twelve hundred settlers and valuable trade goods. They headed for the Darien region of Panama, where Scotland planned to create a trading center.\n\nAfter struggling through years of a food crisis, Scotland had hoped this would help raise its economic prospects. The ambitious plan, however, was brought down by the local diseases: yellow fever and malaria. Virtually no one from Scotland had ever encountered any of these diseases before. After six months, nearly half of them died, and the survivors returned to their ships and fled. If their immune systems had been much stronger, they would not have lost so many lives in such a short time.", "korean": "Winegard가 모기를 역사 변천의 강력한 동인이라 여기는 또 하나의 이유가 있다. 1698년, 다섯 척의 배가 1,200명의 정착민과 값진 교역 물자를 싣고 스코틀랜드를 떠나 항해를 시작했다. 이 배들은 파나마의 다리엔 유역으로 향했는데, 스코틀랜드는 그곳에 교역의 거점을 만들 계획이었다.\n\n수년간 식량난으로 고난을 겪고 난 뒤에, 스코틀랜드는 이를 통해 경제적 전망이 좋아지기를 바랐다. 그러나 그 야심찬 계획은 황열과 말라리아라는 풍토병으로 물거품이 되었다. 사실상 스코틀랜드에서 온 사람들 누구도 이전에 이런 질병을 접한 적이 없었다. 6개월 후 그들 중 거의 절반이 사망했고 생존자들은 배로 돌아가 달아났다. 그들의 면역계가 훨씬 더 강했다면 그렇게 짧은 시간에 그토록 많은 목숨을 잃지는 않았을 것이다.", "vocab": [{"word": "agent of change", "meaning": "변화의 동인/주체", "desc": "역사를 움직이는 원인"}, {"word": "set sail", "meaning": "출항하다, 항해를 시작하다", "desc": "배를 띄워 출발하다"}, {"word": "economic prospects", "meaning": "경제적 전망", "desc": "미래 번영 가능성"}, {"word": "bring down ~", "meaning": "~을 무너뜨리다/좌절시키다", "desc": "수동태: was brought down"}, {"word": "virtually", "meaning": "사실상, 거의", "desc": "= practically, nearly"}, {"word": "flee (과거 fled)", "meaning": "달아나다, 도망치다", "desc": "= escape, run away"}], "nuance": [{"title": "가정법 과거완료 구문 (과거 사실의 반대)", "content": "• If their immune systems [had been] much stronger, they [would not have lost] so many lives in such a short time.\n• 만약 그들의 면역 체계가 훨씬 더 강했더라면, 그렇게 짧은 시간에 그토록 많은 목숨을 잃지는 않았을 텐데 (실제로는 면역력이 전혀 없어 단기간에 궤멸당함)."}, {"title": "5형식 consider + O + O.C (명사 보어)", "content": "Winegard considers [the mosquito] [a powerful agent of historical change] (모기를 역사적 변화의 강력한 동인으로 간주하다)."}]}, {"id": 8, "section": "PART 2 THE PREDATOR", "title": "19세기 말의 발견과 자연계의 작용에서 자유로울 수 없는 인간 역사", "bullets": ["수천 년간 원인도 모른 채 사망 $\\rightarrow$ 19세기 말이 되어서야 모기가 말라리아 매개체임을 규명", "인간의 역사는 결코 자연계의 보이지 않는 작용(workings of nature)에서 자유로울 수 없음"], "english": "Surprisingly, human beings lived with and died of these diseases for thousands of years without understanding how they were spread. It was not until the end of the nineteenth century that we found out that mosquitoes spread malaria. Before this finding, no one imagined that these tiny annoying insects might be affecting our lives so deeply. Now we all know that human history is not free from the workings of the natural world.", "korean": "놀랍게도, 인간은 수천 년간 이들 질병과 함께 살고 그로 인해 죽으면서도 이들이 어떻게 퍼지는지는 알지 못했다. 우리가 모기가 말라리아를 퍼뜨린다는 것을 알게 된 것은 19세기 말이 되어서였다. 이 발견 이전에는 이런 작고 성가신 곤충들이 우리의 삶에 이렇게 깊게 영향을 주리라고는 아무도 상상하지 못했다. 이제 우리는 인간의 역사가 자연계의 작용에서 자유로울 수 없다는 것을 모두 알고 있다.", "vocab": [{"word": "without understanding ~", "meaning": "~을 이해하지 못한 채로", "desc": "전치사 without + 동명사"}, {"word": "workings", "meaning": "작용, 메커니즘, 움직임", "desc": "자연의 법칙과 상호작용"}, {"word": "be free from ~", "meaning": "~로부터 자유롭다/벗어나다", "desc": "is not free from: 결코 벗어날 수 없다"}], "nuance": [{"title": "It was not until ... that ~ 강조구문 (핵심 어법)", "content": "• It was not until [the end of the nineteenth century] that [we found out that mosquitoes spread malaria].\n• '19세기 말이 되어서야 비로소 모기가 말라리아를 퍼뜨린다는 것을 알게 되었다'.\n• 도치 전환: Not until the end of the nineteenth century did we find out that..."}, {"title": "human history is not free from the workings of the natural world (핵심 주제)", "content": "인간의 거대한 정치·경제·문명사조차 모기라는 미세한 자연 생명체의 생태적 작용에 깊숙이 영향받고 있음을 총괄하는 결론적 주제문."}]}];
+    const STORAGE_KEY = 'lesson1_chunjae_mosquito_master_v1';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      if (!vocabList || vocabList.length === 0) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+
+      // Collect search terms
+      const termMap = new Map();
+      vocabList.forEach(v => {
+        if (!v.word) return;
+        const clean = v.word.replace(/[~+()]/g, '').replace(/\b(동사|명사|형용사|부사|전치사)\b/g, '').trim();
+        if (clean.length >= 2) {
+          termMap.set(clean.toLowerCase(), clean);
+        }
+      });
+
+      if (termMap.size === 0) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+
+      // Sort by length descending
+      const terms = Array.from(termMap.values()).sort((a, b) => b.length - a.length);
+      const patternParts = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      
+      try {
+        const re = new RegExp('\\b(' + patternParts.join('|') + ')\\b', 'gi');
+        const highlighted = rawEnglish.replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+        return `<p>${highlighted.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      } catch(err) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "lesson1_chunjae_mosquito_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>
