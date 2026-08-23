@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2024학년도 9월 고2 전국연합학력평가 영어 (20~24번 · 29~42번) - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">2024 9월 고2 학평 영어</span>
+      <h1 class="header-title">2024학년도 9월 고2 전국연합학력평가 영어 (20~24번 · 29~42번)</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish">영어 본문 텍스트 (줄바꿈 지원)</label>
+        <textarea id="inpPassageEnglish" class="form-textarea" style="min-height: 160px; font-family: 'Lora', Georgia, serif; font-size: 1.05rem;"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpPassageKorean">한국어 전문 해석 (줄바꿈 지원)</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.95rem;"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 20, "section": "20번 [필자의 주장]", "title": "의지의 힘으로 통제 가능한 감정으로서의 걱정 극복법", "bullets": ["아이들은 걱정을 통제 불가능한 삶의 사실(A fact of life)로 오해하여 멈추려 시도조차 안 함", "걱정은 죄책감·두려움과 같은 단순한 감정일 뿐이며 의지의 힘(Power of will)으로 없앨 수 있음을 교육해야 함"], "english": "Merely convincing your children that worry is senseless and that they would be more content if they didn't worry isn't going to stop them from worrying. For some reason, young people seem to believe that worry is a fact of life over which they have little or no control. Consequently, they don't even try to stop. Therefore, you need to convince them that worry, like guilt and fear, is nothing more than an emotion, and like all emotions, is subject to the power of the will. Tell them that they can eliminate worry from their lives by simply refusing to attend to it. Explain to them that if they refuse to act worried regardless of how they feel, they will eventually stop feeling worried and will begin to experience the contentment that accompanies a worry-free life.", "korean": "걱정은 의미 없고 그들이 걱정하지 않는다면 더 만족할 것이라고 여러분의 아이들을 설득하는 것만으로는 그들이 걱정하는 것을 멈추게 하지 않을 것이다. 어떤 이유로, 아이들은 걱정이 자신이 거의 통제할 수 없거나 아예 통제할 수 없는 삶의 사실이라고 믿는 것 같다. 결과적으로, 그들은 멈추려고 노력하지도 않는다. 따라서, 여러분은 걱정이 죄책감과 두려움처럼 감정에 지나지 않고, 모든 감정과 같이 의지의 힘에 영향을 받기 쉽다고 그들을 설득할 필요가 있다. 아이들에게 단순히 걱정에 주의를 기울이려 하지 않음으로써 그들이 자신의 삶으로부터 걱정을 없앨 수 있다는 것을 알려주어라. 아이들에게 그들이 어떻게 느끼는지와 상관없이 걱정하며 행동하는 것을 거부한다면, 그들은 결국 걱정하는 것을 멈추고 걱정 없는 삶을 수반하는 만족감을 경험하기 시작할 것이라고 설명하라.", "vocab": [{"word": "a fact of life", "meaning": "어쩔 수 없이 받아들여야 하는 삶의 현실", "desc": "통제 불가하다는 오해"}, {"word": "be subject to ~", "meaning": "~의 영향/지배를 받기 쉬운, ~에 종속된", "desc": "의지의 힘에 영향받음"}, {"word": "attend to ~", "meaning": "~에 주의를 기울이다/신경 쓰다", "desc": "refusing to attend to it"}, {"word": "contentment", "meaning": "만족감, 안락함", "desc": "걱정 없는 삶의 보상"}], "nuance": [{"title": "be subject to 의 3대 문맥 의미", "content": "1. (영향/비판을) 받기 쉬운 (*subject to criticism/power of the will*)\n2. (규칙/절차의) 적용을 받는 (*subject to inspection*)\n3. ~을 조건으로 하는 (*subject to change*)"}]}, {"id": 21, "section": "21번 [함축의미 추론]", "title": "창의적 기업의 변화 극대화와 유연한 조직 운영 (Build a jazz band instead)", "bullets": ["정보화 시대: 산업화 시대의 '오류 방지와 반복성' 대신 '창의성, 속도, 변화 극대화(Variation)'가 핵심", "\"Build a jazz band instead\": 지휘자와 악보에 얽매인 교향악단(경직된 규칙)을 버리고, 즉흥성과 자율적 변화를 장려할 것"], "english": "In today's information age, in many companies and on many teams, the objective is no longer error prevention and replicability. On the contrary, it's creativity, speed, and keenness. In the industrial era, the goal was to minimize variation. But in creative companies today, maximizing variation is more essential. In these situations, the biggest risk isn't making a mistake or losing consistency; it's failing to attract top talent, to invent new products, or to change direction quickly when the environment shifts. Consistency and repeatability are more likely to suppress fresh thinking than to bring your company profit. A lot of little mistakes, while sometimes painful, help the organization learn quickly and are a critical part of the innovation cycle. In these situations, rules and process are no longer the best answer. A symphony isn't what you're going for. Leave the conductor and the sheet music behind. Build a jazz band instead.", "korean": "오늘날 정보화 시대에는, 많은 기업과 팀에서 목표는 더 이상 오류 방지와 반복 가능성이 아니다. 반대로, 그것은 창의성, 속도 그리고 명민함이다. 산업화 시대에서, 목표는 변화를 최소화하는 것이었다. 그런데 오늘날의 창의적 기업에서는 변화를 극대화하는 것이 더 필수적이다. 이러한 상황에서, 가장 큰 위험은 실수를 하거나 일관성을 잃는 것이 아니라, 가장 재능 있는 사람을 끌어들이는 것, 새로운 제품을 만드는 것, 혹은 상황이 변할 때 방향을 빠르게 바꾸는 것에 실패하는 것이다. 일관성과 반복 가능성은 여러분의 회사에 이익을 가져오기보다 새로운 생각을 짓누를 가능성이 더 높다. 많은 작은 실수는 때때로 고통스럽지만, 조직이 빠르게 배우는 것을 돕고 혁신 주기의 중요한 부분이다. 이러한 상황에서, 규칙과 과정은 더 이상 최선의 답이 아니다. 교향악단은 여러분이 추구하는 것이 아니다. 지휘자와 악보는 내버려 두어라. 대신 재즈 밴드를 구성하라.", "vocab": [{"word": "foster variation", "meaning": "조직 내 다양성/변화를 장려·조성하다", "desc": "함축 의미: Build a jazz band"}, {"word": "replicability", "meaning": "재현성, 복제 가능성", "desc": "동일 결과 반복 성질"}, {"word": "keenness", "meaning": "명민함, 예리함, 통찰력", "desc": "= sharpness, acuteness"}, {"word": "go for ~", "meaning": "~을 목표로 하다/추구하다", "desc": "A symphony isn't what you're going for"}], "nuance": [{"title": "교향악단(Symphony) vs 재즈 밴드(Jazz Band)", "content": "• 교향악단 : 지휘자의 통제와 악보(엄격한 프로세스)에 따라 한 치의 오차도 없이 연주.\n• 재즈 밴드 : 정해진 악보 없이 상호작용과 즉흥 연주로 유연하게 혁신(Foster variation)을 창출."}]}, {"id": 22, "section": "22번 [글의 요지]", "title": "위기 및 재난 상황에서 확인되지 않은 소문을 전달하려는 인간의 경향", "bullets": ["위협적 상황 시 소통 중요성 증대로 사회적 장벽이 낮아져 낯선 이와도 대화 시작", "공신력 있는 정보 출처 부재 시, 자신이 속한 집단을 보호하려는 본능으로 검증 안 된 소문을 급속히 전파함"], "english": "Any new or threatening situation may require us to make decisions and this requires information. So important is communication during a disaster that normal social barriers are often lowered. We will talk to strangers in a way we would never consider normally. Even relatively low grade disruption of our life such as a fire drill or a very late train seems to give us the permission to break normal etiquette and talk to strangers. The more important an event to a particular public, the more detailed and urgent the requirement for news becomes. Without an authoritative source of facts, whether that is a newspaper or trusted broadcast station, rumours often run riot. Rumours start because people believe their group to be in danger and so, although the rumour is unproven, feel they should pass it on. For example, if a worker heard that their employer's business was doing badly and people were going to be made redundant, they would pass that information on to colleagues.", "korean": "어떤 새롭거나 긴박한 상황은 우리가 결정을 내리도록 하고 이것은 정보를 요한다. 재난 상황 중에는 소통이 매우 중요해서 보통의 사회적 장벽이 자주 낮아진다. 우리는 평상시에는 전혀 고려하지 않을 방식으로 낯선 사람에게 말을 걸 것이다. 소방 훈련이나 매우 연착된 기차와 같은 우리 삶에서의 비교적 낮은 수준의 혼란조차도 보통의 에티켓을 어기고 낯선 사람에게 말을 거는 것을 허용해 주는 것처럼 보인다. 어떠한 사건이 특정 사람들에게 중요할수록, 소식에 대한 요구가 더 상세하고 긴박해진다. 그것이 신문이든 신뢰할 만한 방송국이든, 사실에 대한 공신력 있는 출처 없이, 소문은 자주 제멋대로 뻗어 나간다. 소문은 사람들이 자신이 속한 집단이 위험에 처해 있다고 믿어서, 입증되지 않은 소문임에도 불구하고, 이를 전달해야 한다고 생각하기 때문에 시작된다. 예를 들어, 한 근로자가 그의 고용주의 사업이 잘 안되어서 사람들이 해고될 것이라고 들으면, 그들은 그 정보를 동료들에게 전달할 것이다.", "vocab": [{"word": "redundant", "meaning": "(인력 과잉으로) 정리해고된 / 중복된", "desc": "be made redundant: 해고되다"}, {"word": "authoritative", "meaning": "공신력 있는, 권위 있는", "desc": "cf. authoritarian: 독재적인"}, {"word": "run riot", "meaning": "제멋대로 날뛰다/걷잡을 수 없이 퍼지다", "desc": "= run wild"}, {"word": "disruption", "meaning": "혼란, 중단, 교란", "desc": "일상 질서의 파괴"}], "nuance": [{"title": "형용사 보어 도치 (So important is communication...)", "content": "• 원문: [So important] is [communication during a disaster] that normal social barriers are lowered.\n• 소통의 중요성을 강조하기 위해 So important 보어가 문두로 도치됨."}]}, {"id": 23, "section": "23번 [글의 주제]", "title": "과학이 문화적 맥락으로부터 자유로운가에 대한 상반된 시각", "bullets": ["예술과 달리 과학의 본질에 대한 양대 관점: 역사·문화적 맥락의 산물 vs 가치와 분리된 순전한 '객관적 사실'의 추구", "홀데인(시대와 장소의 역사적 활동) vs 레이시(인간 경험과 무관하게 존재하는 객관적 질서 탐구)"], "english": "People seem to recognize that the arts are cultural activities that draw on (or react against) certain cultural traditions, certain shared understanding, and certain values and ideas that are characteristic of the time and place in which the art is created. In the case of science, however, opinions differ. Some scientists, like the great biologist J. B. S. Haldane, see science in a similar light as a historical activity that occurs in a particular time and place, and that needs to be understood within that context. Others, however, see science as a purely \"objective\" pursuit, uninfluenced by the cultural viewpoint and values of those who create it. In describing this view of science, philosopher Hugh Lacey speaks of the belief that there is an underlying order of the world which is simply there to be discovered—the world of pure \"fact\" stripped of any link with value. The aim of science according to this view is to represent this world of pure \"fact\", independently of any relationship it might bear contingently to human practices and experiences.", "korean": "사람들은 예술을 예술이 만들어진 시기와 장소에 특유한 특정 문화적 전통, 특정 공유 지식, 그리고 특정 가치와 아이디어에 기반한(또는 이에 반하는) 문화적 활동이라고 인식하는 것 같다. 하지만 과학의 경우에는 의견이 갈린다. 위대한 생물학자 J. B. S. Haldane과 같은 일부 과학자들은 유사한 관점에서 과학을 보는데, 특정한 시기와 장소에서 발생하고 그 맥락 안에서 이해될 필요가 있는 역사적 활동으로 보는 것이다. 하지만 다른 사람들은 과학을 그것을 만들어 내는 사람들의 문화적 관점과 가치에 의해 영향을 받지 않는 순전히 '객관적인' 일로 본다. 과학에 대한 이러한 관점을 묘사할 때, 철학자 Hugh Lacey는 단순히 거기에 있어서 발견되는 세계의 근원적인 질서가 있다는 믿음에 대해 말하는데, 이것은 가치와 어떠한 연관도 없는 순전한 '사실'의 세계이다. 이러한 관점에 따라 과학의 목적은 이러한 순전한 '사실'의 세계를 나타내는 것인데, 그것이 인간의 관습 및 경험과 혹여라도 맺을 수 있는 어떠한 관계와도 무관하게 말이다.", "vocab": [{"word": "draw on ~", "meaning": "~을 원천으로 삼아 이용하다", "desc": "문화적 전통 활용"}, {"word": "in a ... light", "meaning": "~한 시각/관점으로", "desc": "see science in a similar light"}, {"word": "be there to be discovered", "meaning": "이미 존재하여 발견되기를 기다리다", "desc": "객관적 실재관"}, {"word": "strip A of B", "meaning": "A에게서 B를 완전히 박탈/제거하다", "desc": "stripped of any link with value"}, {"word": "contingently", "meaning": "혹여라도, 우연히, 상황에 따라", "desc": "가변적/조건부 관계"}], "nuance": [{"title": "주제: views on whether science is free from cultural context or not", "content": "과학을 인간 문화와 가치로부터 독립된 순수한 객관적 사실 체계로 볼 것인가, 아니면 역사적·문화적 맥락의 산물로 볼 것인가에 대한 대립."}]}, {"id": 24, "section": "24번 [글의 제목]", "title": "연령 기준에 따른 일률적 법적 책임 설정의 타당성에 대한 의문", "bullets": ["정신적 발달은 사회적 규범 내면화 과정이나, 개인마다 발달 속도와 환경이 제각각 다름", "덴마크 형사 책임 연령 15세, 투표권 18세처럼 일률적인 나이 경계선을 긋는 것은 다소 의문스러운 관행임"], "english": "Mental development consists of individuals increasingly mastering social codes and signals themselves, which they can master only in social situations with the support of more competent individuals, typically adults. In this sense, mental development consists of internalizing social patterns and gradually becoming a responsible actor among other responsible actors. In Denmark, the age of criminal responsibility is 15 years, which means that we then say that people have developed sufficient mental maturity to be accountable for their actions at this point. And at the age of 18 people are given the right to vote and are thereby formally included in the basic democratic process. I do not know whether these age boundaries are optimal, but it is clear that mental development takes place at different rates for different individuals, and depends especially on the social and family environment they have been given. Therefore, having formal limits for responsibility from a specific age that apply to everyone is a somewhat questionable practice. But the question, of course, is whether it can be done any differently.", "korean": "정신적 발달은 개인들이 점점 더 사회적 규범과 신호를 스스로 습득하는 것으로 이루어지는데, 그들은 더 유능한 개인들, 일반적으로 성인들의 도움을 받는 사회적 상황에서만 이를 습득할 수 있다. 이러한 의미에서 정신적 발달은 사회적 양식을 내면화하고 다른 책임 있는 행위자들 사이에서 점차 책임 있는 행위자가 되는 것으로 이루어진다. 덴마크에서 형사 책임 연령은 15세인데, 이는 그러면 우리가 사람들이 이 시점에서 자신의 행위에 책임을 지기에 충분한 정신적 성숙을 발현했다고 말할 수 있음을 의미한다. 그리고 18세에 사람들은 투표권을 받고, 그것에 의해 기본적인 민주적 과정에 공식적으로 포함된다. 나는 이러한 연령 경계가 최적인지는 모르겠지만, 정신적 발달이 다른 개인에게 다른 속도로 일어나고, 특히 그들에게 주어져 있는 사회적 환경과 가정 환경에 따라 달라진다는 것은 분명하다. 따라서 특정 연령부터 모든 사람에게 적용되는 책임에 대한 공식적인 제한을 두는 것은 다소 의심스러운 관행이다. 그러나 물론 문제는 그것이 조금이나마 다르게 행해질 수 있는지이다.", "vocab": [{"word": "competent", "meaning": "유능한, 역량 있는", "desc": "지도를 돕는 성인"}, {"word": "accountable for ~", "meaning": "~에 책임이 있는", "desc": "be accountable for actions"}, {"word": "optimal", "meaning": "최적의, 가장 바람직한", "desc": "연령 기준의 적정성"}, {"word": "questionable practice", "meaning": "의문스러운/재고가 필요한 관행", "desc": "일률적 연령 기준 비판"}], "nuance": [{"title": "제목: Setting Responsibilities Based on Age: Is It Appropriate?", "content": "개인마다 인지 발달 속도가 다른데 특정 연령을 기준으로 획일적인 법적 책임을 부과하는 제도의 딜레마를 질문 형식으로 제기."}]}, {"id": 29, "section": "29번 [어법성 판단]", "title": "천동설에서 지동설로의 전환과 생태학적 경제학 관점으로의 시급한 전환", "bullets": ["지동설 패러다임이 확산되었듯, '인간 경제 중심관'은 생태계 물질 흐름의 일부라는 관점으로 대체되어야 함", "그러나 기후 위기 극복을 위해 우리에겐 몇 세기의 시간이 없으므로 생태학적 전환을 가속화해야 함"], "english": "One well-known shift took place when the accepted view—that the Earth was the center of the universe—changed to one where we understood that we are only inhabitants on one planet orbiting the Sun. With each person who grasped the solar system view, it became easier for the next person to do so. So it is with the notion that the world revolves around the human economy. This is slowly being replaced by the view that the economy is a part of the larger system of material flows that connect all living things. When this perspective shifts into place, it will be obvious that our economic well-being requires that we account for, and respond to, factors of ecological health. Unfortunately we do not have a century or two to make the change. By clarifying the nature of the old and new perspectives, and by identifying actions on which we might cooperate to move the process along, we can help accelerate the shift.", "korean": "지구가 우주의 중심이라는 용인된 관점이 우리가 태양을 공전하는 하나의 행성에 사는 거주자일 뿐이라고 이해하는 관점으로 바뀌었을 때 잘 알려진 한 가지 변화가 일어났다. 태양계의 관점을 이해하는 각각의 사람이 있어서, 그 다음 사람이 그렇게 하는 것이 더 쉬워졌다. 세계가 인간의 경제를 중심으로 돌아간다는 개념도 마찬가지이다. 이것은 경제가 모든 생명체를 연결하는 물질 흐름의 더 거대한 시스템의 일부라는 관점으로 서서히 대체되고 있다. 이러한 관점이 바뀌어 자리를 잡으면, 우리의 경제적 안녕이 우리가 생태학적 건강의 요인에 책임지고, 대응하는 것을 필요로 한다는 것이 분명해질 것이다. 불행하게도 우리는 변화를 만들어 낼 한두 세기의 시간이 없다. 오래된 관점과 새로운 관점의 본질을 명확히 하고, 그 과정을 진전시키기 위해 협력할지도 모를 행동을 밝힘으로써 우리는 그 변화를 가속화하는 데 도움을 줄 수 있다.", "vocab": [{"word": "So it is with ~", "meaning": "~의 경우에도 마찬가지이다", "desc": "동일 원리의 적용"}, {"word": "shift into place", "meaning": "제자리로 이동하여 자리 잡다", "desc": "패러다임의 안착"}, {"word": "account for ~", "meaning": "~에 대해 책임지다 / 설명하다", "desc": "생태 요인 감안"}, {"word": "accelerate", "meaning": "가속화하다, 촉진하다", "desc": "변화의 속도 증대"}], "nuance": [{"title": "어법 출제 포인트: make $\\rightarrow$ to make", "content": "we do not have a century or two [to make the change] : 변화를 만들어 낼 한두 세기의 시간이 없다는 명사 수식 to부정사."}]}, {"id": 30, "section": "30번 [문맥상 어휘]", "title": "초기 인류의 직립 보행, 도구 제작 및 식단 확장에 따른 뇌의 성장", "bullets": ["초기 인류는 직립 보행으로 효율적 이동을 달성하고 도구 제작으로 육식 단백질과 지방을 대량 섭취", "식단이 확장됨(Expanded)에 따라 뇌 성장에 필요한 막대한 에너지를 공급받아 신체적·지적 영역을 전 세계로 확장함"], "english": "The first human beings probably evolved in tropical regions where survival was possible without clothing. It is likely that they had very dark skin because light skin would have given little protection against the burning rays of the sun. There is a debate about whether these people spread into other parts of the world or, instead, whether people developed independently in various parts of the world. Whichever the case, it is believed that in time they became capable of spreading out from Africa, eventually to most of the world. This was probably because their physical characteristics changed. For instance, early hominids probably did not walk upright, but when they developed that ability, they could travel more efficiently. More important, perhaps, was their development of tool making. With tools, they could hunt other animals, so they could consume more protein and fat than their low-energy vegetarian diet would have provided. Not only their bodies but also their brains would have been changed with more energy. The brain needs lots of energy to grow. As their diet expanded, hominids could physically and intellectually expand their territory.", "korean": "최초의 인간은 아마도 의복 없이 생존이 가능한 열대 지역에서 진화했다. 밝은 피부는 강렬한 태양 광선에 대한 보호를 거의 제공하지 못했을 것이기 때문에 그들은 매우 어두운 피부를 가졌을 가능성이 있다. 이 사람들이 세계의 다른 지역으로 퍼져나갔는지, 아니면 대신에 사람들이 세계의 다른 지역에서 독립적으로 발생했는지에 대해서는 논쟁이 있다. 어느 경우이든, 언젠가 그들은 아프리카에서부터, 결국 세계 대부분의 지역으로 퍼져 나갈 수 있게 되었다고 믿어진다. 이것은 아마도 그들의 신체적 특성이 바뀌었기 때문일 것이다. 예를 들어, 초기 인류는 아마도 직립 보행을 하지 않았을 것이지만, 그들이 그 능력을 발달시켰을 때, 그들은 더 효율적으로 이동할 수 있었다. 더 중요한 것은 아마도 그들의 도구 제작의 발달이었다. 도구를 이용하여, 그들은 다른 동물을 사냥할 수 있어서, 그들의 저에너지 채식 식단이 제공했을 것보다 더 많은 단백질과 지방을 섭취할 수 있었다. 그들의 신체뿐만 아니라 뇌도 더 많은 에너지와 함께 변화되었을 것이다. 뇌는 성장하기 위해 많은 에너지가 필요하다. 초기 인류의 식단이 확장되면서(expanded), 호미니드는 신체적으로 그리고 지적으로 그들의 영역을 확장할 수 있었다.", "vocab": [{"word": "hominid", "meaning": "인류, 대형 유인원류", "desc": "초기 직립보행 조상"}, {"word": "walk upright", "meaning": "직립 보행하다", "desc": "이동 효율성 극대화"}, {"word": "expanded", "meaning": "확장된, 풍부해진", "desc": "↔ reduced (오답 어휘)"}, {"word": "territory", "meaning": "영역, 서식지", "desc": "지리적·지적 지평"}], "nuance": [{"title": "식단 확장과 뇌 용량의 진화적 연쇄 관계", "content": "채식에서 고단백·고지방 육식으로의 식단 확장(expanded)이 막대한 대사 에너지를 요구하는 뇌 성장을 견인함."}]}, {"id": 31, "section": "31번 [빈칸 추론]", "title": "공정한 절차의 역설: 나쁜 결과의 외부화(Externalize) 불가능", "bullets": ["불공정한 절차 속 나쁜 결과는 억울하지만 '내 탓이 아닌 시스템 탓'으로 돌릴 수 있는 위로를 제공함", "반면 절차가 완벽히 공정하면 결과를 외부화(Externalize)할 수 없으며 온전히 자신의 탓으로 귀인해야 함"], "english": "When we get an unfavorable outcome, in some ways the last thing we want to hear is that the process was fair. As outraging as the combination of an unfavorable outcome and an unfair process is, this combination also brings with it a consolation prize: the possibility of attributing the bad outcome to something other than ourselves. We may reassure ourselves by believing that our bad outcome had little to do with us and everything to do with the unfair process. If the process is fair, however, we cannot nearly as easily externalize the outcome; we got what we got \"fair and square.\" When the process is fair we believe that our outcome is deserved, which is another way of saying that there must have been something about ourselves (what we did or who we are) that caused the outcome.", "korean": "우리가 불리한 결과를 얻을 때, 어떤 면에서 우리가 '가장 듣고 싶지 않은' 말은 그 과정이 공정했다는 말이다. 불리한 결과와 불공정한 과정의 결합이 분노를 불러일으키지만, 이 결합은 또한 위로의 상, 즉 나쁜 결과를 우리 자신 이외의 다른 무언가의 탓으로 돌릴 가능성을 더불어 가져다준다. 우리는 우리의 나쁜 결과가 우리와는 거의 관련이 없었고 불공정한 과정과 전적으로 관련이 있었다고 믿음으로써 우리 자신을 안심시킬지도 모른다. 하지만 그 과정이 공정하다면, 우리는 결과를 거의 마찬가지로 쉽게 외부화할(externalize) 수 없으며, 우리는 우리가 얻은 것을 '정정당당하게' 얻은 것이다. 그 과정이 공정할 때 우리는 우리의 결과가 마땅하다고 믿게 되는데, 이는 그 결과를 초래한 우리 자신(우리가 무엇을 했는지 또는 우리가 누구인지)에 관한 무언가가 틀림없이 있었을 것이라고 말하는 또 다른 방식이다.", "vocab": [{"word": "externalize", "meaning": "(실패 원인을) 외부로 돌리다/외부화하다", "desc": "↔ internalize (자책하다)"}, {"word": "the last thing one wants to hear", "meaning": "가장 듣고 싶지 않은 말", "desc": "절차적 공정성의 역설"}, {"word": "consolation prize", "meaning": "위로의 상, 위안거리", "desc": "남 탓할 수 있는 핑계"}, {"word": "fair and square", "meaning": "정정당당하게, 완전히 공정하게", "desc": "완전한 규칙 준수"}], "nuance": [{"title": "As outraging as ~ is (양보 도치 구문)", "content": "As [outraging (형용사 보어)] as the combination is : 비록 불리한 결과와 불공정한 과정의 결합이 극도의 분노를 일으킬지라도."}]}, {"id": 32, "section": "32번 [빈칸 추론]", "title": "알프레드 크뢰버의 복식사 연구: 50년 주기의 규칙적 패션 순환 (Regular Phenomenon)", "bullets": ["300년간의 서양 여성 이브닝 드레스 판화 실측 통계 분석: 치마 길이, 폭, 네크라인, 허리선 수치화", "패션은 변덕스러운 유행이 아니라 역사의 척도에서 50년마다 극단에 도달하는 '매우 규칙적인 현상(A profoundly regular phenomenon)'임"], "english": "The well-known American ethnologist Alfred Louis Kroeber made a rich and in-depth study of women's evening dress in the West, stretching back about three centuries and using reproductions of engravings. Having adjusted the dimensions of these plates due to their diverse origins, he was able to analyse the constant elements in fashion features and to come up with a study that was neither intuitive nor approximate, but precise, mathematical and statistical. He reduced women's clothing to a certain number of features: length and size of the skirt, size and depth of the neckline, height of the waistline. He demonstrated unambiguously that fashion is a profoundly regular phenomenon, which is not located at the level of annual variations but on the scale of history. For practically 300 years, women's dress was subject to a very precise periodic cycle: forms reach the furthest point in their variations every fifty years. If, at any one moment, skirts are at their longest, fifty years later they will be at their shortest; thus skirts become long again fifty years after being short and a hundred years after being long.", "korean": "미국의 잘 알려진 민속학자인 Alfred Louis Kroeber는 약 3세기 전으로 거슬러 올라가 판화 복제품을 사용하여 서양의 여성 이브닝 드레스에 대한 풍부하고 심도 있는 연구를 수행했다. 다양한 기원 때문에 이 판들의 크기를 조정하여, 그는 패션 특징에서의 일정한 요소를 분석해서 직관적이지도 대략적이지도 않은, 정확하고 수학적이며 통계적인 연구를 구상할 수 있었다. 그는 여성 의류를 스커트의 길이와 크기, 목선의 크기와 깊이, 허리선의 높이와 같은 몇 가지 특징들로 정리했다. 그는 패션이 매년 일어나는 변화의 수준이 아니라 역사의 척도에 위치하는 매우 규칙적인 현상(a profoundly regular phenomenon)이라는 것을 분명하게 보여주었다. 거의 300년 동안 여성 드레스는 매우 정확한 주기적인 순환의 영향을 받았는데, 형식은 50년마다 변화의 정점에 도달했다. 어느 한 시기에 스커트가 가장 길었다면 50년 후에 가장 짧아질 것이고, 따라서 스커트는 짧아진 데서 50년 후에 다시 길어지고, 길어진 데서 100년 후에 길어진다.", "vocab": [{"word": "profoundly regular phenomenon", "meaning": "대단히/심오할 정도로 규칙적인 현상", "desc": "50년 주기성"}, {"word": "engraving", "meaning": "판화, 동판화 복제품", "desc": "측정 데이터 소스"}, {"word": "dimensions", "meaning": "치수, 크기, 차원", "desc": "판화 비율 보정"}, {"word": "be subject to a periodic cycle", "meaning": "주기적 순환의 지배/영향을 받다", "desc": "정확한 50년 진폭"}], "nuance": [{"title": "Having adjusted the dimensions (완료분사구문)", "content": "분석하고 통계를 내기 이전에 다양한 출처의 판화 크기 비율을 먼저 정밀하게 '보정 완료했음'을 나타냄."}]}, {"id": 33, "section": "33번 [빈칸 추론]", "title": "기술 혁신과 노동 시장 붕괴에 따른 사회적 부의 분배 배제 위기", "bullets": ["기술 발전으로 인류의 총 부는 급증했으나 시장 분배 메커니즘의 불평등이 심화됨", "기술 실업(Technological unemployment)으로 유일한 생계 원천인 노동 시장이 무너지면 대다수가 부의 몫을 전혀 받지 못할 위험에 직면"], "english": "Over the last few centuries, humanity's collective prosperity has skyrocketed, as technological progress has made us far wealthier than ever before. To share out those riches, almost all societies have settled upon the market mechanism, rewarding people in various ways for the work that they do and the things that they own. But rising inequality, itself often driven by technology, has started to put that mechanism under strain. Today, markets already provide immense rewards to some people but leave many others with very little. And now, technological unemployment threatens to become a more radical version of the same story, taking place in the particular market we rely upon the most: the labor market. As that market begins to break down, more and more people will be in danger of not receiving a share of society's prosperity at all.", "korean": "지난 몇 세기 동안 기술 발전이 우리를 그 어느 때보다 훨씬 더 부유하게 만듦에 따라, 인류의 집합적 부가 급증했다. 이러한 부를 나누기 위해 거의 모든 사회는 사람들에게 그들이 하는 일과 그들이 소유한 것에 대해 다양한 방식으로 보상하는 시장 메커니즘을 채택했다. 그러나 증가하는 불평등은, 그 자체가 기술로 인해 자주 생기는데, 그 메커니즘에 부담을 주기 시작했다. 오늘날 시장은 이미 일부 사람들에게는 막대한 보상을 제공하지만 많은 다른 사람들에게는 거의 아무것도 남기지 않는다. 그리고 이제, 기술 혁신에 의한 실업은 우리가 가장 의존하는 특정 시장, 즉 노동 시장에서 발생하여, 같은 이야기의 좀 더 급진적인 형태가 될 우려가 있다. 그 시장이 무너짐에 따라 점점 더 많은 사람들이 사회의 부의 몫을 전혀 받지 않을 위험(not receiving a share of society's prosperity at all)에 처하게 될 것이다.", "vocab": [{"word": "skyrocket", "meaning": "급증하다, 치솟다", "desc": "총체적 부의 폭증"}, {"word": "settle upon ~", "meaning": "~을 최종 채택하다/결정하다", "desc": "시장 분배 체계 낙점"}, {"word": "put under strain", "meaning": "~에 과부하/부담을 주다", "desc": "불평등의 심화"}, {"word": "technological unemployment", "meaning": "기술적 실업", "desc": "노동 시장의 붕괴"}], "nuance": [{"title": "not receiving a share of society's prosperity at all (빈칸 정답)", "content": "자본을 가지지 못하고 오직 '노동'만 파는 대다수 대중이 노동 시장에서 퇴출당할 때 사회 번영의 몫에서 완전히 소외되는 암울한 미래 경고."}]}, {"id": 34, "section": "34번 [빈칸 추론]", "title": "전문성의 역설: 숙달될수록 기본기에 대한 의식적 설명이 사라짐 (Implicit Knowledge)", "bullets": ["전문 지식의 대다수는 언어화되지 않는 '암묵지(Implicit knowledge)'로 작동함", "숙달의 정점에 도달할수록 기본기에 대한 의식적 인식이 줄어들며(Less conscious awareness of fundamentals), 설명하려 하면 오히려 수행이 방해됨"], "english": "It's often said that those who can't do, teach. It would be more accurate to say that those who can do, can't teach the basics. A great deal of expert knowledge is implicit, not explicit. The further you progress toward mastery, the less conscious awareness you often have of the fundamentals. Experiments show that skilled golfers and wine aficionados have a hard time describing their putting and tasting techniques—even asking them to explain their approaches is enough to interfere with their performance, so they often stay on autopilot. When I first saw an elite diver do four and a half somersaults, I asked how he managed to spin so fast. His answer: \"Just go up in a ball.\" Experts often have an intuitive understanding of a route, but they struggle to clearly express all the steps to take. Their brain dump is partially filled with garbage.", "korean": "흔히 할 줄 모르는 사람이 가르친다는 말이 있다. 할 수 있는 사람은 기본을 가르칠 수 없다고 말하는 것이 더 정확할 것이다. 많은 전문 지식은 명시적이지 않고 암시적이다. 숙달을 향해 더 나아갈수록 여러분은 흔히 기본에 대해 덜 의식적인 인식을 지닌다(the less conscious awareness you often have of the fundamentals). 실험들에 따르면 숙련된 골퍼와 와인 애호가들은 자신의 퍼팅과 시음 기술을 설명하는 데 어려움을 겪으며, 심지어 그들의 접근 방식을 설명해 달라고 요청하는 것은 그들의 수행에 방해가 되기에 충분하기 때문에 그들은 자주 자동 조종 상태에 있다. 내가 한 엘리트 다이버가 공중제비를 4회 반 도는 것을 처음 봤을 때, 나는 어떻게 그렇게 빨리 회전할 수 있었는지 물었다. 그의 대답은 \"그냥 공 모양으로 올라가기만 하면 돼요.\"였다. 전문가들은 자주 방법에 대해 직관적인 지식을 가지고 있지만, 취해야 할 모든 단계를 분명하게 표현하는 데 고전한다. 그들이 이것저것 표현하는 것은 부분적으로는 쓰레기로 차 있다.", "vocab": [{"word": "implicit vs. explicit", "meaning": "암묵적인(체화된) vs 명시적인(언어화된)", "desc": "지식의 두 형태"}, {"word": "aficionado", "meaning": "전문적 애호가, 마니아", "desc": "wine aficionado"}, {"word": "stay on autopilot", "meaning": "자동 조종/무의식적 상태를 유지하다", "desc": "체화된 자동화 반응"}, {"word": "brain dump", "meaning": "머릿속 생각을 여과 없이 쏟아내기", "desc": "정리되지 않은 지식 표출"}], "nuance": [{"title": "the + 비교급, the + 비교급 구문", "content": "The further you progress toward mastery, [the less conscious awareness you often have of the fundamentals] : 숙달로 나아갈수록 기본 동작은 자동화되어 의식적 자각에서 멀어짐."}]}, {"id": 35, "section": "35번 [무관한 문장]", "title": "식품의 최소 가공(Minimal Processing)과 영양소 보존 (곡물 제분의 한계)", "bullets": ["최소 가공은 합성 첨가물 없이 고유의 풍미와 비타민·항산화 물질 등 민감한 영양소를 유지하는 최적의 방법", "흰 밀가루를 만들기 위한 곡물 제분(Milling)은 핵심 영양소와 섬유질을 파괴하므로, 발효나 발아 같은 전통 영양 공법이 주목받음"], "english": "Minimal processing can be one of the best ways to keep original flavors and taste, without any need to add artificial flavoring or additives, or too much salt. This would also be the efficient way to keep most nutrients, especially the most sensitive ones such as many vitamins and anti-oxidants. Milling of cereals is one of the most harsh processes which dramatically affect nutrient content. While grains are naturally very rich in micronutrients, anti-oxidants and fiber (i.e. in wholemeal flour or flakes), milling usually removes the vast majority of minerals, vitamins and fibers to raise white flour. Such a spoilage of key nutrients and fiber is no longer acceptable in the context of a sustainable diet aiming at an optimal nutrient density and health protection. In contrast, fermentation of various foodstuffs or germination of grains are traditional, locally accessible, low-energy and highly nutritious processes of sounded interest.", "korean": "최소한의 가공은 인공 향료나 첨가물, 또는 과도한 소금을 넣을 필요 없이 본연의 풍미와 맛을 유지하는 가장 좋은 방법 중 하나일 수 있다. 이것은 또한 대부분의 영양소, 특히 많은 비타민과 항산화물질과 같은 가장 민감한 영양소를 유지하는 효율적인 방법일 수 있다. 곡물을 제분하는 것은 영양소 함량에 크게 영향을 미치는 가장 가혹한 과정 중 하나이다. 곡물에는 (즉 통밀가루 또는 플레이크에는) 미량 영양소, 항산화물질, 그리고 섬유질이 자연적으로 매우 풍부하지만, 제분이 일반적으로 흰 밀가루를 만들기 위해 대부분의 미네랄, 비타민 그리고 섬유질을 제거한다. 주요 영양소와 섬유질의 그러한 손상은 최적의 영양소 밀도와 건강 보호를 목표로 하는 지속 가능한 식단의 맥락에서 더 이상 받아들여질 수 없다. 대조적으로, 다양한 식품의 발효나 곡물의 발아는 알려진 관심을 받는 전통적이고, 현지에서 접근 가능하며, 에너지가 적게 들고, 매우 영양가 있는 과정이다.", "vocab": [{"word": "minimal processing", "meaning": "최소 가공", "desc": "원형 보존 가공"}, {"word": "milling", "meaning": "(곡물의) 제분, 도정", "desc": "껍질 및 배아 제거"}, {"word": "spoilage", "meaning": "손상, 변질, 부패", "desc": "영양소의 대량 파괴"}, {"word": "fermentation & germination", "meaning": "발효와 발아", "desc": "친환경 고영양 가공"}], "nuance": [{"title": "제분(Milling)의 폐해 vs 발효·발아의 가치", "content": "가혹한 기계 제분으로 영양소를 파괴하는 흰 밀가루 가공을 비판하고, 전통적인 발효와 발아 공법의 지속가능성과 영양 밀도를 옹호함."}]}, {"id": 36, "section": "36번 [글의 순서]", "title": "유능한 사람의 역설: 지나친 완벽함의 불편함과 실수(Fallibility)의 매력", "bullets": ["능력 있는 사람을 좋아할 것 같지만, 집단 내 최고 능력자는 불편함과 열등감을 유발해 비호감인 역설(Paradox) 존재", "완벽한 능력자가 가끔씩 실수(Fallibility)를 저지를 때 인간미를 느끼며 더 큰 호감을 품게 됨 (실수 효과 / Pratfall Effect)"], "english": "It would seem obvious that the more competent someone is, the more we will like that person. By \"competence,\" I mean a cluster of qualities: smartness, the ability to get things done, wise decisions, etc.\n\n(C) We stand a better chance of doing well at our life tasks if we surround ourselves with people who know what they're doing and have a lot to teach us. But the research evidence is paradoxical: In problem-solving groups, the participants who are considered the most competent and have the best ideas tend not to be the ones who are best liked. Why?\n\n(B) One possibility is that, although we like to be around competent people, those who are too competent make us uncomfortable. They may seem unapproachable, distant, superhuman and make us look bad (and feel worse) by comparison.\n\n(A) If this were true, we might like people more if they reveal some evidence of fallibility. For example, if your friend is a brilliant mathematician, superb athlete, and gourmet cook, you might like him or her better if, every once in a while, they screwed up.", "korean": "누군가가 더 능력이 있을수록, 우리가 그 사람을 더 많이 좋아할 것이라는 점은 명확해 보일 것이다. 나는, '능력'이라는 것을, 똑똑함, 일을 수행하는 능력, 지혜로운 결정 등과 같은 총체적인 특징을 뜻하는 것으로 말한다.\n\n(C) 우리는 자신이 무엇을 하고 있는지를 알고 우리를 가르칠 많은 것들을 갖고 있는 사람 주변에 있을 때, 우리의 인생 과업에서 잘할 더 나은 가능성이 있다. 그러나 연구 증거는 역설적이다. 문제 해결 집단에서, 가장 능력이 있다고 여겨지고 가장 좋은 생각을 갖고 있는 참여자들은 가장 선호되는 사람들이 아닌 경향이 있다. 왜 그럴까?\n\n(B) 하나의 가능성은, 비록 우리는 능력 있는 사람들 주위에 있고 싶어하지만, '너무' 능력 있는 사람들은 우리를 불편하게 만든다는 것이다. 그들은 접근할 수 없고, 멀고, 초인간적으로 보일 수가 있어서, 비교해보면 우리가 형편없어 보이게(그리고 기분이 더 나쁘게) 만든다.\n\n(A) 만약에 이것이 사실이라면, 사람들이 실수를 저지를 수 있다는 어떤 증거를 드러낼 때 그들을 더 좋아할지도 모른다. 예를 들면, 여러분의 친구가 훌륭한 수학자, 뛰어난 운동 선수, 그리고 미식 요리사라면, 여러분은 가끔 그들이 일을 망친다면 그들을 더 좋아할지도 모른다.", "vocab": [{"word": "fallibility", "meaning": "실수를 저지르기 쉬움, 불완전성", "desc": "인간적 결함의 증거"}, {"word": "stand a chance", "meaning": "가능성/승산이 있다", "desc": "stand a better chance"}, {"word": "know what one is doing", "meaning": "일을 제대로 할 줄 알다/유능하다", "desc": "전문적 역량"}, {"word": "make someone look bad", "meaning": "~를 못나 보이게 만들다", "desc": "상대적 열등감 유발"}, {"word": "screw up", "meaning": "일을 망치다, 실수하다", "desc": "인간적 실수"}], "nuance": [{"title": "논리적 순서: (C) $\\rightarrow$ (B) $\\rightarrow$ (A)", "content": "능력자 선호 통념 $\\rightarrow$ (C) 최고 능력자가 비호감인 연구 역설 제시 $\\rightarrow$ (B) 너무 완벽한 사람이 주는 열등감 원인 규명 $\\rightarrow$ (A) 실수를 저지르는 인간미(fallibility)가 호감을 높인다는 결론 도출."}]}, {"id": 37, "section": "37번 [글의 순서]", "title": "컴퓨터 알고리즘(무의미한 계산) vs 꿀벌의 8자 춤(내적 가치 평가)", "bullets": ["컴퓨터 알고리즘: 입력에 가치를 부여하지 않고 생존 목적도 없는 기계적 출력일 뿐", "꿀벌의 8자 춤(Waggle dance): 정보를 맹목적으로 따르지 않고, 자신의 내부 상태와 주변 지식에 비추어 가치를 스스로 평가함"], "english": "A computational algorithm that takes input data and generates some output from it doesn't really embody any notion of meaning. Certainly, such a computation does not generally have as its purpose its own survival and well-being.\n\n(B) It does not, in general, assign value to the inputs. Compare, for example, a computer algorithm with the waggle dance of the honeybee, by which means a foraging bee conveys to others in the hive information about the source of food (such as nectar) it has located.\n\n(C) The \"dance\" a series of stylized movements on the comb shows the bees how far away the food is and in which direction. But this input does not simply program other bees to go out and look for it. Rather, they evaluate this information, comparing it with their own knowledge of the surroundings.\n\n(A) Some bees might not bother to make the journey, considering it not worthwhile. The input, such as it is, is processed in the light of the organism's own internal states and history; there is nothing prescriptive about its effects.", "korean": "입력 데이터를 받아 그것으로부터 어떤 출력을 생성하는 컴퓨터를 사용하는 알고리즘은 실제로 의미라는 그 어떤 개념도 구현하지 않는다. 분명히, 그러한 컴퓨터 계산은 일반적으로 그 자체의 생존과 안녕을 목적으로 하지 않는다.\n\n(B) 이것은 일반적으로 입력에 가치를 부여하지 않는다. 예를 들어, 컴퓨터 알고리즘을, 먹이를 찾아다니는 벌이 벌집 안의 다른 벌들에게 그것이 위치를 찾아낸 (꿀과 같은) 먹이의 출처에 대한 정보를 알려주는 수단인 꿀벌의 8자의 춤과 비교해 보라.\n\n(C) 그 '춤', 즉 벌집에서의 일련의 양식화된 움직임은 벌들에게 먹이가 얼마나 멀리 있고 어느 방향으로 있는지 보여준다. 그러나 이 입력은 다른 벌들이 나가서 먹이를 찾도록 단순히 프로그래밍하는 것이 아니다. 오히려 그것들은 이 정보를 주변 환경에 대한 그들 자신의 지식과 비교하면서 정보를 평가한다.\n\n(A) 일부 벌들은 그 이동이 가치가 없다고 생각해서 굳이 그 이동을 하지 않을 수도 있다. 그 입력은, 대단한 것은 아니지만, 유기체 자체의 내부 상태와 역사에 비추어 처리되며, 그 결과에 대해 규정하는 것은 없다.", "vocab": [{"word": "embody", "meaning": "(의미·아이디어를) 구현하다/담아내다", "desc": "구체적 실체화"}, {"word": "waggle dance", "meaning": "꿀벌의 8자 춤", "desc": "먹이 위치 소통"}, {"word": "such as it is", "meaning": "변변치 않지만, 있는 그대로 보자면", "desc": "겸손한 한정 표현"}, {"word": "prescriptive", "meaning": "규범적인, 일방적으로 지시/규정하는", "desc": "맹목적 강제 없음"}], "nuance": [{"title": "논리적 순서: (B) $\\rightarrow$ (C) $\\rightarrow$ (A)", "content": "알고리즘의 무의미성 $\\rightarrow$ (B) 입력 가치 미부여 지적 및 꿀벌 춤과 비교 $\\rightarrow$ (C) 8자 춤 정보의 자체 평가 과정 $\\rightarrow$ (A) 가치가 없으면 이동하지 않는 자율적 판단 결론."}]}, {"id": 38, "section": "38번 [문장 삽입]", "title": "바이러스성 전염과 행동 전염의 차이점: 가시성과 가치 지향성", "bullets": ["바이러스 전염과 행동 전염(음주 등)의 유사성: 밀접하게 함께할수록 전염 확률 상승", "결정적 차이: 가시성은 행동 전염(태양광 설치)을 촉진하나 질병 전염은 억제하며, 행동 전염은 긍정적일 수도 있음"], "english": "There are deep similarities between viral contagion and behavioral contagion. (1) For example, people in close or extended proximity to others infected by a virus are themselves more likely to become infected, just as people are more likely to drink excessively when they spend more time in the company of heavy drinkers. (2) But there are also important differences between the two types of contagion. One is that visibility promotes behavioral contagion but inhibits the spread of infectious diseases. (3) Solar panels that are visible from the street, for instance, are more likely to stimulate neighboring installations. (4) In contrast, we try to avoid others who are visibly ill. (5) Another important difference is that whereas viral contagion is almost always a bad thing, behavioral contagion is sometimes negative—as in the case of smoking—but sometimes positive, as in the case of solar installations.", "korean": "바이러스성의 전염과 행동의 전염 사이에 깊은 유사성이 있다. 예를 들어, 바이러스에 감염된 다른 사람들과 아주 근접해 있거나 어느 정도 근접해 있는 사람들은 그들도 감염될 가능성이 더 높은데, 이는 사람들이 술을 많이 마시는 사람들과 함께 시간을 많이 보낼 때 술을 과도하게 마실 가능성이 더 높은 것과 마찬가지이다. 하지만 두 종류의 전염 사이에 중요한 차이점들도 있다. 한 가지는 가시성이 행동의 전염을 촉진하지만, 감염성 질병의 확산은 억제한다는 것이다. 예를 들어, 거리에서 볼 수 있는 태양 전지판은 이웃의 설치를 북돋을 가능성이 더 높다. 대조적으로, 우리는 눈에 띄게 몸이 아픈 다른 사람들을 피하려고 노력한다. 또 다른 중요한 차이는 바이러스성의 전염은 거의 항상 나쁜 것인 반면, 행동의 전염은 흡연의 경우와 같이, 때로는 부정적이지만, 태양 전지판 설치의 경우와 같이, 때때로 긍정적이라는 것이다.", "vocab": [{"word": "contagion", "meaning": "전염, 감염 (바이러스성 vs 행동적)", "desc": "확산 현상"}, {"word": "in the company of ~", "meaning": "~와 함께 있을 때, 동석하여", "desc": "음주자들과 어울림"}, {"word": "proximity", "meaning": "근접, 가까움", "desc": "물리적 거리"}, {"word": "inhibit", "meaning": "억제하다, 못하게 하다", "desc": "↔ promote (촉진하다)"}], "nuance": [{"title": "유사성에서 차이점으로의 전환 (2번 위치)", "content": "삽입 문장(*But there are also important differences between the two types of contagion*)이 유사성 설명 직후, 차이점(One is that visibility...) 바로 앞인 2번 위치에 안착함."}]}, {"id": 39, "section": "39번 [문장 삽입]", "title": "진정한 동면(Hibernation/체온 급락)과 곰의 휴면(Torpor)의 과학적 구분", "bullets": ["동면은 단순 수면이 아닌 마취 상태와 같아, 동면 동물도 그 속에서 몇 시간의 일반 수면을 취해야 함", "진짜 동면은 체온이 화씨 32도(0℃) 가까이 급락하지만, 곰은 체온이 정상 유지되고 쉽게 깨어나므로 '휴면(Torpor)'임"], "english": "Sleep is clearly about more than just resting. One curious fact is that animals that are hibernating also have periods of sleep. It comes as a surprise to most of us, but hibernation and sleep are not the same thing at all, at least not from a neurological and metabolic perspective. (1) Hibernating is more like being anesthetized: the subject is unconscious but not actually asleep. (2) So a hibernating animal needs to get a few hours of conventional sleep each day within the larger unconsciousness. (3) A further surprise to most of us is that bears, the most famous of wintry sleepers, don't actually hibernate. (4) Real hibernation involves profound unconsciousness and a dramatic fall in body temperature—often to around 32 degrees Fahrenheit. By this definition, bears don't hibernate, because their body temperature stays near normal and they are easily awakened. (5) Their winter sleeps are more accurately called a state of torpor.", "korean": "잠은 분명 단지 휴식하는 것 이상이다. 한 가지 호기심을 끄는 사실은 동면하고 있는 동물들 또한 잠자는 기간을 가진다는 점이다. 그것은 우리 대부분에게 놀라움으로 다가오지만, 동면과 수면은 적어도 신경학적이고 신진대사적인 관점에서 볼 때 전혀 같은 것이 아니다. 동면은 마취되는 것과 더욱 비슷한데, 그 대상은 의식이 없지만 실제로 잠들어 있지는 않다. 그래서 동면하고 있는 동물은 더 큰 무의식 속에서 매일 몇 시간의 전형적인 잠을 잘 필요가 있다. 우리 대부분에게 더욱 놀라운 점은 겨울에 잠을 자는 동물 중 가장 유명한 곰도 실제로는 동면하지 않는다는 것이다. 실제 동면은 깊은 무의식과 체온의 급격한 하락을 포함하는데, 자주 대략 화씨 32도로 떨어진다. 이러한 정의에 따르면, 곰의 체온은 정상 근처를 유지하고 쉽게 잠에서 깨어나기 때문에 그것들은 동면하지 않는다. 그것들의 겨울잠은 더 정확하게는 휴면 상태라고 불린다.", "vocab": [{"word": "hibernation", "meaning": "동면 (체온 급락과 마취성 무의식)", "desc": "진정한 겨울잠"}, {"word": "anesthetize", "meaning": "마취시키다", "desc": "의식 상실 상태"}, {"word": "by this definition", "meaning": "이 정의에 따르면", "desc": "진짜 동면의 기준"}, {"word": "torpor", "meaning": "휴면 상태, 일시적 무기력/둔화", "desc": "곰의 체온 유지 겨울잠"}], "nuance": [{"title": "By this definition 의 연결 고리 (4번 위치)", "content": "삽입 문장이 '진짜 동면의 정의(체온의 화씨 32도 급락)'를 제시해야 바로 뒤 문장의 *By this definition*이 성립하므로 4번 위치가 유일함."}]}, {"id": 40, "section": "40번 [요약문 완성]", "title": "타인의 시선과 나이에 따른 조난 아동 구조 반응의 역전 현상", "bullets": ["유아기: 또래가 함께 있을 때 편안함을 느껴 조난 아동을 더 적극적으로 구조함", "초등 고학년: 또래의 평가와 과잉 반응에 대한 창피함을 두려워하여, 다른 사람이 있을 때(Presence) 의도적 무표정(Poker face)을 지으며 덜 도움"], "english": "The concern about how we appear to others can be seen in children, though work by the psychologist Ervin Staub suggests that the effect may vary with age. In a study where children heard another child in distress, young children (kindergarten through second grade) were more likely to help the child in distress when with another child than when alone. But for older children—in fourth and sixth grade—the effect reversed: they were less likely to help a child in distress when they were with a peer than when they were alone. Staub suggested that younger children might feel more comfortable acting when they have the company of a peer, whereas older children might feel more concern about being judged by their peers and fear feeling embarrassed by overreacting. Staub noted that \"older children seemed to discuss the distress sounds less and to react to them less openly than younger children.\" In other words, the older children were deliberately putting on a poker face in front of their peers.\n\n[Summary] The study suggests that, contrary to younger children, older children are less likely to help those in distress in the presence of others because they care more about how they are evaluated.", "korean": "우리가 다른 사람들에게 어떻게 보이는지에 대한 걱정은 아이들에게서 보일 수 있지만, 심리학자 Ervin Staub의 연구는 그 영향이 나이에 따라 달라질 수도 있다고 시사한다. 아이들이 곤경에 처한 다른 아이의 소리를 들었던 한 연구에서, 어린아이들(유치원에서 2학년까지)은 혼자 있을 때보다 다른 아이와 함께 있을 때 곤경에 처한 아이를 도울 가능성이 더 높았다. 하지만 4학년과 6학년과 같이 나이가 더 많은 아이들의 경우에는, 그 결과가 뒤바뀌었는데, 그들은 혼자 있을 때보다 또래와 함께 있을 때 곤경에 처한 아이를 도울 가능성이 더 낮았다. Staub은 더 어린아이들은 또래와 함께 있을 때 행동하는 데 더 편안함을 느낄지도 모르는 데 반해, 나이가 더 많은 아이들은 자기 또래들에게 판단받는 것을 더욱 걱정하며 과잉 반응에 의해 창피함을 느끼는 것을 두려워할지도 모른다고 말했다. Staub은 '나이가 더 많은 아이들은 더 어린아이들에 비해 곤경(에 처한 아이들)의 소리에 대해 덜 이야기하고, 덜 공공연하게 반응하는 것처럼 보였다.'라고 언급했다. 다시 말해서, 더 나이가 많은 아이들은 의도적으로 자기 또래들 앞에서 무표정한 얼굴을 하고 있었다.\n\n[요약문] 연구는 더 어린아이들과는 반대로, 나이가 더 많은 아이들은 다른 사람들이 있을 때(presence) 곤경에 처한 아이들을 도울 가능성이 더 낮으며, 그 이유는 그들은 자신이 어떻게 평가받는지(evaluated)에 대해 더 많이 신경 쓰기 때문이라고 시사한다.", "vocab": [{"word": "in distress", "meaning": "곤경에 처한, 고통받는", "desc": "도움이 필요한 위기"}, {"word": "put on a poker face", "meaning": "무표정한 얼굴을 하다/시치미 떼다", "desc": "창피함 회피 전략"}, {"word": "in the presence of ~", "meaning": "~가 있는 자리에서/동석 하에", "desc": "타인의 시선"}, {"word": "evaluated", "meaning": "평가받는", "desc": "또래의 평가 의식"}], "nuance": [{"title": "요약문 키워드: (A) presence - (B) evaluated", "content": "방관자 효과(Bystander Effect)의 발달 심리학적 분기점: 또래의 존재(presence)가 고학년에게는 평가(evaluation) 불안을 야기하여 도움 행동을 억제함."}]}, {"id": 41, "section": "41~42번 [장문독해]", "title": "권위에 대한 의문 제기 억압과 아동의 본질적 질문 수용 (Things Plain to You Aren't to Children)", "bullets": ["부모의 \"그냥 그러니까\"식 억압은 아이들에게 권위자의 말을 맹목 수용하도록 훈련시킴", "\"왜 하늘은 파랄까?\" 같은 아동의 즉흥적 질문은 세상을 이해하려는 합리적(Reasonable) 탐구이므로 진지하게 받아들여야 함"], "english": "What makes questioning authority so hard? The difficulties start in childhood, when parents—the first and most powerful authority figures—show children \"the way things are.\" This is a necessary element of learning language and socialization, and certainly most things learned in early childhood are noncontroversial: the English alphabet starts with A and ends with Z, the numbers 1 through 10 come before the numbers 11 through 20, and so on. Children, however, will spontaneously question things that are quite obvious to adults and even to older kids. The word \"why?\" becomes a challenge, as in, \"Why is the sky blue?\" Answers such as \"because it just is\" or \"because I say so\" tell children that they must unquestioningly accept what authorities say \"just because,\" and children who persist in their questioning are likely to find themselves dismissed or yelled at for \"bothering\" adults with \"meaningless\" or \"unimportant\" questions. But these questions are in fact perfectly reasonable. Why is the sky blue? Many adults do not themselves know the answer. And who says the sky's color needs to be called \"blue,\" anyway? How do we know that what one person calls \"blue\" is the same color that another calls \"blue\"? The scientific answers come from physics, but those are not the answers that children are seeking. They are trying to understand the world, and no matter how irritating the repeated questions may become to stressed and time-pressed parents, it is important to take them seriously to encourage kids to question authority to think for themselves.", "korean": "무엇이 권위에 의문을 제기하는 것을 그토록 어렵게 만들까? 그 어려움은 유년 시절에 시작하는데, 이는 최초이자 가장 영향력 있는 권위자인 부모가 아이들에게 '사물이 존재하는 방식'을 제시하는 때이다. 이것은 언어 학습과 사회화의 필수적인 요소이고, 확실히 초기 유년기에 학습되는 것 대부분은 논쟁의 여지가 없는데, 영어 알파벳은 A에서 시작해서 Z로 끝난다는 것, 숫자 1부터 10은 숫자 11부터 20보다 이전에 나온다는 것 등등처럼 말이다. 하지만 아이들은 어른들과 심지어 더 나이 많은 아이들에게도 꽤 명백한 것들에 즉흥적으로 의문을 제기할 것이다. \"왜요?\"라는 말은 \"왜 하늘은 파랄까요?\"에서처럼 도전이 된다. \"그냥 그러니까\" 혹은 \"내가 그렇다고 하니까\"와 같은 대답들은 권위자들이 \"단지 그러니까\"라고 말하는 것을 아이들이 의심 없이 받아들여야 한다고 아이들에게 말해주며, 의문을 제기하는 것을 지속하는 아이들은 '무의미한' 혹은 '중요하지 않은' 질문으로 어른들을 '성가시게 하는 것' 때문에 그들 자신이 쫓겨나거나 고함을 듣는다는 것을 알게 될 가능성이 높다. 하지만 이러한 질문들은 실제로 완벽하게 합리적이다(reasonable). 왜 하늘은 파랄까? 많은 어른들은 자신도 그 대답을 알지 못한다. 그리고 어쨌든 누가 하늘의 색깔이 '파란색'으로 불려야 한다고 말하는가? 한 사람이 '파란색'이라고 부르는 것이 또 다른 사람이 '파란색'이라고 부르는 것과 같은 색깔인지 어떻게 우리가 아는가? 과학적인 답은 물리학에서 나오지만, 그것들은 아이들이 찾고 있는 답은 아니다. 그들은 세계를 이해하려고 노력하고 있고, 반복되는 질문들이 스트레스가 쌓이고 시간에 쫓기는 부모들에게 아무리 짜증스러울지라도, 아이들이 권위에 의문을 제기하도록 독려하여 스스로 생각하도록 그것들을 진지하게 받아들이는 것이 중요하다.", "vocab": [{"word": "the way things are", "meaning": "사물이 존재하는 방식, 세상 물정/현실", "desc": "권위자가 제시하는 질서"}, {"word": "noncontroversial", "meaning": "논쟁의 여지가 없는, 명백한", "desc": "기본 규칙 체계"}, {"word": "unquestioningly", "meaning": "의심 없이, 무비판적으로", "desc": "맹목적 복종"}, {"word": "reasonable", "meaning": "합리적인, 타당한", "desc": "↔ unreasonable (오답 어휘)"}], "nuance": [{"title": "42번 어휘 출제 포인트: unreasonable $\rightarrow$ reasonable", "content": "어른에게는 뻔해 보이는 아이들의 질문이 실제로는 언어 철학적·인식론적으로 '완벽하게 합리적인(reasonable)' 탐구임."}, {"title": "41번 제목: Things Plain to You Aren't to Children: Let Them Question", "content": "당신에게 명백한 것이 아이들에게는 명백하지 않으므로, 스스로 생각할 수 있도록 권위에 질문하게 하라."}]}];
+    const STORAGE_KEY = 'mock_2024_09_g11_master_v1';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      if (!vocabList || vocabList.length === 0) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+
+      // Collect search terms
+      const termMap = new Map();
+      vocabList.forEach(v => {
+        if (!v.word) return;
+        const clean = v.word.replace(/[~+()]/g, '').replace(/\b(동사|명사|형용사|부사|전치사)\b/g, '').trim();
+        if (clean.length >= 2) {
+          termMap.set(clean.toLowerCase(), clean);
+        }
+      });
+
+      if (termMap.size === 0) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+
+      // Sort by length descending
+      const terms = Array.from(termMap.values()).sort((a, b) => b.length - a.length);
+      const patternParts = terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+      
+      try {
+        const re = new RegExp('\\b(' + patternParts.join('|') + ')\\b', 'gi');
+        const highlighted = rawEnglish.replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+        return `<p>${highlighted.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      } catch(err) {
+        return `<p>${rawEnglish.replace(/\n\n/g, '</p><p>').replace(/\n/g, '<br>')}</p>`;
+      }
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "mock_2024_09_g11_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>
