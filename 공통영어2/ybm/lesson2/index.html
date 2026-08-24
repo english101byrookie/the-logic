@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-Delivery, Speedy and Reliable - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">공통영어2 YBM(김은형) 2과</span>
+      <h1 class="header-title">K-Delivery, Speedy and Reliable</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "서론 (Introduction)", "title": "한국의 독보적인 24시간 배달 문화와 현대 배달 앱", "bullets": ["24시간 이내 배달: 전 세계적으로 유례를 찾기 힘든 한국 배달 산업의 고유한 문화", "복합관계사 구문(whatever/whenever/wherever)과 손끝(at your fingertips)에서 이뤄지는 신속 배송"], "english": "In Korea, nearly anything can be delivered within twenty-four hours. Delivery is not limited to Korea; however, a unique culture has developed around the Korean delivery industry. People in Korea can order whatever they want whenever they want and have it delivered wherever they want. Delivery apps rank stores by various standards: review scores, popularity, price, delivery fee, and distance, to name a few. The speedy delivery of purchased items to your house is literally at the tips of your fingers. What is the history behind this culture?", "korean": "한국에서는, 거의 모든 것이 24시간 이내에 배달될 수 있다. 배달은 한국에만 국한된 것은 아니다. 그러나, 독특한 문화가 한국 배달 산업을 중심으로 발달하였다. 한국에 있는 사람들은 그들이 원하는 때라면 언제든지 그들이 원하는 것이 무엇이든 주문할 수 있고, 그들이 원하는 곳이라면 어디든지 그것을 배달받을 수 있다. 배달 애플리케이션은 다양한 기준으로 상점들의 순위를 매긴다. 예를 들자면, 후기 점수, 인기, 가격, 배달료, 그리고 거리 등. 구매한 물건이 당신의 집으로 빠르게 배달되는 것은 말 그대로 당신 손가락 끝에 달려 있다. 이 문화 이면의 역사는 무엇일까?", "vocab": [{"word": "be limited to ~", "meaning": "~에 국한되다/한정되다", "desc": "범위의 제한"}, {"word": "have + it + delivered", "meaning": "그것이 배달되도록 시키다", "desc": "사역동사 have + 목적어 + 과거분사 (수동 관계)"}, {"word": "to name a few", "meaning": "몇 가지만 예를 들자면", "desc": "나열 시 쓰이는 삽입 관용구"}, {"word": "at the tips of one's fingers", "meaning": "손가락 끝에 있는, 아주 가까이 손쉬운", "desc": "스마트폰 터치 한 번으로 가능한"}], "nuance": [{"title": "whatever / whenever / wherever (복합관계사의 3단 병렬)", "content": "• order [whatever they want] (명사절: 원하는 것은 무엇이든)\n• [whenever they want] (시간 부사절: 원하는 때는 언제든)\n• [wherever they want] (장소 부사절: 원하는 곳은 어디든)\n$\rightarrow$ 한국 배달 문화의 절대적 편리성과 시공간적 자유도를 강조."}, {"title": "사역동사 have + O + 과거분사 (have it delivered)", "content": "물건(it)이 스스로 배달하는 것이 아니라 '배달되는(delivered)' 수동 관계이므로 과거분사 delivered 사용."}]}, {"id": 2, "section": "조선 시대 (Joseon Dynasty)", "title": "1768년 황윤석의 냉면 배달과 전문 서신 배달부 '전인(Jeonin)'", "bullets": ["1768년 황윤석의 과거 시험 후 일기: 한국 음식 배달 역사가 최소 250년(2.5세기) 이상임을 입증", "조선 시대 '전인': 주소 체계 이전 이름과 거주지만으로 길을 꿰뚫고 편지를 배달하던 전문 인력"], "english": "In 1768, Hwang Yun-seok, a scholar, made a diary entry after taking the gwageo, a public service entrance exam. He wrote that he and his friends had ordered a delivery of naengmyeon for lunch. Hwang's diary is the first historical document indicating Koreans have been delivering food for at least two and a half centuries.\n\nDuring the Joseon period, specialized people called jeonin delivered letters for a fee. In the days before the modern address systems, letters were delivered by name and place of residence, so a jeonin had to know the local areas like the back of his hand. Service prices were determined by schedule and distance.", "korean": "1768년에 학자인 황윤석은 관리 채용 시험인 과거에 응시한 후 일기 기록을 남겼다. 그는 그와 그의 친구들이 점심 식사로 냉면 배달을 시켰다고 썼다. 황윤석의 일기는 한국인들이 최소한 두 세기 반 동안 음식을 배달해 왔음을 보여 주는 최초의 역사적 기록물이다.\n\n조선 시대 동안, 전인이라고 불리는 전문화된 사람들이 돈을 받고 편지를 배달했다. 현대 주소 시스템이 있기 이전 시대에 편지는 이름과 거주지에 따라 배달되었으므로 전인은 해당 지역을 매우 잘 알고 있어야만 했다. 서비스 가격은 일정과 거리에 따라 결정되었다.", "vocab": [{"word": "make a diary entry", "meaning": "일기를 쓰다/기록하다", "desc": "일기장 항목을 작성하다"}, {"word": "document indicating ~", "meaning": "~을 보여주는/시사하는 기록물", "desc": "현재분사구 후치 수식"}, {"word": "for a fee", "meaning": "유료로, 돈을 받고", "desc": "유료 서비스"}, {"word": "know ~ like the back of one's hand", "meaning": "~을 손바닥 들여다보듯 훤히 알다", "desc": "지역 지리에 매우 정통함을 뜻하는 관용구"}], "nuance": [{"title": "과거완료 시제 (had ordered)", "content": "일기를 쓴 시점(wrote)보다 더 이전에 점심으로 냉면을 주문하여 먹었으므로 대과거 had ordered 사용."}, {"title": "know ~ like the back of one's hand (관용 표현)", "content": "현대적 도로명 주소가 없던 시절, 동네 골목과 주민 거주지를 손바닥(손등) 보듯 꿰뚫고 있어야 했던 전인의 전문성 묘사."}]}, {"id": 3, "section": "일제강점기 (Colonial Era)", "title": "용달사 '메신저'의 자전거 배달과 상호 신뢰·속도의 문화", "bullets": ["용달사 소속 '메신저': 자전거를 활용한 신속 배송 시스템 구축", "현금 뭉치까지 배달할 정도의 변함없는 정직성과 신뢰 $\\rightarrow$ 현대 오토바이 배달의 토대 마련"], "english": "During the Japanese colonial period, Seoul's streets were filled with delivery professionals called \"messengers,\" most working for a company named Yongdalsa. Many used bikes to speed up delivery. When customers contacted Yongdalsa, a messenger went to pick up the item and then delivered it.\n\nDelivery mistakes were rare. Messengers were sometimes charged with carrying large bundles of cash, but they were unfailingly honest and accurate. Customers trusted the messengers so much that they often did not check the items they received. This messenger service was unique to Korea and was based on a culture of mutual trust and a hunger for speed. It is possible that this paved the way for modern motorcycle delivery.", "korean": "일제 강점기 동안, 서울의 거리는 '메신저'라고 불리는 배달 전문인들로 가득 차 있었는데, 그들 대부분은 용달사라는 이름의 회사에서 일하고 있었다. 많은 이들이 배달 속도를 높이기 위해서 자전거를 사용했다. 고객들이 용달사에 연락을 취하면, 메신저가 물건을 가지러 와서는 그것을 배달했다.\n\n배달 실수는 드물었다. 메신저들은 때때로 다량의 현금 배달을 담당하기도 했는데, 그들은 변함없이 정직하고 정확했다. 고객들은 메신저를 매우 믿었기에 종종 그들이 받은 물품을 확인하지도 않았다. 이러한 메신저 서비스는 한국만의 독특한 것이었으며, 상호 간의 신뢰 문화와 속도에 대한 갈망에 기반한 것이었다. 이것이 현대의 오토바이 배달의 토대를 닦았을 가능성이 있다.", "vocab": [{"word": "be charged with -ing", "meaning": "~의 책임을 맡다/담당하다", "desc": "= be entrusted with"}, {"word": "unfailingly", "meaning": "변함없이, 한결같이", "desc": "= consistently, always"}, {"word": "mutual trust", "meaning": "상호 신뢰", "desc": "고객과 배달원 간의 믿음"}, {"word": "hunger for speed", "meaning": "속도에 대한 갈망/열망", "desc": "신속성을 추구하는 한국적 정서"}, {"word": "pave the way for ~", "meaning": "~의 길을 열다/토대를 닦다", "desc": "= lay the foundation for"}], "nuance": [{"title": "so ~ that ... 구문 (결과의 부사절)", "content": "Customers trusted the messengers [so much that they often did not check the items...]\n$\rightarrow$ 고객들이 메신저를 '너무나 신뢰해서' 물품을 확인조차 하지 않았다는 강한 인과관계 표현."}, {"title": "독립분사구문 most working for a company...", "content": "Seoul's streets were filled with delivery professionals ..., [most (of them) working for a company named Yongdalsa] (대부분이 용달사에서 일하면서)."}]}, {"id": 4, "section": "현대화 & 도시화 (1950s-1990s)", "title": "전후 재건과 도시화: 신문·우유·철가방·보자기 도시락 배달", "bullets": ["한국전쟁으로 파괴된 시스템이 1960년대 도시화·경제개발과 함께 재성장", "점심시간 층층이 쌓은 음식 쟁반 배달 및 80~90년대 보자기 도시락(Caterers) 수거 문화"], "english": "After Korea's liberation from colonial rule, it was divided into two. Then came the Korean War (1950-1953). During this series of upheavals, Korea's delivery system fell apart. It was during the 1960s that delivery services grew again thanks to urbanization. As economic development progressed, people flocked to urban areas, where labor became concentrated. This boosted the demand for delivery services. Deliveries of newspapers and milk quickly became popular. During lunchtime, city centers were filled with restaurant workers delivering trays full of food, stacked on top of each other. In the late 1980s and 1990s, caterers delivered homemade lunches in cloth bags to urban offices and returned later to collect empty dishes. The delivery area grew rapidly.", "korean": "식민지 지배에서 한국이 해방된 후, 한국은 둘로 나뉘었다. 그리고는 한국 전쟁(1950-1953)이 발발했다. 이 일련의 격변 동안, 한국의 배달 시스템은 무너졌다. 도시화 덕분에 배달 산업이 다시 성장한 것은 1960년대 동안이었다. 경제 발전이 진행됨에 따라, 사람들은 노동력이 집중되는 도시 지역으로 모여들었다. 이것이 배달 서비스에 대한 수요를 촉진시켰다. 신문과 우유 배달이 빠르게 인기를 얻었다. 점심시간 동안, 도시 중심부는 음식이 가득 찬 차곡차곡 쌓아 올려진 쟁반을 배달하는 식당 직원들로 가득 찼다. 1980년대 후반과 1990년대에는, 음식 공급자들이 보자기에 싼 집에서 만든 점심을 도시의 사무실로 배달하였고 나중에 빈 그릇을 가져가기 위해 돌아왔다. 배달 영역은 빠르게 성장했다.", "vocab": [{"word": "upheaval", "meaning": "격변, 대변동", "desc": "= turmoil, disruption"}, {"word": "fall apart", "meaning": "무너지다, 결딴나다", "desc": "기능이 정지되다"}, {"word": "flock to ~", "meaning": "~로 떼 지어 모여들다", "desc": "대규모 인구 이동"}, {"word": "boost", "meaning": "촉진하다, 끌어올리다", "desc": "= stimulate, increase"}, {"word": "caterer", "meaning": "출장 요리업체, 음식 공급업자", "desc": "도시락 배달 업체"}], "nuance": [{"title": "부사 도치 구문 (Then came the Korean War)", "content": "부사 Then이 문두에 오며 [동사 came + 주어 the Korean War]로 어순 도치 발생."}, {"title": "It was ~ that 강조구문 (It was during the 1960s that...)", "content": "시간 부사구 during the 1960s를 강조하여 '배달 서비스가 다시 성장한 것은 바로 1960년대였다'를 표현."}]}, {"id": 5, "section": "택배의 탄생과 IT 혁신 (1992-Present)", "title": "1992년 택배의 출범과 디지털·물류 자동화 혁명", "bullets": ["1992년 신속 가정 배송 '택배' 도입 (첫날 2건 $\\rightarrow$ 현재 연간 1인당 65회 이용)", "물류 자동화, GPS 지도, 모바일 앱 및 전자상거래(E-commerce) 폭발적 성장이 견인"], "english": "In 1992, taekbae service, an express home delivery service through which a person receives an ordered item in at least a day or two, was introduced. On the first day, there were just two deliveries. Now, millions of items are delivered daily. On average, a South Korean uses taekbae sixty-five times per year. It was the development of digital and information technology that enabled the remarkable growth of taekbae. Logistics automation, GPS maps, and mobile applications have extended the range and scale of delivery services while keeping prices reasonable. The phenomenal growth of e-commerce has driven the need for delivery services.", "korean": "1992년에는 주문한 물건을 최소 하루 또는 이틀 만에 받을 수 있는 신속 가정 배달 서비스인 택배 서비스가 도입되었다. 첫날에는 고작 두 건의 배달이 있었다. 이제 매일 수백만 개의 물건들이 배달된다. 평균적으로 한국인 한 명은 택배를 연간 65번 이용한다. 택배의 놀랄 만한 성장을 가능하게 해준 것은 바로 디지털과 정보 기술의 발전이었다. 물류 자동화, GPS 지도, 그리고 모바일 애플리케이션은 가격을 적절하게 유지하면서도 배달의 범위와 규모를 넓혀 주었다. 전자 상거래의 놀랄 만한 성장이 배달 서비스의 필요를 이끌어 왔다.", "vocab": [{"word": "express home delivery", "meaning": "신속 가정 배송 (택배)", "desc": "문앞까지 신속 배달"}, {"word": "logistics automation", "meaning": "물류 자동화", "desc": "분류 및 이송 자동화 시스템"}, {"word": "phenomenal", "meaning": "경이로운, 경탄할 만한", "desc": "= extraordinary, astounding"}, {"word": "e-commerce", "meaning": "전자상거래", "desc": "온라인 쇼핑 생태계"}], "nuance": [{"title": "전치사 + 관계대명사 (through which...)", "content": "an express home delivery service [through which a person receives an ordered item...] (그 서비스를 통하여 물건을 수령함)."}, {"title": "It was ~ that 강조구문 (주어 강조)", "content": "It was [the development of digital and information technology] that enabled...\n$\rightarrow$ 택배의 성장을 가능하게 한 주체인 '디지털 및 정보 기술의 발전'을 강조."}]}, {"id": 6, "section": "익일 배송에서 당일 배송으로 (Speed Evolution)", "title": "익일 배송 원칙과 당일 배송·시간 지정 배송으로의 진화", "bullets": ["택배의 기본 원칙(Rule of thumb): 오늘 주문하면 내일 도착하는 '익일 배송'", "당일 주문·당일 배송 및 특정 날짜/시간 맞춤형 지정 배송으로 초고속 진화"], "english": "A rule of thumb for taekbae is next-day delivery; if a person orders something today, it should arrive tomorrow. Taekbae is changing so rapidly that now more and more items are delivered on the same day they are ordered. It is also possible to choose a specific date and time for delivery.", "korean": "택배의 원칙은 익일 배송이다. 누군가 오늘 무언가를 주문하면 내일 도착해야 한다. 택배는 매우 빠르게 변화하고 있어 이제는 점점 더 많은 물품들이 그것들이 주문된 당일에 배달되고 있다. 또한, 배송을 위한 특정 날짜와 시간을 선택할 수도 있다.", "vocab": [{"word": "rule of thumb", "meaning": "경험 법칙, 기본 원칙", "desc": "통용되는 기본 기준"}, {"word": "next-day delivery", "meaning": "익일 배송", "desc": "주문 다음 날 도착"}, {"word": "same day", "meaning": "당일 배송", "desc": "주문 당일 수령"}, {"word": "more and more", "meaning": "점점 더 많은", "desc": "비교급 and 비교급"}], "nuance": [{"title": "so ~ that 구문 (결과의 부사절)", "content": "Taekbae is changing [so rapidly that now more and more items are delivered on the same day...] (택배가 너무나 급속히 변화하여 당일 배송이 일반화됨)."}, {"title": "관계부사 when 생략 (on the same day [they are ordered])", "content": "선행사 the same day 뒤에 관계부사 when (또는 that)이 생략된 수식 구조."}]}, {"id": 7, "section": "미래 기술과 신뢰의 인프라 (Future & Trust)", "title": "자율주행·드론 배송 실험과 한국인의 삶을 지탱하는 신뢰 인프라", "bullets": ["기술 발전(Leaps and bounds): 드론, 자율주행 로봇을 활용한 미래 배송 시험", "한국 배달 산업의 핵심 가치: 신속성(Rapid), 안전성(Safe), 합리적 가격(Affordable)과 고객 신뢰"], "english": "Taekbae services, beginning from foot-powered delivery, have grown by leaps and bounds thanks to advancements in technology. Moreover, the services will likely be developed further due to continuing technological upheavals. Drones and autonomous robots are being used to deliver items by logistics companies in foreign countries. In Korea, companies are testing the possibility of using advanced equipment such as autonomous vehicles, delivery robots, and drones for deliveries.\n\nIt is fair to say that modern Korean life cannot function as it does without its delivery services. To maintain trust with customers, the Korean delivery industry prioritizes rapid, safe, and affordable transportation. These persistent efforts for reliability and the adoption of advanced delivery technology will continue being the driving forces that will move Korean delivery forward well into the future.", "korean": "발로 움직이는 배달에서 시작한 이래로, 택배 서비스는 기술의 발전 덕분에 비약적으로 성장했다. 게다가 계속되는 기술적 격변으로 인해 이 서비스는 더 발달할 것 같다. 외국에서는 드론과 자동화 로봇들이 물류 회사에 의해 물건을 배달하기 위해 사용되고 있다. 한국에서는 기업들이 자율 주행차, 배달 로봇, 그리고 드론과 같은 진보한 장비를 배달에 사용할 수 있는 가능성을 시험해 보고 있다.\n\n현대 한국의 삶은 배달 서비스 없이는 지금처럼 기능할 수 없다고 말해도 과언이 아니다. 고객들과의 신뢰를 유지하기 위해, 한국 배달 산업은 빠르고, 안전하고, 적절한 가격의 운송을 최우선으로 삼고 있다. 이러한 신뢰를 위한 꾸준한 노력과 진보한 배달 기술의 도입은 한국 배달을 미래로 훨씬 나아가게 할 원동력이 될 것이다.", "vocab": [{"word": "by leaps and bounds", "meaning": "비약적으로, 일취월장하여", "desc": "= rapidly, spectacularly"}, {"word": "autonomous", "meaning": "자율적인, 자율 주행의", "desc": "인간 조작 없는 무인 시스템"}, {"word": "It is fair to say that ~", "meaning": "~라고 말해도 과언이 아니다/타당하다", "desc": "= It is not an exaggeration to say that"}, {"word": "prioritize", "meaning": "우선순위를 매기다, 최우선하다", "desc": "= give priority to"}, {"word": "driving force", "meaning": "원동력, 추진력", "desc": "미래 발전을 이끄는 핵심 동력"}], "nuance": [{"title": "It is fair to say that ... cannot function without ...", "content": "'배달 서비스 없이는 현대 한국인의 일상이 기능할 수 없다고 말해도 결코 지나치지 않다'는 한국 사회의 핵심 인프라로서의 위상 강조."}, {"title": "현재진행 수동태 (are being used to deliver)", "content": "Drones and autonomous robots [are being used] to deliver... : 드론과 로봇이 배송을 위해 활발히 '사용되고 있는' 현시점의 역동적 상황 서술."}]}];
+    const STORAGE_KEY = 'lesson2_ybm_kdelivery_master_v5';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "lesson2_ybm_kdelivery_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>

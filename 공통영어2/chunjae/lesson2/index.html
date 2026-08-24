@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teen-Designed Tech for Improving Access - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">공통영어2 천재(강상구) 2과</span>
+      <h1 class="header-title">Teen-Designed Tech for Improving Access</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "서론 (Introduction)", "title": "전 세계 10억 명의 장애와 일상 접근성(Access) 문제", "bullets": ["전 세계 인구의 15%(약 10억 명): 일상생활에서 신체적·사회적 접근성 제약 경험", "국제 과학 경진대회에서 접근성 문제 해결을 위해 혁신 기술을 발표한 두 십대 청소년 소개"], "english": "At least one billion people, or 15% of the world's population, experience some form of disability. In order to fully function in everyday life, they need to have the same physical and social access to the places, goods, and services in their communities as everyone else. For many of them, however, access still remains an issue. Here are two teenagers who presented new inventions to tackle the issue at an international science competition.", "korean": "적어도 10억 명, 즉 전세계 인구의 15%는 어떠한 형태의 장애를 겪고 있다. 그들이 일상에서 온전히 활동하려면 다른 모두와 동일하게 공동체 내의 장소, 재화 및 서비스에 물리적으로나 사회적으로 접근할 수 있어야 한다. 그러나 그들 중 다수에게 접근은 여전히 문제로 남아 있다. 국제 과학 경연 대회에 이 문제를 해결하기 위한 새 발명품을 내놓은 두 십대 청소년이 여기에 있다.", "vocab": [{"word": "disability", "meaning": "장애", "desc": "신체적·정신적 제약"}, {"word": "in order to V", "meaning": "~하기 위하여", "desc": "= so as to V (목적)"}, {"word": "fully function", "meaning": "온전히 활동/기능하다", "desc": "일상의 자립적 영위"}, {"word": "the same A as B", "meaning": "B와 똑같은 A", "desc": "동등한 접근성"}, {"word": "remain", "meaning": "여전히 ~인 채로 남아있다", "desc": "2형식 지속 동사 (remains an issue)"}, {"word": "tackle", "meaning": "(문제와) 씨름하다, 해결에 착수하다", "desc": "= address, deal with, solve"}], "nuance": [{"title": "the same A as B (the same access ... as everyone else)", "content": "다른 모든 사람들과 동등한 수준의 물리적·사회적 접근성(physical and social access)을 보장받아야 함을 나타내는 비교 구문."}, {"title": "to tackle the issue (목적의 to부정사)", "content": "inventions [to tackle the issue at an international science competition] : 형용사적 용법으로 명사 inventions를 수식."}]}, {"id": 2, "section": "Seoyoung Jun - 3D Braille Map", "title": "Seoyoung Jun: 3D 공간 인식과 뇌의 촉각 정보 처리 발견", "bullets": ["한쪽 눈을 감고 연필꽂이를 집어 들며 '3D 공간 위치 인지에 양 눈이 필수가 아님'을 깨달음", "조사를 통해 '뇌는 시각 없이도 3D 정보를 처리할 수 있음'을 확인 $\\rightarrow$ 시각장애인 장치 아이디어 탄생"], "english": "3D Braille Map\n\nWhile thinking about her homework, Seoyoung Jun closed one eye and successfully picked up her pencil holder. At that moment, she realized that orienting herself in a 3D space didn't require both eyes. This surprised her. With research, she learned that the brain can process 3D information without any vision at all. And with that, the idea for a new device for people with visual disabilities was born.", "korean": "3차원 점자 지도\n\n숙제를 생각하다가 Seoyoung Jun은 한쪽 눈을 감은 채로 문제없이 연필꽂이를 집어 들었다. 그 순간 그녀는 3차원 공간에서 자기 위치를 인식하는 데에 양쪽 눈이 필요하지는 않음을 알았다. 그녀에게는 이것이 놀라웠다. 조사를 통해 그녀는 뇌가 시각이 전혀 없더라도 3차원 정보를 처리할 수 있다는 것을 알게 되었다. 이렇게 시각 장애를 가진 사람들을 위한 새로운 장치에 대한 아이디어가 탄생했다.", "vocab": [{"word": "orient oneself", "meaning": "자신의 위치를 파악하다/인식하다", "desc": "공간 정위(Spatial Orientation)"}, {"word": "process", "meaning": "처리하다", "desc": "뇌의 정보 연산"}, {"word": "without ~ at all", "meaning": "전혀 ~ 없이", "desc": "시각의 완전한 부재"}, {"word": "visual disabilities", "meaning": "시각 장애", "desc": "= visual impairments"}], "nuance": [{"title": "접속사가 생략되지 않은 분사구문 (While thinking about...)", "content": "While [she was] thinking about her homework : 시간 관계를 명확히 하기 위해 접속사 While을 남겨둔 분사구문."}, {"title": "동명사 주어 orienting herself in a 3D space", "content": "3차원 공간에서 자신의 위치를 파악하는 것 (동명사구 주어 $\\rightarrow$ 단수 취급, didn't require)."}]}, {"id": 3, "section": "Seoyoung Jun - 3D Braille Map", "title": "적외선 빔 반사와 핀 높낮이를 통한 장애물 감지 점자 지도", "bullets": ["시각장애인은 공간 정보를 주로 '촉각(touch)'에서 얻는다는 원리에 착안", "적외선광 발사 $\\rightarrow$ 주변 장애물(벽, 가구) 반사 빔 감지 $\\rightarrow$ 핀 높낮이 돌출로 전방 배치 안내"], "english": "Those who have lost sight get their spatial information mainly from touch, not vision. She based her new navigation device on this fact. This little device sends a beam of infrared light to gather 3D information about what may lie around the user, including walls and furniture. The bounced beam conveys that information to the device, which then raises little pins to indicate where those obstacles are. By \"reading\" the positions and heights of those pins, the user can understand the arrangement of structures and objects lying ahead and navigate around them.", "korean": "시각을 잃은 사람들은 시각이 아니라 주로 촉각으로부터 공간에 대한 정보를 얻는다. 그녀의 새로운 길 안내 장치는 이 사실에 기반을 두었다. 이 작은 장치는 적외선광을 보내서 벽과 가구를 포함하여 사용자 주위에 놓여 있을 수 있는 것들에 관한 3차원 정보를 수집한다. 반사된 적외선이 그 정보를 장치에 전송하는데, 그러면 그 장치는 장애물이 있는 곳을 나타내도록 작은 핀들을 올린다. 그 핀들의 위치와 높낮이를 '읽음'으로써, 사용자는 앞에 놓인 구조물과 물체들의 배치를 파악하고 그것들을 비켜갈 수 있다.", "vocab": [{"word": "spatial information", "meaning": "공간 정보", "desc": "주변 지형 및 물체 배치"}, {"word": "base A on B", "meaning": "A의 기반을 B에 두다", "desc": "원리의 적용"}, {"word": "infrared light", "meaning": "적외선광", "desc": "거리 측정용 센서 광선"}, {"word": "convey", "meaning": "전달하다, 전송하다", "desc": "= transmit, deliver"}, {"word": "obstacle", "meaning": "장애물, 방해물", "desc": "= barrier, hurdle"}, {"word": "navigate around ~", "meaning": "~을 피해 길을 찾아가다", "desc": "장애물 우회 이동"}], "nuance": [{"title": "Those who have lost sight", "content": "Those who = '~하는 사람들' (시각을 잃은 사람들 = people with visual disabilities)."}, {"title": "계속적 관계대명사 , which then raises little pins...", "content": "선행사는 앞의 the device (단수 선행사이므로 단수동사 raises 결합)."}, {"title": "현재분사구 objects lying ahead", "content": "objects [which are] lying ahead (앞에 놓여 있는 물체들 - 자동사 lie의 현재분사 lying)."}]}, {"id": 4, "section": "Seoyoung Jun - 3D Braille Map", "title": "심도 센서, 3x3 모터 제어와 7개월의 연구 성공", "bullets": ["3D 심도 센서와 3x3으로 배열된 9개 모터: 18개 공간 블록을 스캔하여 장애물 높이에 따라 핀 승강", "7개월간의 연구·제작·시험 끝에 첫 작동 성공 $\\rightarrow$ 스마트폰 연동 미래 버전 구상"], "english": "The heart of this device is a 3D depth sensor connected to a small computer. Seoyoung coded the computer to control the nine motors lined up in three rows of three so that each motor could move a pin up and down. The sensor can scan eighteen blocks of space before it, each 0.06m² in size. When it detects an obstacle in any of these blocks, the corresponding pin rises to either the middle or high position, depending on the height of the obstacle. By running your hand over the nine pins, you can tell where the obstacles are and how high they are.\n\nWhen Seoyoung's device worked for the first time, she didn't believe it. To be sure it wasn't a mistake, she shut it off and rebooted it. When it worked again, she started screaming with joy. It had been seven long months of research, building, and testing. She imagines a future version that could be connected to a smartphone, with more pins and more height positions.", "korean": "이 장치의 핵심은 작은 컴퓨터에 연결된 3차원 심도 감지기이다. Seoyoung은 컴퓨터가 세 개씩 세 줄로 배열된 아홉 개의 모터를 조종해서 각 모터가 하나의 핀을 위아래로 움직일 수 있도록 프로그램을 짰다. 감지기는 그 앞에 있는 0.06m² 크기의 상자 모양의 공간 열여덟 개를 훑을 수 있다. 그것이 이 상자들 중 어느 것에서라도 장애물을 감지하면, 그 장애물의 높이에 따라 해당 핀이 중간 또는 상부 위치로 올라간다. 아홉 개의 핀 위에 손을 대서, 장애물이 어디에 있고 높이는 어느 정도인지를 알 수 있게 된다.\n\n최초로 Seoyoung의 장치가 작동했을 때 그녀는 믿기지 않았다. 잘못된 게 아니라는 걸 확인하기 위해 그녀는 그것을 끄고 다시 가동했다. 그것이 다시 작동하자 그녀는 기쁜 나머지 소리를 질렀다. 7개월이라는 긴 시간이 연구와 제작, 그리고 시험에 소요되었다. 그녀는 스마트폰에 연결될 수 있고, 더 많은 핀과 높이 단계가 있는 앞으로의 버전을 그리고 있다.", "vocab": [{"word": "the heart of ~", "meaning": "~의 핵심, 심장부", "desc": "= the core, the essence"}, {"word": "depth sensor", "meaning": "심도 감지기, 거리 측정 센서", "desc": "깊이와 입체 거리를 측정하는 센서"}, {"word": "corresponding", "meaning": "해당하는, 상응하는", "desc": "위치에 일치하는 핀"}, {"word": "run one's hand over ~", "meaning": "~ 위에 손을 훑다/대다", "desc": "촉각으로 핀을 읽는 동작"}, {"word": "shut off", "meaning": "전원을 끄다", "desc": "= turn off, power down"}], "nuance": [{"title": "so that each motor could move a pin... (목적 부사절)", "content": "각 모터가 핀을 위아래로 움직일 수 있도록 하기 위해 (so that + S + can/could + V)."}, {"title": "독립분사구문 each 0.06m² in size", "content": "scan eighteen blocks of space before it, [each (block being) 0.06m² in size] (각각 크기가 0.06m²인)."}, {"title": "대과거 시제 It had been seven long months...", "content": "첫 작동에 성공한 과거 시점(worked)까지 7개월이라는 긴 시간 동안의 연구와 제작이 지속되어 왔음을 나타냄."}]}, {"id": 5, "section": "Nand Vinchhi - Sign Language-to-Speech App", "title": "Nand Vinchhi: 기계 없는 실시간 미국 수어(ASL) 번역 AI 앱", "bullets": ["별도 기계 장치 없이 스마트폰 카메라만으로 수어를 실시간 번역하는 인공지능 앱 개발", "난관 봉착 시 수면을 통한 해결(Sleeping on it) $\\rightarrow$ 손가락 끝 주요 지점(Key points) 머신러닝 학습"], "english": "Sign Language-to-Speech App\n\nAs a coder, Nand Vinchhi wanted to invent something that didn't require a mechanical device. One day, he was brainstorming with friends, and the group came up with an idea for an app that could translate sign language. In the end, they decided not to develop it, but Nand couldn't stop thinking about the translator. In just a few months, he developed an app based on artificial intelligence for translating American Sign Language (ASL) in real time. Nand's app was basically a speech-to-text app for sign language, where hand movements corresponded to speech.\n\nThe hardest part was figuring out how to make the app recognize hand gestures. At times, he felt he was stuck. When that happened, he would go to sleep. For Nand, sleeping on it paid off. He decided to focus on the body parts which are important in signing, such as individual fingertips. Using a machine-learning program, he then taught the app to identify those key points in the videos he took.", "korean": "수어-음성 변환 앱\n\n컴퓨터 프로그래머로서 Nand Vinchhi는 기계 장치를 필요로 하지 않는 무언가를 발명하고 싶었다. 어느 날, 그는 친구들과 자유롭게 생각을 나누고 있었고, 그들은 수어를 번역하는 앱에 대한 아이디어를 떠올렸다. 결국 그들은 그것을 개발하지 않기로 했지만, Nand는 번역 앱에 대한 생각을 떨칠 수가 없었다. 단 몇 달 만에 그는 미국식 수어를 실시간으로 번역하는 인공 지능 기반의 앱을 개발했다. Nand의 앱은 기본적으로 수어 대상의 말-문자 변환 앱이었고, 여기에서는 손동작이 말에 해당했다.\n\n가장 어려운 부분은 앱이 손동작을 인식하게 만드는 방법을 찾는 것이었다. 때로는 꼼짝도 못하는 느낌이 들었다. 그럴 때면, 그는 잠을 자곤 했다. Nand에게 하룻밤을 자며 생각하는 방법은 효과가 있었다. 그는 각각의 손가락 끝과 같이 수어를 쓸 때 중요한 신체 부위에 초점을 맞추기로 했다. 그런 다음 그는 기계학습 프로그램을 이용해서 그가 찍은 영상 속에서 그 주요 지점들을 앱이 식별하도록 학습시켰다.", "vocab": [{"word": "mechanical device", "meaning": "기계 장치", "desc": "착용형 하드웨어 기기"}, {"word": "American Sign Language (ASL)", "meaning": "미국식 수어", "desc": "청각장애인의 손짓 언어"}, {"word": "correspond to ~", "meaning": "~에 해당하다/일치하다", "desc": "손동작 = 말"}, {"word": "sleep on it", "meaning": "하룻밤 자며 신중히 생각하다", "desc": "수면을 통해 생각을 정리함"}, {"word": "pay off", "meaning": "결실을 맺다, 효과가 있다", "desc": "= bring good results, be successful"}, {"word": "key points", "meaning": "주요 지점, 핵심 포인트", "desc": "손가락 관절 및 끝점 좌표"}], "nuance": [{"title": "couldn't stop thinking about ~ (stop + 동명사)", "content": "stop thinking : 생각을 멈출 수가 없었다 (stop -ing: ~하던 것을 멈추다 vs. stop to V: ~하기 위해 멈추다)."}, {"title": "sleeping on it paid off (관용 표현)", "content": "• sleep on it : 풀리지 않는 문제에 대해 하룻밤 자면서 뇌의 무의식적 정리를 유도하는 기법.\n• pay off : 좋은 성과로 이어지다/보상을 받다."}, {"title": "taught the app to identify... (5형식 teach + O + to V)", "content": "머신러닝 알고리즘을 통해 앱이 영상 속 손가락 끝 주요 지점을 '식별하도록(to identify)' 훈련시켰다는 인공지능 학습 과정 서술."}]}, {"id": 6, "section": "Nand Vinchhi - Sign Language-to-Speech App", "title": "90.4% 정확도, 0.3초 지연시간과 글로벌 플랫폼 연동 비전", "bullets": ["작동 원리: 카메라 제스처 포착 $\\rightarrow$ ASL 알고리즘 단어 매칭 $\\rightarrow$ 텍스트 변환 및 음성 출력", "90.4% 번역 정확도와 0.3초(3/10초) 초고속 반응 $\\rightarrow$ 기존 화상통화 플랫폼 연동 꿈"], "english": "When the user runs the app, gestures are captured by the camera. Then, the app uses an algorithm to match the movements with words in ASL, which are turned into text and then spoken aloud.\n\nAccording to Nand, his system now translates signs with 90.4% accuracy, and the delay from signing to translation is only about three-tenths of a second. He imagines the technology could someday become part of existing communication platforms. That could help ASL speakers communicate with those who don't know the language.", "korean": "사용자가 앱을 실행하면 카메라는 동작을 포착한다. 그러면 앱은 알고리즘을 통해 동작에 맞는 미국식 수어의 어휘를 찾고, 이것이 문자로 변환된 뒤 발화된다.\n\nNand에 의하면, 그의 시스템은 현재 90.4%의 정확도로 수어를 번역하고, 수어에서 번역까지 지연되는 시간은 약 0.3초에 불과하다. 그는 이 기술이 언젠가 현재 사용되는 의사소통 플랫폼의 일부가 될 것을 꿈꾼다. 그것은 미국식 수어를 사용하는 사람들이 그 수어를 모르는 이들과 대화하는 데 도움이 될 것이다.", "vocab": [{"word": "capture", "meaning": "포착하다, 촬영하다", "desc": "카메라 렌즈로 감지"}, {"word": "speak aloud", "meaning": "소리 내어 말하다/음성 출력하다", "desc": "TTS(Text-to-Speech)"}, {"word": "accuracy", "meaning": "정확도, 정밀도", "desc": "번역의 일치율 (90.4%)"}, {"word": "three-tenths of a second", "meaning": "10분의 3초 (0.3초)", "desc": "분수 표현: 기수(three) + 서수 복수(tenths)"}, {"word": "communication platform", "meaning": "의사소통 플랫폼", "desc": "Zoom, 화상통화 메신저 등"}], "nuance": [{"title": "분수 표현법 (three-tenths of a second)", "content": "분자는 기수(three), 분모는 서수(tenths)로 표현하며, 분자가 2 이상이므로 분모에 복수형 -s가 붙음 (= 3/10초, 0.3초)."}, {"title": "which are turned into text and then spoken aloud", "content": "계속적 관계대명사 which의 선행사는 words in ASL (복수 선행사 $\\rightarrow$ are turned into ... and spoken aloud 수동태 병렬)."}, {"title": "help + 목적어 + 동사원형 (help ASL speakers communicate)", "content": "help의 목적격 보어로 원형부정사 communicate (또는 to communicate) 결합."}]}, {"id": 7, "section": "결론 (Conclusion)", "title": "기술의 창의적 활용과 모두를 위한 배리어프리(Accessible) 세상", "bullets": ["두 발명품의 공통점: 장애인의 일상생활 품질을 높이기 위한 '창의적 기술 활용'", "십대 청소년들의 노력이 모두를 위한 더 접근하기 쉬운 세상을 만드는 데 크게 기여(Go a long way)할 것임"], "english": "What these inventions have in common is a creative use of technology to enhance the daily lives of people with disabilities. Their efforts will go a long way toward a more accessible world for all.", "korean": "이 발명품들의 공통점은 장애를 가진 사람들의 일상의 질을 높이기 위해 기술을 창조적으로 활용했다는 것이다. 그들의 노력은 모든 이들에게 보다 접근이 용이한 세상이 되는 데에 큰 도움이 될 것이다.", "vocab": [{"word": "have in common", "meaning": "공통으로 가지다", "desc": "공통 분모"}, {"word": "enhance", "meaning": "향상시키다, 높이다", "desc": "= improve, elevate"}, {"word": "people with disabilities", "meaning": "장애인들", "desc": "장애를 가진 사람들"}, {"word": "go a long way toward ~", "meaning": "~에 크게 기여하다/도움이 되다", "desc": "장기적이고 막대한 영향력"}], "nuance": [{"title": "관계대명사 what 명사절 주어 (What these inventions have in common)", "content": "• What these inventions have in common [단수 명사절 주어] + is [단수동사] + a creative use of technology...\n• '이 발명품들이 공통으로 가지고 있는 것은 바로 ~이다'."}, {"title": "go a long way toward -ing/명사 (핵심 관용구)", "content": "~에 크게 기여하다/효과가 있다 (toward는 전치사이므로 명사구 a more accessible world 결합)."}]}];
+    const STORAGE_KEY = 'lesson2_chunjae_access_master_v5';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "lesson2_chunjae_access_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>

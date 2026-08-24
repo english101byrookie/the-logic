@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Young Change-Makers Shaping the Future - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">공통영어2 YBM(김은형) 1과</span>
+      <h1 class="header-title">Young Change-Makers Shaping the Future</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "서론 (Introduction)", "title": "미래의 희망인 청년 체인지메이커와 3가지 혁신 사례", "bullets": ["기술, 과학, 비영리단체보다 우리에게 더 큰 미래의 희망을 주는 존재는 바로 '젊은이들'임", "지역사회와 지구촌 문제 해결을 위해 이미 행동에 나선 3명의 영감을 주는 청년 사례 소개"], "english": "There are a lot of things that fill us with hope for the future: technology, science, accountable leaders, and nonprofit organizations committed to doing good. However, few things give us more hope for the future than young people. Some young people are already working toward solutions for the problems their communities and the world are facing. Let's look at three inspirational examples of these young people.", "korean": "우리를 미래에 대한 희망으로 채우는 많은 것들이 있다: 기술, 과학, 책임감 있는 지도자들, 그리고 선을 행하는 데 전념하는 비영리 단체들. 그러나 젊은이들보다 우리에게 미래에 대한 더 많은 희망을 주는 것들은 거의 없다. 일부 젊은이들은 이미 그들의 공동체와 세계가 직면하고 있는 문제들에 대한 해결책을 향해 노력하고 있다. 이 젊은이들의 세 가지 영감을 주는 예들을 살펴보자.", "vocab": [{"word": "accountable", "meaning": "책임감 있는, 해명할 책임이 있는", "desc": "= responsible, answerable"}, {"word": "committed to -ing", "meaning": "~에 헌신/전념하는", "desc": "to는 전치사이므로 뒤에 동명사 doing 결합"}, {"word": "few things", "meaning": "~한 것은 거의 없다", "desc": "부정 주어 구문 (준부정어 few)"}, {"word": "inspirational", "meaning": "영감을 주는, 고무적인", "desc": "= inspiring, motivating, uplifting"}, {"word": "work toward ~", "meaning": "~을 향해 노력하다/일하다", "desc": "목표 달성을 위한 점진적 활동"}], "nuance": [{"title": "few things give us more hope ... than young people (부정주어 비교급을 이용한 최상급 표현)", "content": "• 직역: 젊은이들보다 우리에게 미래에 대한 더 많은 희망을 주는 것은 거의 없다.\n• 최상급 의미: 젊은이들이야말로 우리에게 가장 큰 희망을 준다 (= Nothing gives us more hope than young people / Young people give us the most hope)."}, {"title": "committed to doing good (전치사 to + 동명사)", "content": "• 과거분사구 [committed to doing good]이 앞의 명사구 [nonprofit organizations]를 후치 수식함.\n• be committed to -ing : ~에 전념하다/헌신하다 (= be dedicated to -ing, be devoted to -ing)."}, {"title": "accountable vs. responsible 의 뉘앙스", "content": "responsible은 단순한 역할상의 '책임'을 뜻하는 반면, accountable은 자신의 행동과 결과에 대해 대중에게 '해명하고 투명하게 책임지는' 고도의 공적 책임감을 의미합니다."}]}, {"id": 2, "section": "본론 1. Trisha Prabhu", "title": "ReThink: AI 가상 키보드로 온라인 혐오와 사이버 폭력 방지", "bullets": ["미국의 젊은 컴퓨터 과학자 Trisha Prabhu: 사이버 폭력 퇴치 앱 'ReThink' 개발", "AI 가상 키보드: 상처를 줄 수 있는 메시지를 전송 전 자동 감지하여 재고(pause and reconsider)하도록 유도"], "english": "Combating Online Hate with ReThink\n\nTrisha Prabhu, a young computer scientist from the U.S., is fighting cyberbullying with her innovative application ReThink. ReThink is a virtual keyboard that uses artificial intelligence to detect potentially hurtful text messages before they are sent and prompts young people to pause and reconsider their words. When a user types a message that contains potentially offensive language, such as \"I hate you,\" ReThink prompts: \"Hold on! Are you sure you want to say that?\" or \"Remember. You are what you type!\"", "korean": "ReThink로 온라인 혐오와 맞서기\n\n미국의 젊은 컴퓨터 과학자인 트리샤 프라부는 그녀의 혁신적인 애플리케이션인 ReThink로 사이버 폭력과 싸우고 있다. ReThink는 인공 지능을 사용하여 잠재적으로 상처를 주는 문자 메시지가 전송되기 전에 그것들을 감지하고 젊은이들이 잠시 멈추고 그들의 말을 재고하도록 촉구하는 가상 키보드이다. 사용자가 \"미워.\"와 같은 잠재적으로 공격적인 언어를 포함하는 메시지를 입력할 때 ReThink는 다음과 같이 프롬프트를 표시한다. \"잠깐만요! 정말 그렇게 말하고 싶나요?\" 또는 \"기억하세요. 당신은 당신이 입력한 것입니다!\"", "vocab": [{"word": "combat", "meaning": "(악습·범죄와) 싸우다, 맞서다", "desc": "= fight against, tackle"}, {"word": "cyberbullying", "meaning": "사이버 폭력, 온라인 괴롭힘", "desc": "디지털 공간에서의 혐오와 모욕 행위"}, {"word": "detect", "meaning": "감지하다, 발견하다", "desc": "= notice, identify, discover"}, {"word": "prompt A to V", "meaning": "A가 ~하도록 유도/촉구하다", "desc": "5형식 유도 동사 (= urge, encourage A to V)"}, {"word": "offensive", "meaning": "공격적인, 모욕적인", "desc": "= hurtful, insulting, rude"}, {"word": "virtual keyboard", "meaning": "가상 키보드 (소프트웨어 키보드)", "desc": "스마트폰 화면에 표시되는 입력기"}], "nuance": [{"title": "주격 관계대명사절 내의 병렬 구조 (uses ... and prompts ...)", "content": "ReThink is a virtual keyboard [that uses artificial intelligence ... and prompts young people to pause and reconsider...]\n• 선행사 a virtual keyboard(단수)에 맞춰 관계사절 내 동사 uses와 prompts가 and로 병렬 연결됨."}, {"title": "You are what you type! (관계대명사 what)", "content": "• '당신이 입력하는 글이 곧 당신 자신이다'라는 경각심을 주는 격언적 표현.\n• what you type: 선행사를 포함하는 관계대명사 what이 이끄는 보어 명사절 (= the thing that you type)."}, {"title": "prompt A to V 의 5형식 구문", "content": "prompt young people to pause and reconsider (젊은이들이 잠시 멈추어 재고하도록 촉구하다)."}]}, {"id": 3, "section": "본론 1. Trisha Prabhu", "title": "ReThink 개발 동기와 청소년 93%의 행동 변화 성과", "bullets": ["개발 동기: 13세 때 1년 반 동안 사이버 괴롭힘을 당한 12세 소녀의 비극적 뉴스를 접하고 결심", "실증적 성과: 전 세계 학교 도입, 청소년들이 93%의 상황에서 마음을 바꾸어 악플 게시 철회"], "english": "In 2014, when Trisha was just thirteen years old, she read the tragic news of a twelve-year-old girl who had been cyberbullied for over a year and a half. Shocked at the story, she decided to prevent cyberbullying by using technology and created ReThink. ReThink has been used by schools and organizations worldwide and has successfully raised awareness on cyberbullying. It has helped young people make better decisions in digital space where people could easily be unkind toward each other. In fact, it has been found that when using ReThink, adolescents change their minds 93% of the time and decide not to post offensive messages.", "korean": "2014년, 트리샤가 겨우 열세 살이었던 때 그녀는 일 년 반 이상 사이버 폭력을 당했던 열두 살 소녀의 비극적인 뉴스를 읽었다. 그 이야기에 충격을 받고 그녀는 기술을 사용하여 사이버 폭력을 막기로 결심하고 ReThink를 만들었다. ReThink는 전 세계의 학교와 단체에 의해 사용되어 왔고 성공적으로 사이버 폭력에 대한 인식을 높였다. 그것은 사람들이 서로에게 쉽사리 불친절할 수 있는 디지털 공간에서 젊은이들이 더 나은 결정을 내릴 수 있도록 도왔다. 실제로 ReThink를 사용할 때 청소년들은 93%의 경우 마음을 바꾸고 공격적인 메시지를 게시하지 않기로 결정하는 것으로 밝혀졌다.", "vocab": [{"word": "tragic", "meaning": "비극적인, 참담한", "desc": "= heartbreaking, disastrous"}, {"word": "raise awareness on ~", "meaning": "~에 대한 인식을 높이다", "desc": "사회적 관심과 경각심을 고취하다"}, {"word": "adolescent", "meaning": "청소년, 십대", "desc": "= teenager, young person"}, {"word": "decide not to V", "meaning": "~하지 않기로 결정하다", "desc": "to부정사의 부정은 앞에 not 위치"}], "nuance": [{"title": "과거분사구문 Shocked at the story", "content": "• 이유를 나타내는 분사구문 (= As she was shocked at the story).\n• 감정을 느끼는 주체(she)와의 수동 관계이므로 과거분사 Shocked 사용."}, {"title": "과거완료 수동태 (had been cyberbullied)", "content": "트리샤가 뉴스를 읽은 과거 시점(read)보다 더 이전에 1년 반 동안 괴롭힘을 당해왔음을 나타내기 위해 대과거 수동(had been p.p.) 사용."}, {"title": "가주어-진주어 구문 (it has been found that...)", "content": "it(가주어) - that절(진주어): ~라는 사실이 밝혀졌다/발견되었다."}]}, {"id": 4, "section": "본론 2. Kelvin Doe", "title": "시에라리온의 독학 발명가: 폐전자제품으로 만든 FM 라디오", "bullets": ["시에라리온 출신의 켈빈 도: 쓰레기통의 버려진 전자 부품을 수집하여 13세에 FM 라디오 방송국 구축", "2014년 에볼라 발병 시 학교 폐쇄 상황에서 라디오를 통해 학생들에게 원격 교육 프로그램 송출"], "english": "Inventing with Discarded Electronic Parts\n\nKelvin Doe, a self-taught inventor and engineer from Sierra Leone, has been fascinated with electronics since childhood. He would often do experiments with discarded electronics he found in trash cans to create his own inventions. In 2009, at the young age of thirteen, Kelvin built his own FM radio station by using a transmitter he made from discarded electronic parts. In 2014, during the time when an Ebola outbreak affected Africa, Kelvin's radio station proved to be invaluable. With schools closed, his radio station provided educational programs to students over the radio. This was especially important in his country, where the radio was the main source of media.", "korean": "버려진 전자 부품으로 발명하기\n\n시에라리온 출신의 독학한 발명가이자 공학자인 켈빈 도는 어린 시절부터 전자 기기에 매료되어 왔다. 그는 종종 자신의 발명품을 만들기 위해 쓰레기통에서 발견한 버려진 전자 기기로 실험을 하곤 했다. 2009년, 열세 살의 어린 나이에, 켈빈은 버려진 전자 부품으로 만든 송신기를 사용하여 자신만의 FM 라디오 방송국을 만들었다. 2014년, 에볼라 발병이 아프리카에 영향을 미쳤던 시기에, 켈빈의 라디오 방송국은 귀중한 것으로 증명되었다. 학교가 문을 닫은 가운데, 그의 라디오 방송국은 학생들에게 라디오를 통해 교육 프로그램을 제공했다. 이것은 라디오가 미디어의 주요 공급원이었던 그의 나라에서 특히 중요했다.", "vocab": [{"word": "self-taught", "meaning": "독학의, 스스로 터득한", "desc": "정규 교육 없이 스스로 학습한"}, {"word": "discarded", "meaning": "버려진, 폐기된", "desc": "= thrown away, abandoned"}, {"word": "transmitter", "meaning": "송신기", "desc": "전파 신호를 발신하는 장치"}, {"word": "outbreak", "meaning": "(전염병·전쟁의) 발병, 발발", "desc": "갑작스러운 확산"}, {"word": "invaluable", "meaning": "매우 귀중한, 값을 매길 수 없는", "desc": "= priceless (valueless: '가치 없는'과 정반대 뜻임에 주의!)"}, {"word": "with + 명사 + 분사", "meaning": "~한 상황에서", "desc": "With schools closed: 학교가 문을 닫은 가운데"}], "nuance": [{"title": "invaluable vs. valueless 어휘 주의", "content": "• invaluable : 값을 매길 수 없을 만큼 '매우 귀중한' (= priceless, highly valuable).\n• valueless / worthless : 가치가 전혀 없는, 쓸모없는.\n• in- 접두사가 반의어가 아닌 '측정 불가능할 정도로 귀중함'을 나타냄."}, {"title": "with + 명사 + 과거분사 (With schools closed)", "content": "학교(schools)가 능동적으로 닫는 것이 아니라 '폐쇄된(closed)' 수동적 상태이므로 과거분사 closed 결합."}, {"title": "관계부사의 계속적 용법 (, where the radio was...)", "content": "선행사인 his country에 대해 부연 설명하는 관계부사 where (= and in his country)."}]}, {"id": 5, "section": "본론 2. Kelvin Doe", "title": "지역사회를 위한 적정기술 발명: 배터리, 소금물 발전기, 풍차", "bullets": ["주변 사람들을 위한 저비용·적정 가격의 에너지 자원 공급", "가정용 배터리, 소금물 작동 발전기, 지역사회 전력 공급용 풍차 자체 설계 및 건설"], "english": "Kelvin also improved the lives of people around him by providing affordable resources. He invented a battery capable of powering homes and small businesses, designed a generator that runs on salt water, and constructed a windmill to supply electricity to his community.", "korean": "켈빈은 또한 적당한 가격의 자원을 제공함으로써 그의 주변 사람들의 삶을 향상시켰다. 그는 가정과 소규모 사업체에 전력을 공급할 수 있는 배터리를 발명했고, 소금물로 작동하는 발전기를 설계했으며, 그의 지역 사회에 전기를 공급하기 위해 풍차를 건설했다.", "vocab": [{"word": "affordable", "meaning": "가격이 적당한, 감당할 수 있는", "desc": "= reasonably priced, low-cost"}, {"word": "capable of -ing", "meaning": "~할 수 있는", "desc": "형용사구 후치 수식"}, {"word": "power (동사)", "meaning": "동력/전력을 공급하다", "desc": "= supply power to"}, {"word": "generator", "meaning": "발전기", "desc": "전기를 생산하는 기계"}, {"word": "run on ~", "meaning": "~로 가동되다/작동하다", "desc": "에너지원을 나타냄 (runs on salt water)"}, {"word": "windmill", "meaning": "풍차, 풍력 발전기", "desc": "바람을 이용한 동력 장치"}], "nuance": [{"title": "과거 동사의 3중 병렬 구조", "content": "He [invented a battery ...] , [designed a generator ...] , and [constructed a windmill ...] : 주어 He에 세 개의 과거동사가 병렬 연결됨."}, {"title": "형용사구의 후치 수식 (a battery capable of...)", "content": "a battery [capable of powering homes and small businesses] : [주격관계대명사 + be동사]인 which was가 생략된 후치 수식 구조."}, {"title": "run on ~ 의 쓰임새", "content": "연료나 에너지원을 나타낼 때 전치사 on을 사용함 (e.g., Cars that run on electricity / A generator that runs on salt water)."}]}, {"id": 6, "section": "본론 3. John Michael Stagliano", "title": "Home Again 설립과 노숙 탈출 가정을 위한 가구 지원", "bullets": ["미국의 청년 사회활동가 John Michael Stagliano: 2016년 비영리단체 'Home Again' 설립", "차량·쉼터·숲에서 생활하다가 안정적 주거로 전환하는 가정에 가구와 생활 필수품 무상 지원"], "english": "Helping Homeless People Rebuild Their Lives\n\nJohn Michael Stagliano is a young social activist from the U.S. who founded Home Again in 2016. It is a nonprofit organization that offers furniture and household essentials to families and individuals transitioning from homelessness to stable housing. He says, \"For people who have lived in their cars, in and out of shelters, and in the woods, to be home again is a triumph, a sense of peace, and something to be celebrated.\"", "korean": "노숙자들의 삶의 재건을 돕기\n\n존 마이클 스타글리아노는 2016년 Home Again을 설립한 미국 출신의 젊은 사회 활동가이다. 그것은 노숙에서 안정적인 주거로 전환하는 가족과 개인에게 가구와 가정 필수품을 제공하는 비영리 단체이다. 그는 \"그들의 차 안에서, 쉼터를 오가며, 그리고 숲에서 생활해 온 사람들에게 다시 집으로 돌아오는 것은 승리이며, 평화로움이며, 축하할 일입니다.\"라고 말한다.", "vocab": [{"word": "social activist", "meaning": "사회 활동가, 사회 운동가", "desc": "사회적 가치 실현을 위해 행동하는 사람"}, {"word": "household essentials", "meaning": "가정 필수품, 생활용품", "desc": "일상생활에 필수적인 물품들"}, {"word": "transition (동사)", "meaning": "전환하다, 이행하다", "desc": "A 상태에서 B 상태로 옮겨가다"}, {"word": "stable housing", "meaning": "안정적인 주거 환경", "desc": "지속 가능한 보금자리"}, {"word": "triumph", "meaning": "승리, 대성공", "desc": "= victory, great achievement"}], "nuance": [{"title": "to be home again is a triumph... (to부정사 주어)", "content": "For people [who have lived ...] , [to be home again] is a triumph... : 전치사구 뒤에 to부정사구(to be home again)가 문장의 주어로 쓰임."}, {"title": "현재분사구 후치 수식 (transitioning from A to B)", "content": "families and individuals [transitioning from homelessness to stable housing] : 노숙 상태에서 안정적 주거로 옮겨가는 가족과 개인들을 능동 수식."}]}, {"id": 7, "section": "본론 3. John Michael Stagliano", "title": "가구 지원의 진정한 가치: 가족의 존엄성(Dignity) 회복", "bullets": ["12세 쉼터 봉사 중 주택을 구해 이사하더라도 가구가 없어 빈방에서 곤경을 겪는 현실 목격", "가족·이웃 기부 모금 시작 $\\rightarrow$ 전국적 기부 쇄도 $\\rightarrow$ '가구는 가족의 존엄성을 회복시킨다'는 통찰"], "english": "John's journey began in 2015. At the age of twelve, he volunteered at a local shelter where people in need were staying. He learned that many of the shelter residents worked hard to rent houses and trailers but faced difficulties in furnishing their new homes upon moving in. This prompted John to decide to do something for those transitioning out of homelessness. Needing donations to gather essential items to help them, John reached out to his family, friends, and neighbors. As word of his efforts spread, donations began to rush in. So John was able to help more people get settled. He said, \"I never knew the impact that a simple couch or a kitchen table could have. Furniture can restore the dignity of a family.\"", "korean": "존의 여정은 2015년에 시작되었다. 열두 살 때 그는 도움이 필요한 사람들이 머물고 있는 지역 쉼터에서 자원봉사를 했다. 그는 쉼터 거주자 중 많은 사람들이 집과 트레일러를 빌리려고 열심히 일하지만 이사를 하자마자 새 집을 가구로 꾸미는 데 어려움을 겪는다는 것을 알게 되었다. 이것은 존이 노숙 생활에서 벗어나는 사람들을 위해 무언가를 하기로 결심하게 했다. 그들을 돕기 위한 필수 물품을 모으기 위해 기부가 필요했기에 존은 가족, 친구, 이웃들에게 도움을 요청했다. 그의 노력에 대한 소문이 퍼지면서 기부가 쇄도하기 시작했다. 그래서 존은 더 많은 사람들이 정착할 수 있도록 도울 수 있었다. 그는 \"저는 단순한 소파나 식탁이 미칠 수 있는 영향을 전혀 몰랐습니다. 가구는 가족의 존엄성을 회복시킬 수 있습니다.\"라고 말했다.", "vocab": [{"word": "furnish", "meaning": "(가구를) 들여놓다, 비치하다", "desc": "집을 가구와 집기로 꾸미다"}, {"word": "upon -ing", "meaning": "~하자마자", "desc": "= as soon as S+V (upon moving in: 이사하자마자)"}, {"word": "reach out to ~", "meaning": "~에게 도움/손길을 요청하다", "desc": "접촉하고 다가가다"}, {"word": "rush in", "meaning": "쇄도하다, 밀려들다", "desc": "기부금이 폭발적으로 모이다"}, {"word": "get settled", "meaning": "정착하다, 안정을 찾다", "desc": "새로운 주거지에 안착하다"}, {"word": "dignity", "meaning": "존엄성, 품위", "desc": "인간으로서 누려야 할 최소한의 품격"}], "nuance": [{"title": "분사구문 Needing donations...", "content": "이유를 나타내는 분사구문 (= Because he needed donations to gather...).\n• 주절의 주어 John이 기부를 필요로 하는 능동 주체이므로 현재분사 Needing 사용."}, {"title": "upon moving in (전치사 upon + 동명사)", "content": "'이사하자마자'의 뜻으로 on/upon -ing 구문 (= as soon as they moved in)."}, {"title": "Furniture can restore the dignity of a family 의 화용론적 의미", "content": "가구는 단순한 물리적 도구가 아니라, 바닥에 웅크려 자지 않고 식탁에서 함께 밥을 먹는 '인간다운 삶의 기본 조건(존엄성)'을 회복시키는 매개체임을 강조."}]}, {"id": 8, "section": "결론 (Conclusion)", "title": "청년 사회 혁신가들의 의의와 더 나은 세상의 미래", "bullets": ["3인의 청년 활동가들: 기술, 헌신, 개인의 주도성이 가진 거대한 힘을 증명함", "전 세계 청년들에게 열정을 추구하고 공동체에 긍정적 변화(make a difference)를 일으킬 영감 제공"], "english": "Trisha Prabhu, Kelvin Doe, and John Michael Stagliano are all examples of young social activists who have made significant contributions to society. Their innovative efforts to solve social problems demonstrate the power of technology, commitment, and individual initiative. Their stories serve as an inspiration for young people around the world to pursue their passions and make a difference in their communities. As young innovators and social activists keep appearing, they will undoubtedly make the world a better place.", "korean": "트리샤 프라부, 켈빈 도, 존 마이클 스타글리아노는 모두 사회에 상당한 공헌을 한 젊은 사회 활동가의 예이다. 사회 문제를 해결하기 위한 그들의 혁신적인 노력은 기술, 헌신, 개인 주도성의 힘을 보여 준다. 그들의 이야기는 전 세계 젊은이들이 자신의 열정을 추구하고 공동체에 변화를 일으키는 데 영감을 준다. 젊은 혁신가들과 사회 활동가들이 계속 등장하므로, 그들은 틀림없이 세상을 더 나은 곳으로 만들 것이다.", "vocab": [{"word": "significant contribution", "meaning": "상당한 공헌/기여", "desc": "make a contribution to: ~에 기여하다"}, {"word": "commitment", "meaning": "헌신, 전념", "desc": "= dedication, devotion"}, {"word": "initiative", "meaning": "주도성, 솔선수범", "desc": "남이 시키지 않아도 먼저 행동하는 힘"}, {"word": "serve as ~", "meaning": "~로서 역할을 하다", "desc": "= act as, function as"}, {"word": "make a difference", "meaning": "변화를 만들다, 긍정적 영향을 미치다", "desc": "중대한 차이를 낳다"}, {"word": "undoubtedly", "meaning": "틀림없이, 의심할 여지 없이", "desc": "= without doubt, certainly"}], "nuance": [{"title": "serve as an inspiration for young people to pursue... (to부정사의 의미상 주어)", "content": "• an inspiration [for young people around the world] [to pursue their passions and make a difference...]\n• to부정사의 의미상 주어 [for + 명사구]가 결합된 형용사적 수식 구조."}, {"title": "keep + -ing (keep appearing)", "content": "계속해서 ~하다 (청년 혁신가들이 끊임없이 계속 등장하는 지속적 양상 강조)."}]}];
+    const STORAGE_KEY = 'lesson1_changemakers_master_v5';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "lesson1_changemakers_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>
