@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Heroes Who Fought a Deadly Disease - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">영어II NE능률(오선영) 1과</span>
+      <h1 class="header-title">Two Heroes Who Fought a Deadly Disease</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "서론 (Introduction)", "title": "1932년 대공황의 절망과 밤샘 백일해 검체 수집", "bullets": ["1932년 대공황의 혹독한 겨울: 정규 업무를 마치고 또 다른 사명을 시작하는 두 여성 과학자", "백일해로 간신히 생을 붙잡고 있는 아픈 아이들의 집을 방문하여 희미한 램프 불빛 아래 검체 수집"], "english": "One evening in late November 1932, a bitterly cold wind blows fiercely as two figures emerge from a laboratory. Darkness begins to fall as they set out into a world of failed banks, collapsed industry, and widespread despair a world ruined by three years of the Great Depression. The workday has come to an end, but for Pearl Kendrick and Grace Eldering, a different kind of work is about to begin. They are on their way to visit the homes of children suffering from a deadly disease called pertussis. The two women go from home to home collecting samples from the sick children by the faint light of their lamps. They listen to the tragic stories of desperate and unemployed parents as the children, coughing uncontrollably and struggling to breathe, barely hold on to life.", "korean": "1932년 11월 말 어느 날 저녁, 몹시 차가운 바람이 거세게 부는 가운데 두 명의 인물이 실험실에서 모습을 드러낸다. 그들이 파산한 은행들, 붕괴된 산업, 그리고 널리 퍼진 절망의 세계-3년간의 대공황으로 폐허가 된 세계로 나아갈 때 어둠이 내리기 시작한다. 근무는 끝났지만, Pearl Kendrick과 Grace Eldering에게는 다른 종류의 일이 시작될 참이다. 그들은 백일해라고 불리는 치명적인 질병으로 고통받고 있는 어린이들의 집들을 방문하러 가는 길이다. 두 여성은 집집마다 돌아다니면서 희미한 램프 불빛에 의지해 아픈 아이들의 검체를 수집한다. 걷잡을 수 없이 기침하며 숨을 쉬기 위해 고군분투하는 아이들이 간신히 생을 붙잡고 있을 때, 그들은 자포자기하고 실직한 부모들의 비극적인 이야기를 듣는다.", "vocab": [{"word": "bitterly cold", "meaning": "살을 에는 듯이 추운, 몹시 차가운", "desc": "혹독한 날씨"}, {"word": "set out", "meaning": "출발하다, 길을 나서다", "desc": "단순 이동이 아닌 사명을 띤 출발"}, {"word": "be about to V", "meaning": "막 ~하려는 참이다", "desc": "임박한 동작"}, {"word": "pertussis", "meaning": "백일해", "desc": "세균성 급성 호흡기 질환 (= whooping cough)"}, {"word": "go from home to home", "meaning": "집집마다 돌아다니다", "desc": "직접 가가호호 방문"}, {"word": "hold on to life", "meaning": "간신히 생을 붙잡다/버티다", "desc": "절박한 생존 투쟁"}], "nuance": [{"title": "동사 hold on to 의 뉘앙스", "content": "• hold on to ~ : 넘어지지 않으려고, 떨어지지 않으려고 필사적으로 꽉 붙잡는 느낌 (hold on to life: 꺼져가는 생명을 필사적으로 지탱함).\n• cling to ~ : 훨씬 더 강한 집착과 절박함으로 매달리다."}, {"title": "동시 분사구문 (coughing ... and struggling ...)", "content": "as the children, [coughing uncontrollably and struggling to breathe], barely hold on to life : 주어 the children 뒤에 현재분사구가 삽입되어 기침과 호흡 곤란의 고통스러운 상태를 동시 묘사."}]}, {"id": 2, "section": "서론 (Introduction)", "title": "백일해의 끔찍한 공포와 20년간의 백신 개발 실패", "bullets": ["숨을 들이쉴 때 나는 고음의 '흡(whooping)' 소리가 특징인 백일해: 영유아 사망률 극심", "1930년대 미국에서 매년 6,000명 사망(95%가 5세 미만), 20년간의 무익했던 연구와 두 영웅의 등장"], "english": "Pertussis is a bacterial disease characterized by serious coughing, breathing difficulties, and the high-pitched \"whooping\" sound that people with the disease make as they try to breathe in. Because of this distinct sound, people started to call the disease \"whooping cough.\" For a long time, this terrible illness was one of the greatest terrors of families with young children, because babies who contracted it had a high chance of dying. In the 1930s, an average of 6,000 people died of whooping cough in the United States each year. Ninety-five percent of them were children under five years of age. The cause of the disease had been identified in 1906, but the vaccines that had been developed were ineffective. Scientists and researchers worked for more than 20 years to produce an effective one, but their efforts were fruitless until Kendrick and Eldering came along.", "korean": "백일해는 심각한 기침, 호흡 곤란, 그리고 이 질병에 걸린 사람들이 숨을 들이쉬려 할 때 내는 고음의 '흡(whooping)' 소리로 특징지어지는 세균성 질환이다. 이 독특한 소리 때문에 사람들은 이 질병을 'whooping cough(백일해)'라고 부르기 시작했다. 오랫동안, 이 끔찍한 병은 어린아이들이 있는 가정의 가장 큰 공포 중 하나였는데, 백일해에 걸린 아기는 사망할 확률이 높았기 때문이다. 1930년대에, 미국에서는 매년 평균 6,000명이 백일해로 사망했다. 그들 중 95%가 5세 미만의 어린이였다. 그 질병의 원인은 1906년에 밝혀졌지만, 개발된 백신은 효과가 없었다. 과학자들과 연구원들은 효과적인 백신을 만들기 위해 20년 이상 노력했지만, 그들의 노력은 성과가 없었다- Kendrick과 Eldering이 나타나기 전까지는 말이다.", "vocab": [{"word": "characterized by ~", "meaning": "~으로 특징지어지는", "desc": "과거분사구 후치 수식"}, {"word": "contract (a disease)", "meaning": "(병에) 걸리다, 감염되다", "desc": "= catch, become infected with (격식체)"}, {"word": "ineffective", "meaning": "효과가 없는", "desc": "↔ effective (효과적인)"}, {"word": "fruitless", "meaning": "결실 없는, 성과 없는", "desc": "= futile, in vain, unproductive"}, {"word": "come along", "meaning": "(기대하던 사람이) 등장하다/나타나다", "desc": "구원자처럼 마침 때맞춰 나타남"}], "nuance": [{"title": "come along vs. turn up vs. emerge", "content": "• come along : 오랜 기다림 끝에 '마침 때맞춰 나타나다'는 반가움과 구원자의 뉘앙스.\n• turn up : 예기치 않게 불쑥 나타나다.\n• emerge : 서서히 모습을 드러내다."}, {"title": "대과거 시제 (had been identified / had been developed)", "content": "1930년대 연구 시점보다 더 이전인 1906년에 이미 원인이 밝혀졌고(had been identified), 기존 백신들이 개발되었던(had been developed) 과거 완료 상태."}]}, {"id": 3, "section": "본론 (Body)", "title": "미시간주 보건부에서의 만남과 백신 개발의 동기", "bullets": ["세균학 전공자 Pearl Kendrick과 Grace Eldering의 미시간 보건부에서의 운명적 만남", "어린 시절 백일해를 직접 앓았던 기억과 아이들의 건강을 증진하려는 강한 내적 동기"], "english": "Pearl Kendrick studied bacteriology in university and was recruited by the Michigan Department of Health in 1920. It was there that she met fellow bacteriologist Grace Eldering. The two quickly bonded, and in 1932 they started working together on a vaccine for whooping cough. Personal experience served as motivation for both of them, as they had each survived whooping cough as children themselves and remembered the severe pain of the disease. Both scientists were also eager to promote children's health.", "korean": "Pearl Kendrick은 대학에서 세균학을 공부했고 1920년 미시간주 보건부에 채용되었다. 그녀가 동료 세균학자인 Grace Eldering을 만난 것은 바로 그곳에서 였다. 두 사람은 빠르게 유대감을 형성했고, 1932년에 백일해 백신을 함께 연구하기 시작했다. 개인적 경험이 두 사람 모두에게(연구에 대한) 동기가 되었는데, 둘 다 어린 시절 백일해를 직접 이겨냈고 그 질병의 극심한 고통을 기억하고 있었기 때문이다. 두 과학자는 또한 아이들의 건강을 증진시키기를 간절히 바랐다.", "vocab": [{"word": "bacteriology", "meaning": "세균학", "desc": "박테리아 연구 학문"}, {"word": "recruit", "meaning": "영입하다, 채용하다", "desc": "조직이 인재를 적극 발탁함"}, {"word": "bond (동사)", "meaning": "유대감을 형성하다, 친밀해지다", "desc": "깊은 동료애 형성"}, {"word": "serve as ~", "meaning": "~의 역할을 하다, ~이 되다", "desc": "= act as, function as"}, {"word": "be eager to V", "meaning": "~하기를 간절히 바라다", "desc": "= be keen/anxious to V"}], "nuance": [{"title": "It was ~ that 강조구문 (장소 부사 there 강조)", "content": "It was [there] that [she met fellow bacteriologist Grace Eldering] : '그녀가 동료 세균학자 그레이스를 만난 것은 바로 그곳(미시간주 보건부)이었다'."}, {"title": "serve as motivation for ~ (동기 표현 비교)", "content": "• serve as motivation : 객관적으로 동기 역할을 하다.\n• drive : 강하게 밀어붙여 추진하다.\n• fuel : 기존 열정에 불을 지피다/연료를 공급하다."}]}, {"id": 4, "section": "본론 (Body)", "title": "무보수 부업 연구와 아이들의 고통을 덜어주려는 헌신", "bullets": ["대공황으로 인한 연구 자금 고갈 $\\rightarrow$ 낮에는 정규 업무, 밤에는 무보수 부업(side project) 연구", "금전적 보상이 아닌 죄 없는 아이들과 가족의 고통을 덜어주기 위한 끈질긴 헌신"], "english": "Unfortunately, research funding was extremely limited due to the Great Depression. Also, Kendrick and Eldering had to develop the vaccine as a side project. It was like having a second job for which they never received any payment. Still, when they finished their normal duties each day, they would get started on the work that they were enthusiastic about. The difficulties they faced did not stop them from persisting toward their goal. They did not do the work to make extra money; instead, they worked to relieve the suffering of innocent children and their families.", "korean": "안타깝게도 대공황으로 인해 연구 자금이 극히 제한되었다. 또한 Kendrick과 Eldering은 부가적인 프로젝트로 백신을 개발해야 했다. 그것은 마치 어떠한 보수도 받지 못하는 두 번째 직업을 갖는 것과 같았다. 그럼에도 불구하고 그들은 매일 일상적인 업무를 마치고 나면, 그들이 열의를 가진 일을 시작하곤 했다. 그들이 직면한 어려움들은 그들이 목표를 향해 끈질기게 나아가는 것을 막지 못했다. 그들은 돈을 추가로 벌기 위해 그 일을 한 것이 아니었다. 그보다는, 그들은 죄 없는 아이들과 그들의 가족들의 고통을 덜어주기 위해 연구했다.", "vocab": [{"word": "side project", "meaning": "부가 프로젝트, 부업", "desc": "정규 업무 외의 추가 연구"}, {"word": "stop A from -ing", "meaning": "A가 ~하는 것을 막다/방해하다", "desc": "= prevent, keep, hinder A from -ing"}, {"word": "persist toward ~", "meaning": "~을 향해 끈질기게 나아가다", "desc": "어려움 속에서도 지속함"}, {"word": "relieve", "meaning": "(고통·부담을) 덜어주다, 완화하다", "desc": "= ease, alleviate, soothe"}], "nuance": [{"title": "전치사 + 관계대명사 (for which they never received...)", "content": "a second job [for which they never received any payment] : 그 두 번째 직업에 대해 어떠한 보수도 받지 못했다 (receive payment for the job)."}, {"title": "stop A from persisting toward their goal", "content": "금지·방해 구문: stop/prevent/keep + 목적어 + from -ing (난관이 그들의 지속적 전진을 가로막지 못했다)."}]}, {"id": 5, "section": "본론 (Body)", "title": "기침판(Cough Plates)과 배양기를 통한 세균 군집 분석", "bullets": ["지역 의사·간호사들의 '기침판(Cough plates)' 지원 $\\rightarrow$ 페트리 접시와 배양기로 세균 군집 배양", "환자 가정을 직접 방문할 때마다 효과적인 백신 개발의 절박한 필요성을 강렬히 재확인"], "english": "They began the process of developing their vaccine by gathering samples of the bacteria that cause whooping cough. To support them, local doctors and nurses provided \"cough plates\" from their patients. The patients coughed onto a petri dish, which was then put into an incubator. This allowed the bacteria to grow into colonies that Kendrick and Eldering could analyze. When they collected samples on their own, they would go to the homes of sick children. Each time, they were reminded once again of the dreadful suffering caused by the disease. The sight of these innocent young victims coughing and struggling to breathe was a powerful reminder of the urgent need for an effective vaccine.", "korean": "그들은 백일해의 원인이 되는 세균의 검체를 수집함으로써 백신을 개발하는 과정을 시작했다. 그들을 지원하기 위해, 지역 의사들과 간호사들은 그들의 환자들에게서 얻은 '기침판'을 제공했다. 환자들은 페트리 접시 위에 기침했고, 그런 다음 그것은 세균 배양기에 넣어졌다. 이는 세균이 Kendrick과 Eldering이 분석할 수 있는 군집으로 자라게 했다. 직접 검체를 수집할 때, 그들은 아픈 아이들의 집으로 가곤 했다. 그때마다. 그들은 그 병에 의해 야기된 끔찍한 고통을 다시 한번 떠올렸다. 이 무고한 어린 희생자들이 기침하고 숨쉬기 위해 고군분투하는 모습은 효과적인 백신의 시급한 필요성을 강력하게 상기시켰다.", "vocab": [{"word": "cough plate", "meaning": "기침판", "desc": "환자가 기침하여 균을 채취하는 배양판"}, {"word": "petri dish", "meaning": "페트리 접시", "desc": "세균 배양용 샬레"}, {"word": "incubator", "meaning": "배양기, 인큐베이터", "desc": "온도·습도를 조절하여 균을 증식시키는 장치"}, {"word": "colony", "meaning": "(세균) 군집, 집락", "desc": "분열 증식한 균 덩어리"}, {"word": "powerful reminder", "meaning": "강력하게 상기시키는 것", "desc": "시급성을 절감하게 하는 계기"}], "nuance": [{"title": "allow + 목적어 + to부정사 (5형식)", "content": "This allowed [the bacteria] [to grow into colonies...] : 이것이 박테리아가 분석 가능한 군집으로 자라나도록 가능하게 해 주었다."}, {"title": "powerful reminder vs. stark reminder vs. grim reminder", "content": "• powerful reminder : 이미 알고 있던 사실을 마음속에 다시 한번 '강렬하게 되새겨주는' 자극.\n• stark / grim reminder : 가혹하고 냉혹하며 암울한 현실을 직시하게 하는 상기."}]}, {"id": 6, "section": "본론 (Body)", "title": "자기 몸에 직접 주사한 안전성 검증과 1,592명 1차 임상", "bullets": ["임상시험 전 안전성 확신을 위해 연구원 본인들의 몸에 직접 백신을 주사하여 검증", "1934~1935년 1,592명 대상 1차 현장 시험: 접종군 712명 중 단 4명만 경증 발병으로 대성공"], "english": "Kendrick and Eldering spent many long nights studying the bacteria and finally produced a potential vaccine. Before they performed any clinical trials, though, they had to be certain that it would not have any negative side effects on the subjects. They ran many laboratory tests, and they even injected it into themselves to confirm that it was safe. From 1934 to 1935, they conducted their first field test with 1,592 children. In the group of 712 vaccinated children, only four developed whooping cough, and none of these cases were serious.", "korean": "Kendrick과 Eldering은 세균을 연구하며 많은 긴 밤을 보냈고, 마침내 잠재적인 백신을 생산해 냈다. 그러나 임상 실험을 실시하기 전에, 그들은 그것이 실험 대상자들에게 어떠한 부정적인 부작용도 일으키지 않을 것이라는 것을 확실히 해야 했다. 그들은 많은 실험실 시험을 실행했고, 심지어 그들은 그것이 안전하다는 것을 확인하기 위해 스스로에게 주사했다. 1934년부터 1935년까지, 그들은 1,592명의 아이들을 대상으로 첫 현장 실험을 실시했다. 백신을 접종한 712명의 아이들의 그룹에서, 단지 4명만이 백일해에 걸렸고, 이 사례들 중 어떠한 사례도 심각하지 않았다.", "vocab": [{"word": "clinical trial", "meaning": "임상시험, 임상실험", "desc": "사람을 대상으로 약효·안전성을 검증하는 공식 시험"}, {"word": "side effect", "meaning": "부작용", "desc": "원치 않는 부정적 반응"}, {"word": "inject (into oneself)", "meaning": "(자신에게) 주사하다", "desc": "스스로를 피험자로 삼은 위험 감수"}, {"word": "field test", "meaning": "현장 시험, 실지 시험", "desc": "실제 환경에서 실시하는 대규모 시험"}, {"word": "develop (a disease)", "meaning": "(병에) 걸리다, 증상이 나타나다", "desc": "= contract"}], "nuance": [{"title": "confirm vs. verify", "content": "• confirm : 기존의 판단이나 기대가 맞았음을 확인/확증하다 (confirm that it was safe).\n• verify : 객관적 데이터와 진위를 절차적으로 검증하다."}, {"title": "none of these cases were serious (부정대명사 수일치)", "content": "none of 뒤에 복수명사(these cases)가 올 때 현대 영어에서는 복수동사 were와 단수동사 was 모두 통용되며, 여기서는 were 사용."}]}, {"id": 7, "section": "본론 (Body)", "title": "자금난 위기와 엘리너 루스벨트 여사의 극적 방문 지원", "bullets": ["백신의 효과성 확증을 위한 연구 확대 필요성 직면 $\\rightarrow$ 그러나 심각한 자금난으로 중단 위기", "1936년 영부인 Eleanor Roosevelt 직접 방문 $\\rightarrow$ 감염병 퇴치 관심과 공감으로 대규모 임상 자금 확보"], "english": "Despite the apparent success of the vaccine, Kendrick and Eldering wanted further confirmation of its effectiveness. They became determined to expand their research and run more tests with larger groups of children. However, they were unable to proceed because they were facing a severe lack of funds. With thousands of children continuing to suffer from the disease, they found themselves in a desperate situation.\n\nLuckily, they got help from an unexpected figure. In 1936, First Lady Eleanor Roosevelt herself visited the laboratory and saw with her own eyes the efforts that Kendrick and Eldering were making in their battle against whooping cough. Eleanor Roosevelt, whose husband suffered from polio, was interested in fighting infectious diseases. She spent time with the women and came to realize the enormous importance of their work. With her help, Kendrick and Eldering were able to secure enough funding to conduct a large-scale trial.", "korean": "백신의 분명한 성공에도 불구하고, Kendrick과 Eldering은 백신의 효과에 대한 추가 확인을 원했다. 그들은 연구를 확대하고 더 큰 그룹의 어린이들을 대상으로 더 많은 실험을 진행하기로 굳게 결심했다. 그러나 그들은 심각한 자금 부족에 직면하고 있었기 때문에 (연구와 실험을) 계속 진행할 수 없었다. 수천 명의 어린이들이 계속해서 그 질병으로 고통받고 있는 가운데, 그들은 절망적인 상황에 처했다.\n\n다행히도 그들은 예상치 못한 인물로부터 도움을 받았다. 1936년에 영부인 Eleanor Roosevelt가 직접 실험실을 방문했고 Kendrick과 Eldering이 백일해와의 싸움에 기울이는 노력을 직접 보았다. 남편이 소아마비를 앓았던 Eleanor Roosevelt는 전염병을 퇴치하는 것에 관심이 많았다. 그녀는 두 여성과 함께 시간을 보냈고, 그들의 일의 엄청난 중요성을 깨닫게 되었다. 그녀의 도움으로 Kendrick과 Eldering은 대규모 실험을 실시하기에 충분한 자금을 확보할 수 있었다.", "vocab": [{"word": "apparent", "meaning": "분명한, 표면적으로 드러난", "desc": "= evident, obvious"}, {"word": "determined", "meaning": "단호한, 굳게 결심한", "desc": "= resolute"}, {"word": "find oneself in ~", "meaning": "자신이 ~한 처지에 있음을 알게 되다", "desc": "상황에 처한 무력감과 절박함"}, {"word": "see with one's own eyes", "meaning": "자신의 눈으로 직접 보다", "desc": "현장 실사"}, {"word": "come to realize ~", "meaning": "~을 점차 깨닫게 되다", "desc": "인식의 심화 과정"}, {"word": "large-scale trial", "meaning": "대규모 임상시험", "desc": "광범위한 검증"}], "nuance": [{"title": "with + 명사 + 분사 (With thousands of children continuing to suffer...)", "content": "수천 명의 아이들이 계속해서 고통받고 있는 '긴박하고 절박한 배경 상황'을 묘사하는 with 부대상황 분사구문."}, {"title": "소유격 관계대명사 whose husband suffered from polio", "content": "Eleanor Roosevelt [whose husband suffered from polio] : 남편(루스벨트 대통령)이 소아마비를 겪었다는 개인적 배경을 부연."}]}, {"id": 8, "section": "결론 (Conclusion)", "title": "4,200명 대규모 임상 성공, 전국 보급과 사망자 급감", "bullets": ["1937년 4,200명 대규모 임상으로 높은 면역력 입증 $\\rightarrow$ 1940년 미국 전역 배포 및 의학협회 권장 백신 지정", "1934년 연간 7,518명에 달하던 백일해 사망자가 1970년대 중반 10명 미만으로 극적 급감"], "english": "By 1937, Kendrick and Eldering were able to include more than 4,200 children in their trial. Just as in their first field test, the vaccinated group demonstrated a high level of immunity against the disease. The scientific community was amazed at the results, and, in 1940, the vaccine started being distributed all across the United States. Four years later, it was added to the American Medical Association's list of recommended immunizations, and soon after, there was a dramatic decline in whooping cough infections. In the mid-1970s, the number of annual deaths caused by whooping cough, which had reached 7,518 in 1934, dropped to under 10.", "korean": "1937년까지 Kendrick과 Eldering은 4,200명 이상의 어린이들을 그들의 실험에 포함시킬 수 있었다. 첫 번째 현장 실험에서와 같이, 백신을 접종한 그룹은 질병에 대해 높은 수준의 면역력을 보여주었다. 과학계는 그 결과에 깜짝 놀랐고, 1940년에 백신이 미국 전역으로 배포되기 시작했다. 4년 후, 이것은 미국 의학 협회의 권장 예방접종 목록에 추가되었고, 얼마 지나지 않아 백일해 감염은 극적으로 감소했다. 1934년에 7,518명에 달했던 백일해로 인한 연간 사망자 수는 1970년대 중반에 10명 미만으로 떨어졌다.", "vocab": [{"word": "demonstrate", "meaning": "(실증적으로) 보여주다, 입증하다", "desc": "= prove, show, display"}, {"word": "immunity", "meaning": "면역력, 면역", "desc": "질병 저항력"}, {"word": "distribute", "meaning": "배포하다, 보급하다", "desc": "전국적 유통"}, {"word": "recommended immunizations", "meaning": "권장 예방접종 (목록)", "desc": "공식 의학 인증"}, {"word": "dramatic decline", "meaning": "극적인 감소/급감", "desc": "= sharp/drastic decrease"}], "nuance": [{"title": "the number of vs. a number of", "content": "• the number of annual deaths : 연간 사망자 '수' (the number가 단수 주어이므로 단수동사 dropped와 결합).\n• a number of : 많은 (= many)."}, {"title": "계속적 관계대명사 , which had reached 7,518 in 1934,", "content": "1934년 과거 시점에 이미 7,518명에 달했던 대과거 수치를 부연 설명."}]}, {"id": 9, "section": "결론 (Conclusion)", "title": "특허 포기와 겸손한 두 영웅의 진정한 보상", "bullets": ["특허 등록을 통한 막대한 부의 축적 기회를 포기: '수많은 이들의 협력 덕분'이라며 겸손한 태도 견지", "과도한 칭찬과 인터뷰를 피하고, 수많은 생명을 구했다는 사실 자체를 가장 큰 보상으로 여김"], "english": "Kendrick and Eldering were often told that they could have become very wealthy if they had patented their vaccine. However, they replied that it had not been created by them alone, but with the help of many others. They also avoided personal interviews, not wanting to reveal the great contribution they had made. They said that they had genuinely enjoyed the challenge of creating the vaccine, so the excessive praise that they received made them uncomfortable. In the end, knowing that so many lives were being saved thanks to their hard work was enough of a reward for these remarkable and modest heroes.", "korean": "Kendrick과 Eldering은 그들이 백신으로 특허를 받았더라면 매우 부유해질 수도 있었을 것이라는 말을 자주 들었다. 그러나 그들은 그것은 둘이서만 만든 것이 아니라, 다른 많은 사람들의 도움으로 만들어졌다고 대답했다. 그들은 또한 자신들의 큰 공헌을 드러내고 싶지 않아 개인적인 인터뷰를 피했다. 그들은 진정으로 백신을 만드는 도전을 즐겼기 때문에, 그들이 받는 지나친 칭찬은 그들을 불편하게 만든다고 말했다. 결국, 그들의 노고 덕분에 매우 많은 생명이 구해지고 있다는 것을 아는 것만으로도 이 놀랍고도 겸손한 영웅들에게는 충분한 보상인 것이었다.", "vocab": [{"word": "patent (동사)", "meaning": "특허를 내다, 특허권을 얻다", "desc": "독점적 상업 권리"}, {"word": "not A but B", "meaning": "A가 아니라 B이다", "desc": "not by them alone, but with the help..."}, {"word": "genuinely", "meaning": "진심으로, 진정으로", "desc": "= truly, sincerely"}, {"word": "excessive praise", "meaning": "지나친 칭찬", "desc": "과도한 찬사"}, {"word": "modest", "meaning": "겸손한, 소박한", "desc": "= humble, unpretentious"}], "nuance": [{"title": "가정법 과거완료 (could have become ... if they had patented)", "content": "• they [could have become] very wealthy if they [had patented] their vaccine.\n• '만약 그들이 백신 특허를 냈더라면 막대한 부를 누릴 수도 있었을 텐데' (실제로는 특허를 포기하여 공공재로 보급했음을 과거 반대로 가정)."}, {"title": "동명사 주어 knowing that so many lives...", "content": "[knowing that so many lives were being saved...] (동명사 주어 $\\rightarrow$ 단수 취급) + was [동사] + enough of a reward... : 수많은 생명이 구해지고 있다는 앎 자체가 충분한 보상이었다."}]}];
+    const STORAGE_KEY = 'lesson1_heroes_vaccine_master_v5';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "lesson1_heroes_vaccine_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>
