@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Around the Globe - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">World English Unit 3</span>
+      <h1 class="header-title">English Around the Globe</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "서론 (Introduction)", "title": "청소년 문화 교류 라운지: 언어와 문화가 빚어낸 세계의 다양한 영어", "bullets": ["프린스우드 고교 영어 교사 Leah Bennett의 온라인 커뮤니티 'Youth Cultural Exchange Lounge' 개회", "언어와 문화의 불가분성(Go hand in hand): 각국 고유의 문화적 뉘앙스(Cultural nuances)를 반영하는 다양한 영어 탐구"], "english": "English Around the Globe\n\nHost: Welcome to the “Youth Cultural Exchange Lounge!” I’m your host, Leah Bennett. I teach English at Princewood High School, and I’m pleased to have you all here. This online community brings students from around the world to discuss culture and build lasting friendships.\n\nToday, I’ve got an interesting topic for you: “Unique Expressions in Your Country’s Version of English.” *Language and culture go hand in hand*, and the English spoken in different countries reflects its own distinct cultural nuances. Embracing this diversity will help us connect and understand one another better.\n\nSo, I invite you all to share English expressions from your country, along with their meanings and cultural significance. Who would like to go first?", "korean": "세계의 다양한 영어\n\n진행자: \"청소년 문화 교류 라운지(Youth Cultural Exchange Lounge)\"에 오신 것을 환영합니다! 저는 진행자 리아 베넷입니다. 저는 프린스우드 고등학교에서 영어를 가르치고 있으며, 여러분 모두를 이곳에 모시게 되어 기쁩니다. 이 온라인 커뮤니티는 전 세계 학생들이 모여 문화를 논의하고 지속적인 우정을 쌓을 수 있도록 해줍니다.\n\n오늘, 저는 여러분을 위해 흥미로운 주제를 준비했습니다: \"여러분 국가 버전의 영어에 나타난 독특한 표현들\"입니다. 언어와 문화는 밀접한 관련이 있으며(go hand in hand), 여러 나라에서 사용되는 영어는 각자의 뚜렷한 문화적 뉘앙스를 반영합니다. 이러한 다양성을 포용하는 것은 우리가 서로를 더 잘 연결하고 이해하는 데 도움이 될 것입니다.\n\n그러니, 여러분 국가의 영어 표현들을 그 의미와 문화적 중요성과 함께 공유해 주시길 바랍니다. 누가 먼저 시작해 보시겠습니까?", "vocab": [{"word": "go hand in hand", "meaning": "밀접한 연관이 있다, 손을 맞잡고 가다", "desc": "언어와 문화의 불가분성"}, {"word": "distinct", "meaning": "뚜렷한, 구별되는", "desc": "= clear, unmistakable"}, {"word": "cultural nuance", "meaning": "문화적 뉘앙스/미묘한 차이", "desc": "지역별 고유 정서"}, {"word": "embrace diversity", "meaning": "다양성을 포용하다", "desc": "상호 이해의 출발점"}], "nuance": [{"title": "동명사 주어와 5형식 help 구문", "content": "• *[Embracing this diversity] (동명사 주어) will help [us (목적어)] [connect and understand one another better (원형부정사 보어)].*\n• 문화적 다양성을 존중하고 수용할 때 글로벌 시민으로서 진정한 소통이 가능해짐을 강조."}]}, {"id": 2, "section": "영국 영어 vs 미국 영어 (1)", "title": "역사적 차용어의 유래와 철자 차이 (*-our vs. -or*, *-re vs. -er*)", "bullets": ["영어 형성사: 게르만어, 라틴어, 고대 노르드어, 프랑스어 차용 (*beef/cow meat*, *pork/pig meat*의 계급적 언어 유래)", "철자 차이: 영국식 *-our* (*colour, flavour, honour, labour*) vs 미국식 *-or* (*color, flavor*) 및 *-re* (*centre, fibre, litre, metre*) vs *-er* (*center, fiber*)"], "english": "Brian: I’ll go first! Did you know English has been influenced by other languages such as Germanic, Latin, Old Norse, French, and others over time? For instance, words like *beef* and *pork* actually come from French. Beef used to be called “cow meat” and pork, “pig meat.”\n\nJi-hyun: Really? “Cow meat” and “pig meat”? It’s the same in Korean.\n\nBrian: That’s right. And these days, British English has its own characteristics, especially compared to American English. In terms of spelling, British English often adds the letter “u” in words like *colour*, *flavour*, *honour*, and *labour*.\n\nAmelia: While American English spells them as *color*, *flavor*, *honor*, and *labor*.\n\nHost: Thanks, Amelia. Can you tell us more about differences in spelling?\n\nAmelia: Sure! Another example is the “er” and “re” endings. Words with an “er” ending like *center*, *fiber*, *liter*, and *meter* in American English are spelled *centre*, *fibre*, *litre*, and *metre* in British English.", "korean": "브라이언: 제가 먼저 하겠습니다! 영어가 시간이 지남에 따라 게르만어, 라틴어, 고대 노르드어, 프랑스어 등 다른 언어들의 영향을 받아왔다는 사실을 알고 계셨나요? 예를 들어, beef와 pork 같은 단어들은 사실 프랑스어에서 유래했습니다. 소고기는 원래 '소 고기(cow meat)'로, 돼지고기는 '돼지 고기(pig meat)'로 불리곤 했죠.\n\n지현: 정말요? \"소 고기\"와 \"돼지 고기\"요? 한국어와 똑같네요.\n\n브라이언: 맞아요. 그리고 요즘 영국 영어는 특히 미국 영어와 비교했을 때 고유한 특징들을 지니고 있습니다. 철자 측면에서 영국 영어는 colour, flavour, honour, labour 같은 단어들에 흔히 문자 \"u\"를 추가합니다.\n\n아멜리아: 미국 영어에서는 그것들을 color, flavor, honor, labor로 쓰는 반면에 말이죠.\n\n진행자: 고마워요, 아멜리아. 철자 차이에 대해 더 알려줄 수 있나요?\n\n아멜리아: 물론이죠! 또 다른 예는 \"er\"과 \"re\" 어미입니다. 미국 영어에서 center, fiber, liter, meter처럼 \"er\"로 끝나는 단어들이 영국 영어에서는 centre, fibre, litre, metre로 표기됩니다.", "vocab": [{"word": "Old Norse", "meaning": "고대 노르드어 (바이킹어)", "desc": "영어 형성에 지대한 영향"}, {"word": "beef vs. cow meat", "meaning": "귀족 프랑스어 beef vs 평민 앵글로색슨 cow meat", "desc": "1066 노르만 정복의 언어 유산"}, {"word": "in terms of ~", "meaning": "~의 관점에서, ~의 측면에서", "desc": "in terms of spelling"}, {"word": "British vs. American spelling", "meaning": "영국식 철자 (-our, -re) vs 미국식 철자 (-or, -er)", "desc": "웹스터 사전의 미국 철자 개혁"}], "nuance": [{"title": "노르만 정복(1066)과 음식 어휘의 이중성", "content": "살아있는 가축을 키우던 앵글로색슨 농민들의 어휘(*cow, pig*)와 식탁에서 요리로 즐기던 노르만 프랑스 귀족들의 어휘(*beef, pork*)가 결합되어 현대 영어의 다층적 어휘 체계를 형성함."}]}, {"id": 3, "section": "영국 영어 vs 미국 영어 (2)", "title": "영국 고유 어휘 (*flat*, *lorry*, *bloke*)와 미국 지역 방언 (*you guys* vs. *y'all*)", "bullets": ["어휘 차이: 아파트(*flat* vs. *apartment*), 트럭(*lorry* vs. *truck*), 남성 구어 표현(*bloke* vs. *guy/dude*)", "미국 내부의 지역별 방언 편차: 일반적인 *you guys*에 대응하여 남부 지역에서 광범위하게 쓰이는 *y'all*"], "english": "Brian: Also, British English has distinct words like *flat* for apartment, and *lorry* for truck. We also use informal expressions like *bloke* for man, as in “He’s a nice bloke.”\n\nAmelia: We use *guy* or *dude* instead of *bloke*. What’s interesting is that even within the US, expressions differ from region to region. While we usually say “you guys,” it’s “*y’all*” in the South. Let me show you.", "korean": "브라이언: 또한 영국 영어는 아파트를 뜻하는 flat, 트럭을 뜻하는 lorry와 같이 뚜렷이 구별되는 단어들을 가지고 있습니다. 우리는 또한 \"그는 참 좋은 친구(남자)야\"라는 표현에서처럼 남자를 뜻하는 속어로 bloke를 사용하기도 합니다.\n\n아멜리아: 우리는 bloke 대신 guy나 dude를 사용해요. 흥미로운 점은 미국 내에서도 지역마다 표현이 다르다는 것입니다. 우리는 보통 \"you guys(너희들)\"라고 말하지만, 남부에서는 \"y'all\"이라고 하죠. 보여드릴게요.", "vocab": [{"word": "flat vs. apartment", "meaning": "아파트 (영국: flat / 미국: apartment)", "desc": "주거 명칭 차이"}, {"word": "lorry vs. truck", "meaning": "화물차 (영국: lorry / 미국: truck)", "desc": "교통 수단 차이"}, {"word": "bloke vs. guy/dude", "meaning": "남자/녀석 (영국: bloke / 미국: guy, dude)", "desc": "구어체 비격식 호칭"}, {"word": "y'all", "meaning": "너희들 (you all의 남부 축약형)", "desc": "미국 남부의 상징적 2인칭 복수"}], "nuance": [{"title": "지역별 언어 분화 (Regional Dialects)", "content": "단일 국가 내에서도 지리적·문화적 격리에 따라 2인칭 복수 대명사가 표준적인 *you guys*에서 남부의 *y'all*, 피츠버그의 *yinz*, 북동부의 *youse* 등으로 다채롭게 분화됨."}]}, {"id": 4, "section": "인도 영어 (Hinglish)", "title": "상태동사 진행형, 단어 반복 강조와 힌디어 차용어 (*veranda*, *jungle*)", "bullets": ["영국의 식민지 역사로 영어가 공용어로 정착 $\rightarrow$ 힌디어 및 지역 언어와 융합된 독창적 표현 생성", "상태동사 진행형(*I am liking it*), 반복 강조(*little-little*, *big-big*), 세계적 차용어(*veranda*, *jungle* - *The Jungle Book*)"], "english": "Rajesh: Sure. Due to the country’s British colonial past, English is one of the official languages. But what’s interesting is that we mix Hindi and regional languages with English, creating unique expressions. We say *“I am liking it very much,”* instead of “I like it very much.” We also use repetition, like *“little-little things”* or *“big-big problems.”* And we have English words from Hindi, like *veranda* and *jungle*.\n\nThabo: The word *jungle* is from India?\n\nRajesh: Yes. You know *The Jungle Book*? It’s a collection of stories that take place in an Indian forest.", "korean": "라제시: 물론이죠. 인도의 영국 식민지 과거로 인해, 영어는 공용어 중 하나입니다. 하지만 흥미로운 점은 우리가 힌디어와 지역 언어들을 영어와 혼합하여 독특한 표현들을 만들어낸다는 것입니다. 우리는 \"I like it very much\" 대신에 *\"I am liking it very much\"*라고 말합니다. 우리는 또한 *\"little-little things\"*나 *\"big-big problems\"*처럼 단어를 반복하여 사용하기도 하죠. 그리고 *veranda*와 *jungle*처럼 힌디어에서 유래한 영어 단어들도 있습니다.\n\n타보: jungle이라는 단어가 인도에서 온 거라고요?\n\n라제시: 네. <정글북(The Jungle Book)> 아시죠? 인도의 숲에서 펼쳐지는 이야기 모음집입니다.", "vocab": [{"word": "Hinglish", "meaning": "힌글리시 (힌디어 + 영어 융합)", "desc": "인도식 영어의 특징"}, {"word": "repetition for emphasis", "meaning": "강조를 위한 중복 표현", "desc": "little-little, big-big"}, {"word": "veranda", "meaning": "베란다, 테라스 (힌디어 varandā 유래)", "desc": "글로벌 영어 차용어"}, {"word": "jungle", "meaning": "밀림, 정글 (힌디어 jaṅgal 유래)", "desc": "The Jungle Book의 배경"}], "nuance": [{"title": "상태동사 진행형의 인도 영어 문법화", "content": "표준 영미권에서는 상태동사(*like, understand, know*)의 진행형을 지양하나, 인도 영어에서는 현재 느끼고 있는 감정의 생생한 진행을 강조하기 위해 *I am liking it*과 같은 진행형이 널리 통용됨."}]}, {"id": 5, "section": "남아프리카공화국 영어 (South African English)", "title": "다문화적 융합과 아프리칸스어 유래 표현 (*lekker*, *Howzit*)", "bullets": ["네덜란드(더치/아프리칸스어), 영국, 원주민 부족들의 다문화적 영향이 복합적으로 반영된 남아공 영어", "아프리칸스어 유래의 *lekker* (nice/great) 및 인사말 *Howzit* (How is it going?의 축약)"], "english": "Thabo: Oh, I see. South African English also reflects diverse cultural influences from the Netherlands, Britain, and indigenous tribes. For example, *lekker*, meaning “nice” or “great,” comes from Afrikaans, a South African language derived from Dutch. And *Howzit* is short for, “How is it going?”\n\nSophie: Look, I have a *Howzit* T-shirt here.", "korean": "타보: 아, 그렇군요. 남아프리카공화국 영어 역시 네덜란드, 영국, 그리고 원주민 부족들의 다양한 문화적 영향을 반영합니다. 예를 들어 '좋은' 또는 '멋진'을 뜻하는 *lekker*는 네덜란드어에서 파생된 남아공 언어인 아프리칸스어(Afrikaans)에서 유래했습니다. 그리고 *Howzit*은 \"How is it going?(어떻게 지내?)\"의 줄임말입니다.\n\n소피: 보세요, 저 여기 *Howzit* 티셔츠가 있어요.", "vocab": [{"word": "Afrikaans", "meaning": "아프리칸스어 (남아공 공용어)", "desc": "17세기 네덜란드어에서 파생"}, {"word": "indigenous tribes", "meaning": "원주민 부족들 (줄루, 코사 등)", "desc": "남아공의 뿌리 문화"}, {"word": "lekker", "meaning": "아주 좋은, 맛있는, 멋진 (= nice, great)", "desc": "남아공 최고의 대중 슬랭"}, {"word": "Howzit", "meaning": "안녕? 어떻게 지내? (= How's it going?)", "desc": "남아공 대표 인사말"}], "nuance": [{"title": "아프리칸스어(Afrikaans)와 영어의 결합", "content": "남아공은 11개 공식 언어가 공존하는 '무지개 국가(Rainbow Nation)'로, 네덜란드계 보어인의 아프리칸스어 어휘(*lekker, braai*)가 영어 회화에 자연스럽게 흡수됨."}]}, {"id": 6, "section": "호주 영어 (Aussie Slang)", "title": "친근한 축약형 슬랭 (*arvo*, *brekki*, *ambo*)과 원주민 차용어 (*boomerang*, *kangaroo*)", "bullets": ["호주 특유의 짧고 단순한 축약 슬랭(*Aussie slangs*): *arvo*(오후), *brekki*(아침식사), *ambo*(구급차)", "영국 정착민의 영어 + 광활한 자연환경 + 원주민 애보리지널 문화의 융합 $\rightarrow$ *boomerang*, *kangaroo*의 일상화"], "english": "Sophie: Australians also use a lot of short words. Can anyone guess what the words *arvo*, *brekki*, and *ambo* mean?\n\n(No one answers.)\n\nSophie: Well, *arvo*, *brekki*, and *ambo* mean afternoon, breakfast, and ambulance, respectively. We have a lot of short expressions called Aussie slangs.\n\nJi-hyun: Is there any reason why so many short words are used in Australia?\n\nSophie: Australia was originally inhabited by indigenous people, but with the arrival of British settlers, English became widely spoken. Over time, the British English changed under the influence of Australia’s diverse natural environment and rich indigenous cultures, leading to unique Aussie English. We also have some indigenous words, such as *boomerang* and *kangaroo*, which have become part of our everyday language.", "korean": "소피: 호주인들 역시 짧은 단어들을 많이 사용합니다. arvo, brekki, ambo가 무슨 뜻인지 맞힐 수 있는 분 계신가요?\n\n(아무도 대답하지 않는다.)\n\n소피: 글쎄요, *arvo*, *brekki*, *ambo*는 각각 오후(afternoon), 아침 식사(breakfast), 구급차(ambulance)를 의미합니다. 우리는 '오지 슬랭(Aussie slangs)'이라고 불리는 수많은 축약 표현을 가지고 있어요.\n\n지현: 호주에서 그렇게 많은 짧은 단어들이 사용되는 특별한 이유가 있나요?\n\n소피: 호주는 원래 원주민들이 거주하고 있었지만, 영국 정착민들이 도착하면서 영어가 널리 쓰이게 되었습니다. 시간이 흐르며 영국 영어는 호주의 다양한 자연환경과 풍부한 원주민 문화의 영향을 받아 변화했고, 독특한 '오지 잉글리시'로 이어졌습니다. 우리는 또한 *boomerang(부메랑)*과 *kangaroo(캥거루)*와 같은 원주민 단어들도 가지고 있는데, 이것들은 우리의 일상 언어의 일부가 되었습니다.", "vocab": [{"word": "Aussie slang", "meaning": "호주 슬랭/속어 (축약형 어미 -o, -ie/i)", "desc": "호주 특유의 친근한 화법"}, {"word": "arvo / brekki / ambo", "meaning": "afternoon / breakfast / ambulance", "desc": "대표적 호주 축약어"}, {"word": "respectively", "meaning": "각각, 제각기", "desc": "순서대로 대응"}, {"word": "boomerang & kangaroo", "meaning": "부메랑과 캥거루", "desc": "호주 원주민 언어에서 유래"}], "nuance": [{"title": "호주 영어의 축약 선호(Hypocoristics)", "content": "호주인들은 격식을 차리기보다 평등하고 친근한 유대감(Mateship)을 중시하여 단어 끝을 *-o*나 *-ie/i*로 줄여 부르는 독특한 언어 습관을 발달시킴."}]}, {"id": 7, "section": "뉴질랜드 영어 (Kiwi English)", "title": "키위새에서 유래한 정체성: 마오리어 원주민 어휘와 다의어 *Kiwi*", "bullets": ["마오리 원주민 언어의 *Kiwi*: 뉴질랜드 고유의 날지 못하는 새 $\rightarrow$ 새의 갈색 털을 닮아 *kiwifruit* 명명", "확장된 용법: 뉴질랜드인 자체를 가리키는 호칭(*\"I’m a Kiwi guy\"*) 및 화폐 단위(*Kiwi dollar*)"], "english": "Kevin: Hi! Has anyone heard of Kiwi English?\n\nJi-hyun: What? Kiwi is a fruit!\n\nKevin: I knew someone was going to say that. Actually, *kiwi* is an indigenous word that refers to a flightless bird native to New Zealand, and the fruit is called “*kiwifruit*” due to their resemblance to the kiwi bird—both are brown and fluffy. Not only that, I’m a *Kiwi guy*, and a *Kiwi dollar* means a New Zealand dollar.\n\nJi-hyun: That’s really interesting!", "korean": "케빈: 안녕하세요! 혹시 '키위 잉글리시'에 대해 들어보신 분 계신가요?\n\n지현: 뭐라고요? 키위는 과일이잖아요!\n\n케빈: 누군가 그렇게 말할 줄 알았습니다. 사실 *kiwi*는 뉴질랜드 고유의 날지 못하는 새를 가리키는 원주민(마오리어) 단어이며, 그 과일은 키위새와의 유사성 때문에 \"*kiwifruit*\"라고 불립니다. 둘 다 갈색에 솜털이 보송보송하거든요. 그뿐만 아니라, 저는 '키위 사람(뉴질랜드인)'이고, *Kiwi dollar*는 뉴질랜드 달러를 의미합니다.\n\n지현: 정말 흥미롭네요!", "vocab": [{"word": "flightless bird", "meaning": "날지 못하는 새 (키위새)", "desc": "뉴질랜드의 국조"}, {"word": "resemblance", "meaning": "유사성, 닮음 (= similarity)", "desc": "갈색 솜털의 외형"}, {"word": "fluffy", "meaning": "솜털이 보송보송한, 푹신한", "desc": "키위새와 과일 껍질"}, {"word": "Kiwi (다의어)", "meaning": "1. 키위새  2. 키위 과일  3. 뉴질랜드인  4. 뉴질랜드 달러", "desc": "뉴질랜드의 국가적 상징"}], "nuance": [{"title": "Kiwi 단어의 4중 상징 체계", "content": "마오리어 조류 명칭에서 출발하여 $\rightarrow$ 농산물 수출 브랜드(Kiwifruit) $\rightarrow$ 국민 정체성(Kiwi = New Zealander) $\rightarrow$ 통화 단위(Kiwi dollar)로 확장된 뉴질랜드 고유 문화의 표상."}]}, {"id": 8, "section": "한국어와 글로벌 영어 (K-Expressions)", "title": "한류(Korean Wave)의 확산과 영단어로 정착한 한국어 표현들 (*oppa*, *unni*, *noona*, *mukbang*)", "bullets": ["한류의 글로벌 확산으로 한국어 어휘들이 영단어로 차용되어 전 세계 영어 화자들 사이에서 일상화", "혈연관계를 넘어선 친근한 호칭(*oppa*, *unni*, *noona*) 및 식문화·미디어(*mukbang*, *kimchi*, *samgyeopsal*)"], "english": "Kevin: Yes, indeed. By the way, Ji-hyun, I know that Korea is not an English-speaking country, but I wonder if there are some interesting English expressions in Korea.\n\nJi-hyun: You know what? Actually, something really interesting has happened since the rise of the Korean Wave. As Korean culture has spread around the world through the Internet, some Korean words are being used in English.\n\nThabo: That’s so true. I know words like *oppa*, *unni*, and *noona*. I’m a big fan of K-pop, and Koreans use them for singers although they’re not real brothers and sisters, right?\n\nJi-hyun: Exactly! Koreans often use family terms for people who are not family members.\n\nBrian: Oh, wait! I know something about Korean culture, too. I love Korean food and enjoy *mukbang* videos. I want to try authentic *kimchi* and *samgyeopsal* in Korea someday.\n\nJi-hyun: Really? When you visit Korea, I’ll treat you to samgyeopsal.\n\nBrian: That’s cool! I’ll definitely visit one of these days.", "korean": "케빈: 맞아요, 정말 그렇죠. 그런데 지현, 한국이 영어를 모국어로 쓰는 나라는 아니라는 걸 알지만, 한국에도 혹시 흥미로운 영어 표현들이 있는지 궁금해요.\n\n지현: 그거 아세요? 사실, 한류(Korean Wave)의 부상 이래로 정말 흥미로운 일이 일어났어요. 인터넷을 통해 한국 문화가 전 세계로 퍼져나가면서, 몇몇 한국어 단어들이 영어 속에서 사용되고 있답니다.\n\n타보: 정말 맞아요. 저는 *oppa(오빠)*, *unni(언니)*, *noona(누나)* 같은 단어들을 알고 있어요. 제가 K-pop의 열렬한 팬인데, 한국인들은 실제 친형제자매가 아님에도 가수들에게 그 호칭들을 쓰더군요, 맞죠?\n\n지현: 정확해요! 한국인들은 가족 구성원이 아닌 사람들에게도 가족 호칭을 자주 씁니다.\n\n브라이언: 아, 잠깐만요! 저도 한국 문화에 대해 아는 게 있어요. 저는 한국 음식을 사랑하고, *mukbang(먹방)* 영상을 즐겨 봐요. 언젠가 한국에서 진짜 원조 *kimchi(김치)*와 *samgyeopsal(삼겹살)*을 먹어보고 싶어요.\n\n지현: 정말요? 한국에 놀러 오시면, 제가 삼겹살 쏠게요.\n\n브라이언: 멋지네요! 조만간 꼭 방문할게요.", "vocab": [{"word": "Korean Wave", "meaning": "한류 (Hallyu)", "desc": "K-컬처의 글로벌 확산"}, {"word": "family terms for non-family", "meaning": "비가족에 대한 가족 호칭 사용", "desc": "한국 고유의 정(情) 문화"}, {"word": "mukbang", "meaning": "먹방 (음식 먹는 방송)", "desc": "옥스퍼드 영어사전(OED) 등재"}, {"word": "treat A to B", "meaning": "A에게 B를 대접하다/한턱내다", "desc": "I’ll treat you to samgyeopsal"}], "nuance": [{"title": "한국어의 글로벌 잉글리시 유입 (K-Words in English)", "content": "영어가 타국에 전파되는 일방향 수용을 넘어, 한류의 영향으로 *oppa, unni, noona, mukbang, K-drama, daebak* 등 한국어 고유 어휘가 옥스퍼드 영어사전(OED)에 등재되며 세계 영어의 외연을 확장시킴."}]}, {"id": 9, "section": "결론 (Conclusion)", "title": "다양성 포용과 글로벌 소통의 미래: 다양성을 존중하는 열린 대화", "bullets": ["단일한 정답으로서의 영어가 아닌, 역사와 문화적 배경에 따라 다채롭게 진화한 '세계의 영어들(World Englishes)'", "새로운 친구들과 소그룹 토론을 이어가며 문화적 배경과 고유 표현에 대한 상호 존중과 이해 심화"], "english": "Host: Thank you for your participation. I am sure you have more to share with your new friends. So, why don’t we split into small groups to continue our discussion?", "korean": "진행자: 여러분의 참여에 감사드립니다. 새로운 친구들과 나눌 이야기가 더 많으실 것으로 확신합니다. 그러니 소그룹으로 나누어 토론을 계속 이어가 보는 건 어떨까요?", "vocab": [{"word": "participation", "meaning": "참여, 참가", "desc": "열린 대화 동참"}, {"word": "why don’t we V", "meaning": "~하는 게 어떨까요? (제안)", "desc": "= let's V, how about -ing"}, {"word": "split into ~", "meaning": "~으로 나누다/갈라지다", "desc": "소그룹 분과 토론"}, {"word": "World Englishes", "meaning": "세계의 다양한 영어들", "desc": "다원적 언어관"}], "nuance": [{"title": "World Englishes (세계 영어군)의 교육적 지향점", "content": "영국식·미국식 표준 영어만을 정답으로 보던 과거 관점에서 벗어나, 각 국가의 역사와 문화가 투영된 인도, 남아공, 호주, 뉴질랜드, 한국 등의 다채로운 영어를 동등한 문화적 자산으로 존중하는 다문화주의적 시각 함양."}]}];
+    const STORAGE_KEY = 'english_around_globe_real_master_v1';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "english_around_globe_real_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>
