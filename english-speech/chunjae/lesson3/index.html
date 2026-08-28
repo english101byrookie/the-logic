@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A Canoe Called “the Earth” - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">영어 발표와 토론 천재(김현진) 3과</span>
+      <h1 class="header-title">A Canoe Called “the Earth”</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "도입 및 연사 소개 (Intro & Speaker)", "title": "제이슨 모모아의 UN 연설: 모든 섬나라와 지구의 청지기들을 대변하여", "bullets": ["배우 Jason Momoa: 기후 변화에 맞서 긴급한 행동을 취할 것을 세계 지도자들에게 촉구", "모든 도서 국가들의 단독 대표이자 지구의 청지기(Stewards)로서 맞서 싸우는 사람들을 대변하여 연단에 섬"], "english": "A Canoe Called “the Earth”\n\nThe following speech is delivered by a well-known actor, Jason Momoa. In it, he tells world leaders about the urgent need to take action and combat climate change.\n\nAloha, your excellencies, distinguished delegates, ladies and gentlemen. Today, I stand before you as a singular representative of all island nations. Iʼm honored to represent those who continue to fight as stewards of this planet.", "korean": "지구라는 이름의 카누\n\n다음 연설은 잘 알려진 배우인 Jason Momoa에 의해 진행됩니다. 이 연설에서 그는 세계 지도자들에게 기후 변화에 맞서 행동을 취해야 하는 시급한 필요성에 대해 이야기합니다.\n\n알로하, 각하, 존경하는 대표단 여러분, 그리고 신사 숙녀 여러분. 오늘, 저는 모든 섬나라들의 단독 대표로서 여러분 앞에 섰습니다. 이 행성의 청지기(지킴이)로서 계속해서 싸워나가는 사람들을 대표하게 되어 영광입니다.", "vocab": [{"word": "combat climate change", "meaning": "기후 변화에 맞서 싸우다/대처하다", "desc": "긴급한 행동 촉구"}, {"word": "distinguished delegates", "meaning": "존경하는 대표단 여러분", "desc": "UN 공식 외교 호칭"}, {"word": "singular representative", "meaning": "유일한/단독 대표", "desc": "모든 도서 국가의 대변인"}, {"word": "steward", "meaning": "청지기, 관리인, 보호자", "desc": "지구 환경을 보존할 책임자"}], "nuance": [{"title": "청지기 (Stewardship)의 생태 윤리적 개념", "content": "인간이 지구의 지배자나 주인이 아니라, 미래 세대를 위해 지구 생태계를 온전하게 관리하고 돌보아야 하는 '청지기(Steward)'라는 생태주의적 책임 윤리를 제시."}]}, {"id": 2, "section": "두 세계의 발판 (Foothold in Two Worlds)", "title": "하와이와 아이오와: 두 세계의 발판과 상호연결성의 자각", "bullets": ["하와이 원주민 출신이자 아이오와 출신 어머니에게서 출생: 내륙과 섬의 상호 무관심 목격", "두 세계에 발을 딛고 선 경험을 통해 '한 곳의 문제가 곧 모두의 문제가 된다'는 사실을 조기 자각"], "english": "As a native Hawaiian, born to a mother from Iowa, I have seen how one place can be oblivious to another. The issues facing an island can feel so far removed from that place that is landlocked in the middle of our country. However, with a foothold in two worlds, I quickly began to see how a problem for one will soon become a problem for all.", "korean": "아이오와 출신의 어머니에게서 태어난 하와이 원주민으로서, 저는 한 지역이 다른 지역에 대해 얼마나 무지하고 무관심할 수 있는지 보아왔습니다. 섬이 직면한 문제들은 우리 나라 한가운데 육지로 둘러싸인 내륙 지역에서는 너무나 멀리 동떨어진 것처럼 느껴질 수 있습니다. 그러나 두 세계에 발판을 두고 있었기에, 저는 한 사람(한 곳)의 문제가 어떻게 곧 모두의 문제가 될 것인지를 일찌감치 깨닫기 시작했습니다.", "vocab": [{"word": "oblivious to ~", "meaning": "~을 전혀 의식하지 못하는, 무관심한", "desc": "= unaware of, ignorant of"}, {"word": "far removed from ~", "meaning": "~와 아주 동떨어진/동떨어지게 느껴지는", "desc": "지리적·심리적 거리감"}, {"word": "landlocked", "meaning": "육지로 둘러싸인, 내륙의", "desc": "바다와 접하지 않은 지역"}, {"word": "foothold", "meaning": "발판, 디딤돌", "desc": "with a foothold in two worlds"}], "nuance": [{"title": "how a problem for one will soon become a problem for all", "content": "도서 국가가 겪는 기후 위기가 특정 지역의 고립된 문제가 아니라, 지구 기후 시스템의 상호연결성에 의해 전 인류의 재앙으로 번진다는 핵심 명제 제시."}]}, {"id": 3, "section": "인간의 오만과 망각 (Ego & Amnesia)", "title": "인간의 오만, 끝없는 이윤 추구와 '집단적 기억상실(Collective Amnesia)'", "bullets": ["창의성으로 가장 강력한 존재가 되었으나, 자만·공포·끝없는 이윤 추구로 자연의 균형을 파괴", "집단적 기억상실: '지구에 돌이킬 수 없는 피해를 입히는 것은 곧 자신에게 같은 피해를 초래하는 것'이라는 진실 망각"], "english": "As a human family, through innovation and creativity, we have elevated ourselves and perceivably stand as the most powerful beings on Earth. Yet our ego, our fear, and our relentless drive for profits have made us the only species willing to force disharmony with the natural balance of our world. We are the living consequence of forgotten traditions. We suffer a *collective amnesia* of a truth that was once understood, the truth that *to cause irreversible damage to the earth is to bring the same onto ourselves.*", "korean": "하나의 인류 가족으로서, 혁신과 창의성을 통해 우리는 스스로를 높여왔으며 겉보기에 지구상에서 가장 강력한 존재로 서 있습니다. 그러나 우리의 자만심, 두려움, 그리고 이윤에 대한 끊임없는 욕망은 우리를 세상의 자연스러운 균형과 기꺼이 불협화음을 강요하는 유일한 종으로 만들었습니다. 우리는 잊혀진 전통의 살아있는 결과물입니다. 우리는 한때 이해되었던 진실, 즉 *지구에 돌이킬 수 없는 피해를 입히는 것은 곧 우리 자신에게 똑같은 피해를 가져오는 것*이라는 진실에 대한 '집단적 기억상실'을 겪고 있습니다.", "vocab": [{"word": "relentless drive for profits", "meaning": "이윤에 대한 가차 없는/끊임없는 욕망", "desc": "자연 파괴의 근원"}, {"word": "collective amnesia", "meaning": "집단적 기억상실증", "desc": "조상의 지혜 망각"}, {"word": "irreversible damage", "meaning": "돌이킬 수 없는/비가역적인 피해", "desc": "회복 불가능한 파괴"}, {"word": "bring A onto oneself", "meaning": "스스로에게 A를 자초하다/초래하다", "desc": "인과응보적 귀결"}], "nuance": [{"title": "동격의 명사절 that절 구문", "content": "• *the truth [that to cause irreversible damage to the earth is to bring the same onto ourselves]*\n• to부정사 주어(*to cause...*)와 to부정사 보어(*to bring...*)가 결합된 완전한 절로 진실의 구체적 내용을 서술."}]}, {"id": 4, "section": "환경 위기의 최전선 (Frontlines of Crisis)", "title": "위기의 최전선: 해양 비상사태, 해수 온도 상승과 심해까지 번진 플라스틱 오염", "bullets": ["도서 국가와 해안 공동체는 환경 위기의 최전선: 해수 온난화로 전체 해양 생태계 소멸", "대기권에서부터 심해저(Abyssal zone)에 이르기까지 지구 전체를 감염시키는 플라스틱 질병"], "english": "We, the island nations, and all coastal communities, are the frontlines in this environmental crisis. The oceans are in a state of emergency. Entire marine ecosystems are vanishing with the warming of the seas. And as the waste of the world empties into our waters, we face the devastating crisis of plastic pollution. We are a disease that is infecting our planet. From the atmosphere to the abyssal zone, we are polluted.", "korean": "우리 섬나라들과 모든 연안 공동체들은 이 환경 위기의 최전선에 서 있습니다. 바다는 비상사태에 처해 있습니다. 바다의 온난화와 함께 전체 해양 생태계가 사라져가고 있습니다. 그리고 전 세계의 쓰레기가 우리의 바다로 쏟아져 들어옴에 따라, 우리는 플라스틱 오염이라는 파괴적인 위기에 직면해 있습니다. 우리는 우리의 행성을 감염시키고 있는 질병과도 같습니다. 대기에서부터 심해저대에 이르기까지, 우리는 오염되었습니다.", "vocab": [{"word": "coastal communities", "meaning": "연안/해안 공동체", "desc": "해수면 상승의 직접 피해자"}, {"word": "in a state of emergency", "meaning": "비상사태에 처한", "desc": "해양의 긴급 상황"}, {"word": "abyssal zone", "meaning": "심해저대 (수심 4,000~6,000m)", "desc": "가장 깊은 바다 바닥"}, {"word": "infect", "meaning": "감염시키다, 오염시키다", "desc": "지구의 병폐로서의 인간"}], "nuance": [{"title": "은유 표현 (We are a disease that is infecting our planet)", "content": "인간의 무분별한 소비와 폐기물 배출을 행성을 병들게 하는 '바이러스/질병'에 빗대어 강력한 경각심과 자기반성을 촉구."}]}, {"id": 5, "section": "해양 오염의 참상 (Shameful Pollution)", "title": "프랑스보다 거대한 태평양 쓰레기 섬과 은하수의 별보다 많은 플라스틱 입자", "bullets": ["태평양에 떠 있는 거대 쓰레기 지대(Great Garbage Patch)의 크기는 프랑스 국토 면적 초과", "가장 깊은 마리아나 해구에서 나노 플라스틱 발견 및 은하수 별보다 많은 해양 미세 플라스틱의 수치스러운 현실"], "english": "It is a known fact that the great garbage patch floating in the Pacific is larger than the country of France. Even at the depths of the Mariana Trench, we are discovering nano plastics. And shockingly, there are more plastic particles in the ocean than the stars in the Milky Way. It is shameful.", "korean": "태평양에 떠다니는 거대한 쓰레기 지대가 프랑스라는 나라보다 더 크다는 것은 널리 알려진 사실입니다. 심지어 마리아나 해구의 깊은 곳에서도, 우리는 나노 플라스틱을 발견하고 있습니다. 그리고 충격적이게도, 바다에는 은하수의 별들보다 더 많은 플라스틱 입자들이 존재합니다. 참으로 부끄러운 일입니다.", "vocab": [{"word": "great garbage patch", "meaning": "태평양 거대 쓰레기 지대 (GPGP)", "desc": "프랑스 면적 초과"}, {"word": "Mariana Trench", "meaning": "마리아나 해구 (지구에서 가장 깊은 바다)", "desc": "수심 11,000m"}, {"word": "nano plastics", "meaning": "나노 플라스틱 (초미세 플라스틱)", "desc": "심해까지 침투한 입자"}, {"word": "the Milky Way", "meaning": "은하수, 은하계", "desc": "항성 수와의 충격적 비교"}, {"word": "shameful", "meaning": "부끄러운, 수치스러운", "desc": "인류의 도덕적 자각 촉구"}], "nuance": [{"title": "극적 수치 비교를 통한 충격 요법", "content": "가장 깊은 바다(마리아나 해구)와 광활한 우주(은하수의 별)를 대비시켜 플라스틱 오염이 상상을 초월하는 재앙적 규모에 도달했음을 강조."}]}, {"id": 6, "section": "도서 국가의 실질적 위협 (Island Nations at Risk)", "title": "도서 개발국의 침수 위기: 온실가스 배출 주범과 피해자의 극명한 불일치", "bullets": ["제1세계 선진국들의 막대한 배출량으로 인해 섬 전체가 바다에 수몰되는 실존적 위협 직면", "재앙에 대한 기여도는 가장 낮지만 그 결과의 가장 무거운 짐을 강요받고 있는 도서 국가들"], "english": "Yet the greatest threat to small island developing states is the fact that entire islands are drowning into the sea due to the enormous volume of emissions generated by the first world countries. Island nations contribute the least to this disaster, but are made to suffer the weight of these consequences. Our governments and corporate entities have known for decades the immediate changes needed. Yet change still has not come. And when the frontline is gone, we are doomed. There is no undoing.", "korean": "그러나 소규모 섬 개발도상국들에 가장 큰 위협은 제1세계 국가들이 발생시키는 엄청난 양의 탄소 배출로 인해 섬 전체가 바다 속으로 가라앉고 있다는 사실입니다. 섬나라들은 이 재앙에 가장 적게 기여했지만, 이러한 결과의 무게를 견디도록 강요받고 있습니다. 우리 정부와 기업체들은 즉각적인 변화가 필요하다는 것을 수십 년 동안 알고 있었습니다. 그러나 변화는 여전히 오지 않았습니다. 그리고 최전선이 사라지면, 우리는 파멸할 것입니다. 되돌릴 수는 없습니다.", "vocab": [{"word": "small island developing states", "meaning": "소규모 도서 개발도상국 (SIDS)", "desc": "기후 취약 국가군"}, {"word": "enormous volume of emissions", "meaning": "엄청난 양의 탄소 배출량", "desc": "선진국 유발 요인"}, {"word": "be made to V", "meaning": "~하도록 강요당하다 (사역동사 수동태)", "desc": "be made to suffer"}, {"word": "doomed", "meaning": "파멸할 운명인, 끝장난", "desc": "we are doomed"}, {"word": "there is no undoing", "meaning": "되돌릴 수 있는 방법이 없다", "desc": "비가역적 파국"}], "nuance": [{"title": "기후 정의 (Climate Justice)의 불평등 문제", "content": "탄소 배출 원인(선진국)과 기후 재앙 피해(도서 개발국) 사이의 극심한 비대칭성을 고발하며, 사역동사 수동태 *are made to suffer*로 피해국의 억울한 처지를 강조."}]}, {"id": 7, "section": "임계점과 기업의 책임 (Tipping Point & Corporate Powers)", "title": "임계점(Tipping Point)의 돌파와 100대 부유체 중 69개 기업에 대한 책임 추궁", "bullets": ["도서국의 위기에 무관심하게 방관할 경우, 지구의 죽음을 공유하는 임계점(*Tipping Point*)을 넘게 됨", "세계 100대 부유체 중 69개가 기업: 정부와 결탁하여 환경 파괴를 용인해 온 권력자들에 대한 준엄한 심판 예고"], "english": "If you continue to watch unsympathetic to the issues of island nations, this realization will soon come that you stood by and witnessed the world cross the critical tipping point of sharing the death of our planet. Sixty-nine of the hundred richest entities in the world are corporations. They are not governments. Obviously, it is not naive to believe that one does not influence the other. But we are watching, and the people will hold our governments and corporate powers accountable for the destruction you are allowing to our environment.", "korean": "섬나라들의 문제에 공감하지 않은 채 계속해서 방관만 한다면, 여러분이 수수방관하며 우리 행성의 죽음을 공유하는 중대한 티핑 포인트(임계점)를 세계가 넘어서는 것을 지켜보았다는 깨달음이 곧 닥쳐올 것입니다. 세계에서 가장 부유한 100개 주체 중 69개는 기업입니다. 그들은 정부가 아닙니다. 분명, 한쪽이 다른 쪽에 영향을 미치지 않는다고 믿는 것은 순진한 생각일 것입니다. 하지만 우리는 지켜보고 있으며, 시민들은 여러분이 우리 환경에 용인하고 있는 파괴에 대해 우리 정부와 기업 권력에 책임을 물을 것입니다.", "vocab": [{"word": "unsympathetic to ~", "meaning": "~에 공감하지 않는, 냉담한", "desc": "무관심한 방관 태도"}, {"word": "critical tipping point", "meaning": "중대한 티핑 포인트/임계점", "desc": "돌이킬 수 없는 급변점"}, {"word": "stand by", "meaning": "방관하다, 가만히 서 있다", "desc": "행동 없는 방관"}, {"word": "hold A accountable for B", "meaning": "B에 대해 A에게 책임을 묻다", "desc": "정부·기업 책임 추궁"}], "nuance": [{"title": "지각동사 witness + 목적어 + 동사원형", "content": "• *witnessed [the world (목적어)] [cross (원형부정사 보어)] the critical tipping point...*\n• 세계가 지구의 죽음이라는 임계점을 돌파하는 파국을 두 눈으로 똑똑히 목격하게 될 것임을 경고."}]}, {"id": 8, "section": "파리 협약과 약속 이행 촉구 (Paris Agreement & Broken Promises)", "title": "파리 기후 협약의 약속 불이행 비판과 인류 번영을 위한 연대 질문", "bullets": ["3년 전 파리 기후 협약: 지구 온난화 1.5°C 이내 제한 서약 $\rightarrow$ 그러나 약속을 저버린 지도자들에 대한 부끄러움", "\"우리는 여전히 연대하고 있는가? 단기 이윤을 좇아 아이들의 기본적 생존권을 짓밟을 것인가?\""], "english": "Three years ago, in Paris, the world stood united and vowed to keep the earth below 1.5 degrees of warming. We pledged to hold ourselves to a higher standard and to do what is right. Iʼm standing here today because I am ashamed that not all of our leaders have honored this agreement. Delegates, I ask you now, do we still stand in unity for this cause? Do you intend to honor the commitments for the betterment of mankind, or will you continue to chase short-term profits above our childrenʼs basic human rights to live on this earth?", "korean": "3년 전, 파리에서 세계는 하나로 뭉쳐 지구 온난화를 1.5도 이하로 유지하겠다고 맹세했습니다. 우리는 스스로에게 더 높은 기준을 적용하고 옳은 일을 하겠다고 서약했습니다. 제가 오늘 이 자리에 서 있는 것은 모든 지도자들이 이 협정을 이행하지 않았다는 사실이 부끄럽기 때문입니다. 대표단 여러분, 지금 여러분께 묻습니다. 우리는 여전히 이 대의를 위해 하나로 뭉쳐 있습니까? 여러분은 인류의 번영을 위한 약속을 이행할 의향이 있으십니까, 아니면 우리 아이들이 이 땅에서 살아갈 기본적인 인권 위에 단기적인 이윤을 계속해서 쫓으시겠습니까?", "vocab": [{"word": "vow to V", "meaning": "~하겠다고 맹세하다/서약하다", "desc": "파리 협정의 결의"}, {"word": "pledge to V", "meaning": "~하겠다고 굳게 약속하다", "desc": "= promise firmly"}, {"word": "honor an agreement", "meaning": "협정/약속을 존중하여 이행하다", "desc": "약속 실천 여부"}, {"word": "betterment of mankind", "meaning": "인류의 향상/번영", "desc": "장기적 공동선"}, {"word": "chase short-term profits", "meaning": "단기적 이윤을 좇다", "desc": "미래 세대 희생"}], "nuance": [{"title": "부분부정 구문 (not all of our leaders...)", "content": "• *I am ashamed that [not all of our leaders] have honored this agreement.*\n• '모든 지도자가 다 협정을 이행한 것은 아니다' $\rightarrow$ 일부 강대국과 기업의 약속 파기를 정면 비판."}]}, {"id": 9, "section": "지금 행동하라 (Act Today)", "title": "미래가 아닌 바로 오늘(Today)의 변화: \"인간에겐 지구가 필요하지만, 지구는 인간을 필요로 하지 않는다\"", "bullets": ["2050년이나 2030년이 아닌 '오늘 당장'의 변화 필수: 어설픈 미봉책(Halfway luxury)은 불가능함", "\"인간은 생존을 위해 지구가 필요하지만, 지구는 인간을 필요로 하지 않는다\"는 냉혹한 진실"], "english": "Change cannot come in 2050 or 2030, or even 2025. The change must come today. We can no longer afford the luxury of halfway doing it as we willingly force ourselves beyond the threshold of no return. It is important to take action now. As a human species, we need the Earth to survive. *But make no mistake, the Earth doesnʼt need us.* We are demanding global unity for a global crisis, to once again bring harmony between mankind and the natural balance of our world. We must right the wrongs we have done against our children and grandchildren because we are gifting them with a world that suffers from our irresponsible stewardship.", "korean": "변화는 2050년이나 2030년, 혹은 2025년에 올 수 없습니다. 변화는 오늘 당장 와야 합니다. 우리는 스스로를 돌아올 수 없는 문턱 너머로 기꺼이 밀어 넣으면서 어설프게 실행하는 사치를 더 이상 누릴 여유가 없습니다. 지금 당장 행동을 취하는 것이 중요합니다. 인류라는 종으로서, 우리는 생존하기 위해 지구가 필요합니다. *하지만 오해하지 마십시오, 지구는 우리를 필요로 하지 않습니다.* 우리는 인류와 세상의 자연적 균형 사이에 다시 한번 조화를 가져오기 위해 글로벌 위기에 맞선 전 세계적 단결을 요구하고 있습니다. 우리는 우리의 무책임한 관리로 인해 고통받는 세상을 물려주고 있기에, 자녀와 손주들에게 저지른 잘못들을 바로잡아야만 합니다.", "vocab": [{"word": "threshold of no return", "meaning": "돌아올 수 없는 문턱/한계선", "desc": "비가역적 파국점"}, {"word": "make no mistake", "meaning": "명심하라, 오해하지 마라", "desc": "냉혹한 진실 강조"}, {"word": "right the wrongs", "meaning": "잘못된 것을 바로잡다", "desc": "역사적·도덕적 책임 이행"}, {"word": "irresponsible stewardship", "meaning": "무책임한 관리/청지기 역할", "desc": "미래 세대에 대한 죄책감"}], "nuance": [{"title": "\"make no mistake, the Earth doesnʼt need us\" (연설의 명대사)", "content": "지구 환경 보호는 지구를 위한 시혜적 활동이 아니라, 지구라는 거대한 생명 시스템에서 '인간이라는 종이 멸종되지 않고 살아남기 위한 유일한 자구책'임을 선언."}]}, {"id": 10, "section": "하와이 속담과 결론 (Hawaiian Proverb & Global Canoe)", "title": "하와이 속담: \"모든 땅은 카누요, 모든 카누는 땅이다\" - 지구라는 이름의 카누를 올바른 방향으로", "bullets": ["하와이 원주민 속담 *“He Waʻa He Moku, He Moku He Waʻa”*: 모든 땅은 바다 위의 카누이며, 지구는 별들의 바다에 떠 있는 섬임", "한정된 자원을 지닌 우주선 지구호: 엄격한 보존과 항해 계획으로 우리 모두의 집인 지구 카누를 올바른 미래로 이끌자는 결의"], "english": "I leave you with an island proverb that states, *“He Waʻa He Moku, He Moku He Waʻa.”* These words teach us that all land, no matter how big or small, floats on the ocean like a canoe in the middle of the sea, and that our planet is nothing more than an island floating amongst an ocean of stars. Life on a floating vessel has limited resources. It requires strict conservation practices and carefully planned navigation to ensure survival. Why don’t we work together as a global community to best steer our canoe in the right direction, the direction of the healthy and abundant future on Earth that we call home? Please join us in unified commitment to protect and heal the planet. This is for all of us. Aloha!", "korean": "저는 여러분께 *“He Waʻa He Moku, He Moku He Waʻa (카누가 곧 섬이요, 섬이 곧 카누이다)”*라는 섬의 속담을 남기며 연설을 마치고자 합니다. 이 말은 크든 작든 모든 땅이 바다 한가운데 떠 있는 카누처럼 대양 위에 떠 있으며, 우리의 행성은 별들의 바다 사이에 떠 있는 하나의 섬에 지나지 않는다는 것을 가르쳐 줍니다. 떠다니는 배에서의 삶은 한정된 자원을 가지고 있습니다. 생존을 보장하기 위해서는 엄격한 보존 관행과 신중하게 계획된 항해가 필요합니다. 우리가 집이라 부르는 지구상에서 건강하고 풍요로운 미래라는 올바른 방향으로 우리의 카누를 가장 잘 조종하기 위해 지구촌 공동체로서 함께 협력하는 것이 어떻겠습니까? 지구를 보호하고 치유하기 위한 하나 된 약속에 동참해 주십시오. 이것은 우리 모두를 위한 것입니다. 알로하!", "vocab": [{"word": "He Waʻa He Moku, He Moku He Waʻa", "meaning": "카누가 곧 섬이요, 섬이 곧 카누이다", "desc": "하와이 전통 속담"}, {"word": "no matter how big or small", "meaning": "크든 작든 상관없이", "desc": "양보 부사절"}, {"word": "floating vessel", "meaning": "떠다니는 배/선박", "desc": "지구에 대한 은유"}, {"word": "steer our canoe", "meaning": "우리의 카누를 조종하다/키를 잡다", "desc": "인류의 공동 항해"}, {"word": "Aloha", "meaning": "알로하 (안녕, 사랑, 평화, 존중)", "desc": "하와이 전통 인사"}], "nuance": [{"title": "A Canoe Called the Earth (우주선 지구호 메타포의 원주민적 재해석)", "content": "바다 한가운데 떠 있는 고립된 카누에서 승무원들이 한정된 식량과 물을 아끼며 호흡을 맞춰 노를 젓지 않으면 전복되듯이, 광활한 우주 속 단 하나의 지구 카누에서 인류가 운명공동체로 연대해야 함을 감동적으로 설파."}]}];
+    const STORAGE_KEY = 'speech_chunjae_canoe_master_v1';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "speech_chunjae_canoe_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>

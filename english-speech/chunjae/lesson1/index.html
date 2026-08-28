@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miracle of a Small Fragrance Store - 인터랙티브 강의 뷰어 (전체 완벽 편집 지원)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-sub: #334155;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent-blue: #38bdf8;
+      --accent-green: #34d399;
+      --accent-purple: #a78bfa;
+      --accent-yellow: #fbbf24;
+      --accent-red: #f87171;
+      --highlight-bg: rgba(56, 189, 248, 0.18);
+      --highlight-border: #38bdf8;
+    }
+
+    .theme-light {
+      --bg-main: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-sub: #f8fafc;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
+      --accent-blue: #0284c7;
+      --accent-green: #059669;
+      --accent-purple: #7c3aed;
+      --accent-yellow: #d97706;
+      --accent-red: #dc2626;
+      --highlight-bg: rgba(2, 132, 199, 0.12);
+      --highlight-border: #0284c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: text;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge-pill {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--accent-blue);
+      border: 1px solid var(--accent-blue);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .nav-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background-color: var(--bg-card-sub);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+      transform: translateY(-1px);
+    }
+
+    .btn-active {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .btn-edit {
+      background-color: rgba(251, 191, 36, 0.15);
+      color: var(--accent-yellow);
+      border-color: var(--accent-yellow);
+    }
+    .btn-edit:hover {
+      background-color: var(--accent-yellow);
+      color: #0f172a;
+    }
+
+    .btn-danger {
+      background-color: rgba(248, 113, 113, 0.15);
+      color: var(--accent-red);
+      border-color: var(--accent-red);
+    }
+    .btn-danger:hover {
+      background-color: var(--accent-red);
+      color: #ffffff;
+    }
+
+    .btn-tiny {
+      padding: 3px 8px;
+      font-size: 0.75rem;
+      border-radius: 6px;
+    }
+
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      gap: 24px;
+    }
+
+    .passage-container {
+      flex: 1.2;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .analysis-container {
+      flex: 1;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-height: calc(100vh - 180px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .mode-focus .passage-container {
+      flex: 1;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 48px;
+    }
+    .mode-focus .analysis-container {
+      display: none;
+    }
+
+    .passage-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .passage-header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .passage-step {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .passage-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .english-text-box em, .english-text-box i {
+      font-style: italic;
+      font-family: 'Lora', Georgia, serif;
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .korean-box em, .korean-box i {
+      font-style: italic;
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .english-text-box strong, .english-text-box b {
+      font-weight: 700;
+      color: var(--accent-yellow);
+    }
+
+    .english-text-box {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.45rem;
+      line-height: 1.95;
+      color: var(--text-main);
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+
+    .english-text-box p {
+      margin-bottom: 18px;
+    }
+
+    .hl-vocab {
+      background: var(--highlight-bg);
+      border-bottom: 2px solid var(--highlight-border);
+      padding: 1px 4px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--accent-blue);
+    }
+
+    .hl-vocab:hover {
+      background: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    .korean-box {
+      background-color: var(--bg-card-sub);
+      border-left: 4px solid var(--accent-green);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text-sub);
+      margin-top: auto;
+      transition: all 0.3s;
+    }
+
+    .korean-box.hidden {
+      display: none;
+    }
+
+    .section-card {
+      background-color: var(--bg-card-sub);
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .section-header-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .bullet-list {
+      list-style: none;
+    }
+    .bullet-list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+    .bullet-list li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent-blue);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .vocab-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border-color);
+      transition: all 0.2s;
+      position: relative;
+    }
+    .vocab-card:hover {
+      border-color: var(--accent-blue);
+      transform: translateX(3px);
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .vocab-card:hover .card-actions,
+    .nuance-card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .vocab-word {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.02rem;
+      color: var(--accent-blue);
+    }
+    .vocab-meaning {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--accent-green);
+      margin-left: 6px;
+    }
+    .vocab-desc {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      padding-right: 55px;
+    }
+
+    .nuance-card {
+      background-color: var(--bg-card);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-purple);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .nuance-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--accent-purple);
+      margin-bottom: 6px;
+      padding-right: 65px;
+    }
+    .nuance-content {
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .vote-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .vote-table th, .vote-table td {
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      text-align: center;
+    }
+    .vote-table th {
+      background-color: var(--bg-card-sub);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* Modal Styling */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-sub);
+    }
+    .form-input, .form-textarea {
+      background-color: var(--bg-card-sub);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .form-textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    footer {
+      background-color: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .progress-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      max-width: 400px;
+      margin: 0 24px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 8px;
+      background-color: var(--bg-card-sub);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+      width: 6.66%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .page-indicator {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      min-width: 65px;
+    }
+
+    .shortcuts-hint {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+    }
+
+    @media (max-width: 1024px) {
+      .main-workspace {
+        flex-direction: column;
+        padding: 16px;
+        gap: 16px;
+      }
+      .analysis-container {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 8px 12px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+      .logo-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .badge-pill {
+        font-size: 0.72rem;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .header-title {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .nav-controls {
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        gap: 6px;
+        width: 100%;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+      .nav-controls::-webkit-scrollbar {
+        display: none;
+      }
+      .nav-controls .btn {
+        flex-shrink: 0;
+        padding: 5px 9px;
+        font-size: 0.76rem;
+        white-space: nowrap;
+      }
+      .main-workspace {
+        padding: 10px;
+        gap: 12px;
+      }
+      .passage-container {
+        padding: 16px 14px;
+        border-radius: 12px;
+      }
+      .passage-title {
+        font-size: 1.15rem;
+      }
+      .english-text-box {
+        font-size: 1.16rem;
+        line-height: 1.8;
+        margin-bottom: 14px;
+      }
+      .korean-box {
+        font-size: 0.92rem;
+        line-height: 1.65;
+        padding: 12px 14px;
+      }
+      .analysis-container {
+        padding: 14px 12px;
+        border-radius: 12px;
+        gap: 12px;
+      }
+      footer {
+        padding: 8px 12px;
+      }
+      .shortcuts-hint {
+        display: none;
+      }
+      .progress-group {
+        margin: 0 8px;
+        gap: 6px;
+      }
+      .page-indicator {
+        font-size: 0.82rem;
+        min-width: 50px;
+      }
+      #btnPrev, #btnNext {
+        padding: 6px 10px;
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body class="mode-split">
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="badge-pill">영어 발표와 토론 천재(김현진) 1과</span>
+      <h1 class="header-title">Miracle of a Small Fragrance Store</h1>
+    </div>
+
+    <div class="nav-controls">
+      <button type="button" class="btn" id="btnModeFocus" onclick="setMode('focus')">📖 지문 집중</button>
+      <button type="button" class="btn btn-active" id="btnModeSplit" onclick="setMode('split')">📊 분할 해설</button>
+      <button type="button" class="btn" id="btnToggleKorean" onclick="toggleKorean()">🌐 한국어 해석</button>
+      <button type="button" class="btn" onclick="toggleTheme()">🌓 테마</button>
+      <button type="button" class="btn" onclick="changeFontSize(1)">A+</button>
+      <button type="button" class="btn" onclick="changeFontSize(-1)">A-</button>
+      <button type="button" class="btn" onclick="exportData()">💾 내보내기</button>
+      <button type="button" class="btn btn-danger" onclick="resetToDefault()">🔄 초기화</button>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="main-workspace">
+    <!-- Left: English Passage -->
+    <section class="passage-container">
+      <div class="passage-header">
+        <div class="passage-header-left">
+          <div class="passage-step" id="lblSection">섹션</div>
+          <div class="passage-title" id="lblTitle">[제목]</div>
+        </div>
+        <button type="button" class="btn btn-edit btn-tiny" onclick="openEditPassageModal()">✏️ 본문·해석 수정</button>
+      </div>
+
+      <div class="english-text-box" id="boxEnglish"></div>
+
+      <div class="korean-box" id="boxKorean"></div>
+    </section>
+
+    <!-- Right: Analysis Panel -->
+    <aside class="analysis-container" id="panelAnalysis">
+      <!-- Key Summary Bullets -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>💡 핵심 요약 (Key Points)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openEditBulletsModal()">✏️ 요약 수정</button>
+        </div>
+        <ul class="bullet-list" id="listBullets"></ul>
+      </div>
+
+      <!-- Optional Table -->
+      <div class="section-card" id="cardTable" style="display: none;">
+        <div class="section-header-title">📊 데이터 집계표</div>
+        <div id="boxTable"></div>
+      </div>
+
+      <!-- Core Vocabulary -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>📚 핵심 어휘 &amp; 문맥적 의미 (Vocabulary)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddVocabModal()">+ 새 어휘 추가</button>
+        </div>
+        <div class="vocab-grid" id="gridVocab"></div>
+      </div>
+
+      <!-- Nuance / Syntax Deep-Dive -->
+      <div class="section-card">
+        <div class="section-header-title">
+          <span>🔍 어휘 뉘앙스 심층 비교 &amp; 구문 분석 (Deep-Dive)</span>
+          <button type="button" class="btn btn-edit btn-tiny" onclick="openAddNuanceModal()">+ 새 구문/설명 추가</button>
+        </div>
+        <div id="boxNuance"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Bottom Floating Controller -->
+  <footer>
+    <button type="button" class="btn" onclick="prevSlide()" id="btnPrev">◀ 이전 문단</button>
+
+    <div class="progress-group">
+      <div class="page-indicator" id="lblProgress">01 / 01</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="barFill"></div>
+      </div>
+    </div>
+
+    <button type="button" class="btn" onclick="nextSlide()" id="btnNext">다음 문단 ▶</button>
+
+    <div class="shortcuts-hint">
+      단축키: [◀] 이전 | [▶] 다음 | [Space] 해설 토글 | [T] 해석 토글
+    </div>
+  </footer>
+
+  <!-- Passage & Korean Edit Modal -->
+    <!-- English/Korean Edit Modal -->
+  <div class="modal-overlay" id="modalPassage">
+    <div class="modal-card">
+      <div class="modal-title">📝 영어 본문 및 한국어 해석 수정</div>
+      
+      <!-- English Section -->
+      <div class="form-group">
+        <label class="form-label" for="inpPassageEnglish" style="font-weight: 700; color: var(--accent-blue);">영어 본문 (줄바꿈 및 이탤릭·볼드 서식 지원)</label>
+        
+        <!-- Toolbar -->
+        <div style="display: flex; gap: 8px; align-items: center; background: var(--bg-card-sub); padding: 8px 12px; border-radius: 8px 8px 0 0; border: 1px solid var(--border-color); border-bottom: none;">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-sub); margin-right: 4px;">서식 적용:</span>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-style: italic; font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '*', '*')"><i>I</i> 이탤릭체 (*선택영역*)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="font-weight: 700; padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '**', '**')"><b>B</b> 굵게 (**선택영역**)</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<u>', '</u>')"><u>U</u> 밑줄</button>
+          <button type="button" class="btn btn-tiny btn-edit" style="padding: 4px 10px;" onclick="applyFormatting('inpPassageEnglish', '<mark>', '</mark>')">💡 형광펜</button>
+        </div>
+        
+        <textarea id="inpPassageEnglish" class="form-textarea" style="border-radius: 0 0 8px 8px; min-height: 180px; font-family: 'Lora', Georgia, serif; font-size: 1.08rem; line-height: 1.75;"></textarea>
+        
+        <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 6px; padding: 8px 12px; margin-top: 6px; font-size: 0.82rem; color: var(--text-main); line-height: 1.5;">
+          ✨ <b>이탤릭체 서식 안내:</b> 단어를 마우스로 드래그한 후 <b>[<i>I</i> 이탤릭체]</b> 버튼을 누르거나 <code>*도서명*</code> 또는 <code>&lt;i&gt;학명&lt;/i&gt;</code> 형태로 감싸주시면, 본문에서 유려한 이탤릭체(<i>Italic</i>)로 렌더링됩니다. (예: <code>*When You Trap a Tiger*</code>)
+        </div>
+      </div>
+
+      <!-- Korean Section -->
+      <div class="form-group" style="margin-top: 10px;">
+        <label class="form-label" for="inpPassageKorean" style="font-weight: 700; color: var(--accent-green);">한국어 전문 해석</label>
+        <textarea id="inpPassageKorean" class="form-textarea" style="min-height: 140px; font-size: 0.98rem; line-height: 1.65;"></textarea>
+      </div>
+
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="savePassageData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bullets Edit Modal -->
+  <div class="modal-overlay" id="modalBullets">
+    <div class="modal-card">
+      <div class="modal-title">💡 핵심 요약 (Key Points) 및 소제목 수정</div>
+      <div class="form-group">
+        <label class="form-label" for="inpSlideTitle">문단 소제목</label>
+        <input type="text" id="inpSlideTitle" class="form-input" placeholder="문단 소제목">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpBulletsContent">핵심 요약 불릿 (한 줄에 하나씩 작성)</label>
+        <textarea id="inpBulletsContent" class="form-textarea" style="min-height: 130px;" placeholder="• 첫 번째 요약 포인트&#10;• 두 번째 요약 포인트"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveBulletsData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vocab Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalVocab">
+    <div class="modal-card">
+      <div class="modal-title" id="modalVocabTitle">✨ 어휘 추가 / 수정</div>
+      <input type="hidden" id="editVocabIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpVocabWord">영어 단어/숙어</label>
+        <input type="text" id="inpVocabWord" class="form-input" placeholder="예: compromise">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabMeaning">한국어 의미</label>
+        <input type="text" id="inpVocabMeaning" class="form-input" placeholder="예: 타협하다, 절충안을 찾다">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpVocabDesc">문맥적 설명 / 뉘앙스</label>
+        <input type="text" id="inpVocabDesc" class="form-input" placeholder="예: 양측이 한 발씩 양보하여 도출하는 합의">
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveVocabData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nuance / Syntax Modal (Add & Edit) -->
+  <div class="modal-overlay" id="modalNuance">
+    <div class="modal-card">
+      <div class="modal-title" id="modalNuanceTitle">✨ 구문 / 설명 추가 및 수정</div>
+      <input type="hidden" id="editNuanceIndex" value="-1">
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceTitle">구문/표현 제목</label>
+        <input type="text" id="inpNuanceTitle" class="form-input" placeholder="예: not only A but also B 구조 분석">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="inpNuanceContent">상세 설명 / 문법·어휘 비교</label>
+        <textarea id="inpNuanceContent" class="form-textarea" placeholder="선생님의 설명, 출제 포인트, 유의어 비교 등을 자유롭게 작성하세요."></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn" onclick="closeModals()">취소</button>
+        <button type="button" class="btn btn-active" onclick="saveNuanceData()">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const defaultData = [{"id": 1, "section": "도입 (Introduction)", "title": "조 말론(Jo Malone)의 소개와 난독증을 극복하게 해준 두 가지 선물", "bullets": ["영국의 조향사이자 기업가인 Joanne Lesley Malone: 향기로 이야기를 전하는 스토리텔러", "학창 시절 심각한 난독증(Dyslexia)을 겪었으나 사진 기억력(Photographic memory)과 뛰어난 후각이라는 두 가지 재능을 바탕으로 극복"], "english": "Miracle of a Small Fragrance Store\n\nThe following speech is adapted from a lecture series delivered by Joanne Lesley Malone, a British perfumer. She tells the story of her struggles and successes.\n\nMy name is Joanne Lesley Malone. I am an entrepreneur, perfumer, and a storyteller with scent. Today I’m going to tell you about the first brand I ever created and all the fun adventures that we had in building a global brand.\n\nEverybody faces challenges in life regardless of who you are or where you came from. My dyslexia was certainly a challenge in my life. One of the things I learned as a child at school was that I was struggling to read. I couldn’t learn in the same way other children did. I had to think differently and always find a way of getting out of the situations. I would just memorize everything. I have a photographic memory, and I have a very good sense of smell. Those are the two gifts I need. I trust those two things every time I create anything.", "korean": "작은 향수 가게의 기적\n\n다음 연설은 영국의 조향사인 Joanne Lesley Malone이 진행한 일련의 강의에서 발췌한 것이다. 그녀는 자신의 고난과 성공에 관한 이야기를 들려준다.\n\n제 이름은 Joanne Lesley Malone입니다. 저는 기업가이자 조향사이며 향기로 이야기를 전하는 사람입니다. 오늘 저는 제가 처음 만든 브랜드와 글로벌 브랜드를 구축하면서 겪었던 모든 재미있는 모험들에 대해 말씀드리고자 합니다.\n\n여러분이 누구이든 어디에서 왔든 간에 모든 사람은 삶에서 도전에 직면합니다. 제 난독증은 분명 제 인생의 도전이었습니다. 제가 어렸을 때 학교에서 알게 된 것 중 하나는 제가 글을 읽는 데 어려움을 겪고 있다는 사실이었습니다. 저는 다른 아이들이 배우는 것과 같은 방식으로 배울 수 없었습니다. 저는 다르게 생각해야 했고 항상 상황에서 벗어날 방법을 찾아야 했습니다. 저는 그저 모든 것을 암기하곤 했습니다. 저에게는 사진을 찍듯 기억하는 능력(사진 기억력)과 아주 뛰어난 후각이 있습니다. 그것들이 제가 필요로 하는 두 가지 선물입니다. 저는 무언가를 창조할 때마다 그 두 가지를 신뢰합니다.", "vocab": [{"word": "perfumer", "meaning": "조향사, 향수 전문가", "desc": "storyteller with scent"}, {"word": "dyslexia", "meaning": "난독증", "desc": "글 읽기에 어려움을 겪는 증상"}, {"word": "photographic memory", "meaning": "사진 기억력, 직관적 기억력", "desc": "장면을 사진처럼 통째로 기억하는 능력"}, {"word": "sense of smell", "meaning": "후각", "desc": "조향의 핵심 감각"}, {"word": "every time S+V", "meaning": "~할 때마다 (접속사)", "desc": "= whenever"}], "nuance": [{"title": "regardless of who you are or where you came from", "content": "• *regardless of [who you are] or [where you came from]* (복합의문사절 병렬)\n• 출신이나 배경에 상관없이 누구나 삶에서 역경에 직면한다는 보편적 공감대 형성."}]}, {"id": 2, "section": "첫 브랜드의 시작 (First Brand)", "title": "작은 아파트 주방에서 탄생한 산딸기 향과 피부관리 고객들의 입소문", "bullets": ["작은 아파트에서 피아노 건반을 조율하듯 음을 더하고 빼며 완벽한 산딸기(Wild strawberry) 향 완성", "피부관리사로 일하며 고객들에게 손수 만든 향수를 판매 $\rightarrow$ 입소문(Buzz)을 타며 한 고객이 100병을 일괄 구매"], "english": "I started my first brand from my tiny little apartment. I think the very very first note I made was a wild strawberry note and violet. It didn’t smell as good as I wanted it to, so I would take it, you know almost like playing the piano, add notes in, take notes out, give a beat to the fragrance, and find it. And I created a wonderful wild strawberry note from that.\n\nThe fragrances that I created, I would just make by hand and I would sell them to my consumers that would come to have their faces done because I was a beautician in the very beginning. Everybody loved the product, and there was this buzz about everything that we did. And one lady one day bought one-hundred bottles of perfume. It was amazing.", "korean": "저는 제 아주 작은 아파트에서 첫 번째 브랜드를 시작했습니다. 제가 만든 맨 처음 향의 노트(조향 단위)는 산딸기 노트와 제비꽃이었던 것 같습니다. 제가 원했던 만큼 향이 좋지 않아서, 마치 피아노를 치듯이 음을 넣고, 음을 빼고, 향기에 박자를 주면서 향을 찾아갔습니다. 그리고 그것으로부터 멋진 산딸기 노트를 만들어냈습니다.\n\n제가 만든 향수들은 그저 손으로 직접 만들었고, 제가 초기에는 피부관리사였기 때문에 얼굴 관리를 받으러 오곤 했던 제 고객들에게 그것들을 팔곤 했습니다. 모든 사람이 그 제품을 아주 좋아했고, 우리가 하는 모든 일에 대해 소문(입소문)이 났습니다. 그리고 어느 날 한 여성분이 향수 100병을 샀습니다. 정말 놀라운 일이었습니다.", "vocab": [{"word": "note", "meaning": "노트 (향수 조향 단위 / 음악의 음표)", "desc": "향의 음계를 비유"}, {"word": "beautician", "meaning": "피부관리사, 미용사", "desc": "조 말론의 초기 직업"}, {"word": "have one's face done", "meaning": "얼굴 피부 관리를 받다", "desc": "사역동사 have + 목적어 + p.p."}, {"word": "buzz", "meaning": "입소문, 소문, 열풍", "desc": "there was this buzz about..."}], "nuance": [{"title": "음악과 조향의 공감각적 비유 (like playing the piano)", "content": "향수 제조를 피아노 연주에 비유하여 음표(note)를 더하고 빼며 박자(beat)를 부여하듯 향기를 창조한 독창적 감각 표현."}]}, {"id": 3, "section": "첫 매장 오픈 (154 Walton Street)", "title": "주방 냄비에서 시작된 꿈: 런던 월턴가 154번지 첫 매장 개점", "bullets": ["100병이 놓인 파티에서 한 달 만에 86명이 구매를 열망 $\rightarrow$ 플라스틱 저그와 작은 냄비, 커다란 꿈으로 주방에서 수작업 제조", "남편이자 사업 파트너인 Gary와 함께 런던 월턴가 154번지에 대망의 첫 매장 오픈"], "english": "Those bottles sat at a place at a party that she was holding. Within one month, eighty-six out of one-hundred people were desperate to buy the product. They thought it was a really big full-on brand, but it wasn’t. It was all being made in my kitchen with poor plastic jugs, a little saucepan, and a whole heap of dreams.\n\nThose one-hundred people grew and grew and grew until the point where my husband Gary and I, who were business partners as well as best friends, decided to open our first little shop on 154 Walton Street, London.", "korean": "그 병들은 그녀가 열고 있던 파티의 한자리에 놓여 있었습니다. 한 달 만에 100명 중 86명이 그 제품을 너무나 사고 싶어 했습니다. 그들은 그것이 정말 크고 본격적인 브랜드라고 생각했지만, 그렇지 않았습니다. 그 모든 것은 허름한 플라스틱 저그와 작은 냄비, 그리고 가득한 꿈을 가지고 제 주방에서 만들어지고 있었습니다.\n\n그 100명의 사람은 점점 더 늘어나 마침내 가장 친한 친구이자 사업 파트너였던 제 남편 Gary와 제가 런던 월턴가 154번지에 우리의 첫 번째 작은 매장을 열기로 결정한 지점에 이르렀습니다.", "vocab": [{"word": "desperate to V", "meaning": "간절히 ~하고 싶어 하는", "desc": "강렬한 구매 열망"}, {"word": "full-on brand", "meaning": "완전한/본격적인 브랜드", "desc": "대규모 완제품 브랜드"}, {"word": "a whole heap of ~", "meaning": "많은 양의 ~, 한 무더기의 ~", "desc": "a whole heap of dreams"}, {"word": "as well as ~", "meaning": "~뿐만 아니라", "desc": "business partners as well as best friends"}], "nuance": [{"title": "과거진행 수동태 (was all being made...)", "content": "• *It was all being made in my kitchen with poor plastic jugs, a little saucepan, and a whole heap of dreams.*\n• 겉보기엔 화려한 브랜드 같았지만 실제로는 좁은 주방에서 냄비로 하나하나 '만들어지고 있던 중'이었음을 생생히 묘사."}]}, {"id": 4, "section": "폭발적 성장과 독창성 (Disruptive Creativity)", "title": "전일 대비 무감소의 기적적인 성장과 상충하는 향기들의 과감한 결합", "bullets": ["개점 첫날부터 고객들을 매료시키며 매출이 전날 아래로 떨어진 날이 단 하루도 없었음 (*Not one day did we drop...*)", "얌전한 향 대신 충돌하고 공격적이면서 동시에 부드러운 향들을 조합하여 사람들의 창의성을 자극"], "english": "So from day one of opening, we saw everybody was totally captivated by the products that we were creating. And every day I would sit and I would look at the figures that we were bringing in. *Not one day did we drop below the previous day.* It was an incredible moment of growth. I didn’t just take nice neat little fragrances and put them in a bottle and expect it to sell. I took things that collided. I took things that were aggressive and then soft all at the same time, and it worked. It captivated and really challenged people’s creativity.", "korean": "그래서 매장을 연 첫날부터 우리는 모든 사람이 우리가 만들고 있던 제품에 완전히 매료되는 것을 보았습니다. 그리고 매일 저는 앉아서 우리가 올리고 있는 매출 수치들을 살펴보곤 했습니다. 전날보다 매출이 떨어진 날은 단 하루도 없었습니다. 그것은 믿을 수 없는 성장의 순간이었습니다. 저는 그저 깔끔하고 좋은 작은 향수들을 병에 담아 팔리기를 기대한 것이 아니었습니다. 저는 충돌하는 것들을 취했습니다. 저는 공격적이면서 동시에 부드러운 것들을 가져왔고, 그것은 효과가 있었습니다. 그것은 사람들의 마음을 사로잡았고 사람들의 창의성에 진정으로 도전장을 던졌습니다.", "vocab": [{"word": "captivate", "meaning": "마음을 사로잡다, 매혹하다", "desc": "= enchant, fascinate"}, {"word": "bring in figures", "meaning": "매출/수치를 올리다", "desc": "사업적 실적 달성"}, {"word": "collide", "meaning": "충돌하다, 상충하다", "desc": "이질적인 향의 대담한 배합"}, {"word": "aggressive", "meaning": "공격적인, 강렬한", "desc": "강렬함과 부드러움의 공존"}], "nuance": [{"title": "부정어 도치 (Not one day did we drop...)", "content": "• *Not one day [부정어구] + did [조동사] + we [주어] + drop [동사원형] below the previous day.*\n• 매출이 전일 대비 단 하루도 꺾이지 않고 매일 신기록을 경신했던 폭발적 성장을 강조."}]}, {"id": 5, "section": "미국 진출과 빈 쇼핑백 마케팅 (Empty Bag Genius)", "title": "마케팅 예산 0원의 기적: 뉴욕 거리를 뒤덮은 '빈 쇼핑백' 게릴라 마케팅", "bullets": ["미국 진출 당시 마케팅 예산 0원: 모든 자금을 사업에 쏟아부어 남은 돈이 전무했던 절체절명의 위기", "남편 Gary의 천재적 아이디어: 20~30명을 고용해 로고가 새겨진 빈 쇼핑백 수백 개를 들고 뉴욕 거리를 활보하게 하여 오픈 전부터 대세 브랜드로 인식시킴"], "english": "Our first global journey from my first brand was to go into the United States. It was so scary. Honestly, I didn’t know how on earth we were going to get there.\n\nI said to Gary, “How much money do I have for marketing and PR?” “Mm, nothing.” There was no money left. We put every single penny we had into our business.\n\n“What am I going to do? How am I going to convince everyone to come and buy my product?”\n\nHe was standing in the corner of the hotel room packing boxes. He started to put bags together and put ribbons around them.\n\nI said, “What are you doing that for? There’s nothing in there.”\n\n“No one else knows that.”\n\nFrom that day, we employed twenty to thirty people, and they carried hundreds of those empty bags with our logo around New York City. By the time we opened on the first of October, everyone assumed this brand was everywhere. We converted New York City and America — eventually the rest of the world — with people just holding empty bags.\n\nAs an entrepreneur, such a good lesson. Remember, you can often have the greatest idea that costs pennies but can transform your business into a global market.", "korean": "제 첫 번째 브랜드의 첫 글로벌 여정은 미국으로 진출하는 것이었습니다. 너무나 두려웠습니다. 솔직히 우리가 도대체 어떻게 그곳에 도달할 수 있을지 알지 못했습니다.\n\n제가 Gary에게 물었습니다. \"마케팅과 홍보비로 쓸 수 있는 돈이 얼마나 있지?\" \"음, 전혀 없어.\" 남은 돈이 없었습니다. 우리는 가진 동전 한 푼까지 전부 우리 사업에 쏟아부었던 상태였습니다.\n\n\"어쩌면 좋지? 어떻게 사람들을 설득해서 내 제품을 사러 오게 만들지?\"\n\n그는 호텔 방 구석에 서서 상자들을 포장하고 있었습니다. 그는 가방(쇼핑백)들을 모아서 그 둘레에 리본을 묶기 시작했습니다.\n\n제가 말했습니다. \"왜 그런 짓을 해? 안에는 아무것도 안 들었잖아.\"\n\n\"그건 남들은 모르지.\"\n\n그날부터 우리는 20~30명의 사람을 고용했고, 그들은 우리 로고가 박힌 수백 개의 빈 쇼핑백을 들고 뉴욕 시내를 돌아다녔습니다. 우리가 10월 1일에 매장을 열었을 때쯤에는 모든 사람이 이 브랜드가 온 동네에 널려 있다고 생각했습니다. 우리는 그저 빈 가방을 든 사람들을 통해 뉴욕시와 미국, 그리고 궁극적으로는 전 세계를 사로잡았습니다.\n\n기업가로서 정말 훌륭한 교훈이었습니다. 기억하세요, 여러분은 종종 단돈 몇 푼밖에 들지 않지만 여러분의 비즈니스를 글로벌 시장으로 탈바꿈시킬 수 있는 가장 위대한 아이디어를 가질 수 있습니다.", "vocab": [{"word": "how on earth", "meaning": "도대체 어떻게", "desc": "의문사 강조"}, {"word": "every single penny", "meaning": "단 한 푼까지 전부", "desc": "전 재산 투자"}, {"word": "convince A to V", "meaning": "A를 설득하여 ~하게 하다", "desc": "고객 설득"}, {"word": "convert", "meaning": "전향시키다, 사로잡다, 개종시키다", "desc": "뉴욕 시장을 완전히 사로잡음"}, {"word": "cost pennies", "meaning": "비용이 거의 들지 않다", "desc": "저비용 고효율 혁신 아이디어"}], "nuance": [{"title": "By the time S+V (시간의 부사절)", "content": "• *By the time we opened on the first of October, everyone assumed this brand was everywhere.*\n• 매장을 열기도 전에 이미 뉴욕 전역에서 가장 핫한 대세 브랜드라는 인식을 심어준 '빈 쇼핑백 게릴라 마케팅'의 승리."}]}, {"id": 6, "section": "인생의 예기치 못한 시련 (Life's Curveball)", "title": "인생의 커브볼: 38세의 유방암 진단과 잃어버린 후각", "bullets": ["사업이 날로 번창하고 어린 아들을 둔 38세의 전성기에 찾아온 유방암 진단과 '시한부 9개월' 선고", "투병 끝에 기적적으로 생명을 되찾았으나, 조향사로서의 생명인 후각을 잃어버리는 비극에 직면"], "english": "Our business was growing and growing. I just had a little boy. I was just thirty-eight years old. But you know something? In life sometimes you get curveballs. Mine was about to come from a direction I didn’t anticipate. I was diagnosed with breast cancer, and I was given nine months to live. I looked at my son. I wondered if I’d ever see him grow up. Was I going to last for nine months? Well, you can see the evidence sitting before you. What I did realize was I had a chance of getting my life back. What I didn’t realize: it would take my sense of smell. I never told a soul.", "korean": "우리 사업은 점점 더 번창해 가고 있었습니다. 저에게는 막 어린 아들이 생겼습니다. 저는 겨우 서른여덟 살이었습니다. 하지만 그거 아시나요? 인생에서는 때때로 예기치 못한 시련(커브볼)을 맞닥뜨리게 됩니다. 제 커브볼은 제가 예상하지 못한 방향에서 막 날아오려 하고 있었습니다. 저는 유방암 진단을 받았고, 살 수 있는 날이 9개월밖에 남지 않았다는 선고를 받았습니다. 저는 제 아들을 바라보았습니다. 내가 저 아이가 자라는 것을 볼 수나 있을까 싶었습니다. 내가 과연 9개월이나 버틸 수 있을까? 글쎄요, 여러분은 지금 여러분 앞에 앉아 있는 증거(살아남은 저)를 보고 계십니다. 제가 깨달았던 것은 제가 삶을 되찾을 기회를 얻었다는 것이었습니다. 하지만 제가 미처 깨닫지 못했던 것은, 암 치료가 제 후각을 앗아갈 것이라는 점이었습니다. 저는 그 누구에게도 이 사실을 말하지 않았습니다.", "vocab": [{"word": "curveball", "meaning": "(야구의 커브볼) 예기치 못한 난제/시련", "desc": "인생의 불시의 위기"}, {"word": "anticipate", "meaning": "예상하다, 기대하다", "desc": "방향을 예측하지 못함"}, {"word": "be diagnosed with ~", "meaning": "~라는 진단을 받다", "desc": "유방암 진단"}, {"word": "tell a soul", "meaning": "남에게 말하다 (보통 부정문)", "desc": "I never told a soul (비밀 엄수)"}], "nuance": [{"title": "관계대명사 what 명사절 대조 (What I did realize vs What I didn't realize)", "content": "• *What I did realize was I had a chance of getting my life back.*\n• *What I didn't realize: it would take my sense of smell.*\n• 목숨을 건진 안도감 뒤에 닥친 '조향사로서의 후각 상실'이라는 충격적 비극을 극적으로 대비."}]}, {"id": 7, "section": "이별과 5년간의 단절 (Leaving the Business)", "title": "브랜드 매각과 내면의 붕괴: 5년간 향수 매장을 멀리했던 아픔", "bullets": ["후각 상실로 더 이상 예전의 자신이 아님을 깨닫고 사업 매각 결정 $\rightarrow$ 계약 서명 순간 인생 최대의 실수임을 직감", "내면의 기업가가 '제발 멈춰, 돌아가고 싶어'라고 외쳤으나 결국 떠남 $\rightarrow$ 마음이 찢겨 5년간 어떤 향수 매장 근처도 가지 못함"], "english": "Back to work, back to the shop. But I knew something deep within me had gone. I was “just Jo.” I made the decision within a few months that I was to leave the business. You can imagine this emotional connection that I had with my business. It wasn’t just a brand to me. It was my life. It was my best friend. As we came to that last week of signing the deal, I felt I’d made the biggest mistake of my life. “What had I done?” This business entrepreneur within me was nearly bursting out, saying, “Please stop. I’ve made a mistake. I want to go back.” But I didn’t. I didn’t go near any department store, any fragrance shop, anything for five years because it absolutely broke me inside that I had made a huge mistake.", "korean": "일터로, 매장으로 돌아왔습니다. 하지만 저는 제 내면 깊은 곳에서 무언가가 사라졌음을 알았습니다. 저는 '그냥 평범한 조'에 불과했습니다. 저는 몇 달 안에 사업을 떠나기로 결정을 내렸습니다. 여러분은 제가 제 사업과 맺고 있던 그 정서적 유대를 상상하실 수 있을 것입니다. 그것은 저에게 단순한 브랜드가 아니었습니다. 그것은 제 삶이었습니다. 제 가장 친한 친구였습니다. 계약서에 서명하던 그 마지막 주에 다다랐을 때, 저는 제 인생에서 가장 큰 실수를 저질렀다고 느꼈습니다. \"내가 무슨 짓을 한 거지?\" 제 안의 비즈니스 기업가가 거의 터져 나오며 소리치고 있었습니다. \"제발 멈춰. 내가 실수를 했어. 돌아가고 싶어.\" 하지만 저는 그러지 못했습니다. 저는 5년 동안 그 어떤 백화점도, 그 어떤 향수 가게도, 그 어떤 곳도 근처에 가지 않았습니다. 제가 엄청난 실수를 저질렀다는 사실이 제 내면을 완전히 무너뜨렸기 때문입니다.", "vocab": [{"word": "emotional connection", "meaning": "정서적 유대감/애착", "desc": "브랜드에 대한 애정"}, {"word": "sign the deal", "meaning": "계약서에 서명하다", "desc": "브랜드 매각 계약"}, {"word": "burst out", "meaning": "불쑥 터져 나오다/외치다", "desc": "내면의 절규"}, {"word": "break someone inside", "meaning": "~의 내면을 무너뜨리다/마음을 찢어놓다", "desc": "극심한 상실감"}], "nuance": [{"title": "be to 용법 (의도/운명: was to leave the business)", "content": "자신의 전부였던 브랜드를 내려놓아야 했던 피할 수 없었던 결단과 그로 인한 5년간의 뼈아픈 단절의 고통을 묘사."}]}, {"id": 8, "section": "두 번째 도전 (The Second Brand)", "title": "창의성의 부름과 두 번째 브랜드의 시작: \"조, 당신이 그 말을 하길 기다려왔어\"", "bullets": ["5년의 방황 끝에 창의성이 자신을 다시 부르고 있음을 자각 (*boy, was it calling me*)", "남편 Gary의 전폭적인 지지(\"조, 당신이 그 말을 하길 기다려왔어\") 속에 공책을 펼치고 두 번째 브랜드(Jo Loves) 설계 시작"], "english": "I didn’t think I would ever enter back into the fragrance industry. But, *boy, was it calling me*, and I missed creativity. So one evening sitting around with Gary, I said, “I think I want to try again and build another brand.ˮ He looked me dead in the eye and he said, “Jo, I’ve been waiting for you to say that.” That evening, we sat down with our notebook and worked out how we were going to do it.\n\nWhen I first started the second brand, I didn’t know I was going to make it. And now honestly and truly, I feel like that thirty-year-old woman again living her dreams especially right at this moment.", "korean": "저는 제가 향수 업계로 다시 돌아갈 수 있을 것이라고는 결코 생각하지 못했습니다. 하지만, 세상에, 창의성이 저를 부르고 있었고, 저는 창의성이 너무나 그리웠습니다. 그래서 어느 날 저녁 Gary와 둘러앉아 있다가 제가 말했습니다. \"나 다시 도전해서 또 다른 브랜드를 만들고 싶어.\" 그는 제 눈을 똑바로 쳐다보며 말했습니다. \"조, 난 당신이 그 말을 해주기를 기다려왔어.\" 그날 저녁, 우리는 공책을 펴고 앉아 우리가 그것을 어떻게 해나갈지 계획을 세웠습니다.\n\n제가 두 번째 브랜드를 처음 시작했을 때, 저는 제가 해낼 수 있을지 알지 못했습니다. 그리고 지금 솔직하고 진실되게 말씀드리자면, 저는 바로 지금 이 순간, 다시 꿈을 꾸며 살아가던 그 서른 살의 여성이 된 것 같은 기분을 느낍니다.", "vocab": [{"word": "boy, was it calling me", "meaning": "세상에, 그것이 나를 얼마나 강하게 불렀던지 (감탄 도치)", "desc": "창의성에 대한 열망"}, {"word": "look sb dead in the eye", "meaning": "~의 눈을 똑바로/정면으로 쳐다보다", "desc": "진심 어린 확신"}, {"word": "work out", "meaning": "방법을 찾아내다/계획을 세우다", "desc": "사업 계획 구체화"}, {"word": "make it", "meaning": "성공하다, 해내다", "desc": "두 번째 브랜드의 성공"}], "nuance": [{"title": "감탄 도치 구문 (boy, was it calling me)", "content": "• *Boy, [was (동사)] [it (주어)] [calling me]*\n• 감탄사 *Boy*와 함께 도치 구문이 쓰여, 향수에 대한 열정과 창의성이 내면에서 얼마나 강렬하게 요동치며 자신을 불렀는지를 생생하게 표현."}]}, {"id": 9, "section": "결론 (Conclusion)", "title": "창의성의 은행 계좌(Bank Account of Creativity): 사용할 때만 가치가 불어나는 마법", "bullets": ["꿈은 여러분의 것이며, 우리 모두는 오직 자신만이 접근할 수 있는 '창의성의 은행 계좌'를 가지고 있음", "창의성의 계좌는 '사용할 때만' 가치가 증가하며 세상을 바꾸고 삶을 거대한 모험으로 이끌어줌 $\rightarrow$ \"저는 조의 창의성 은행에 투자했고, 그러길 참 잘했습니다\""], "english": "I am a person who believes that your dreams belong to you, and we all have a bank account of creativity. No one can touch that bank account but you. It belongs to you. No one can access it. *But the only time it will increase in its value is when you use it.* And then it can change the world. It can change your life and take you on huge adventures. That is exactly what has happened to me; I invested in that bank of Jo’s creativity. I am glad I did it.", "korean": "저는 여러분의 꿈이 여러분의 것이라고 믿는 사람이며, 우리 모두는 '창의성의 은행 계좌'를 가지고 있습니다. 여러분 외에는 그 누구도 그 은행 계좌에 손을 댈 수 없습니다. 그것은 여러분의 것입니다. 아무도 그것에 접근할 수 없습니다. 하지만 그것의 가치가 증가하는 유일한 시간은 바로 여러분이 그것을 '사용할 때'뿐입니다. 그리고 그것은 세상을 바꿀 수 있습니다. 그것은 여러분의 삶을 바꿀 수 있고 여러분을 거대한 모험으로 데려갈 수 있습니다. 그것이 바로 저에게 일어난 일입니다. 저는 '조의 창의성'이라는 그 은행에 투자했습니다. 제가 그렇게 해서 정말 기쁩니다.", "vocab": [{"word": "bank account of creativity", "meaning": "창의성의 은행 계좌", "desc": "조 말론의 핵심 인생 철학"}, {"word": "belong to ~", "meaning": "~에 속하다/소유이다", "desc": "꿈의 주체성"}, {"word": "increase in value", "meaning": "가치가 상승하다/불어남", "desc": "창의성을 쓸수록 커짐"}, {"word": "invest in ~", "meaning": "~에 투자하다", "desc": "자신의 창의성에 대한 신뢰"}], "nuance": [{"title": "The only time it will increase in its value is when you use it", "content": "일반 은행 계좌는 가만히 두어야 이자가 붙지만, '창의성의 계좌'는 머릿속에 아껴두는 것이 아니라 실제로 도전하고 사용할 때만 가치가 기하급수적으로 증식한다는 조 말론의 불멸의 메시지."}]}];
+    const STORAGE_KEY = 'speech_chunjae_jomalone_master_v1';
+    let dataset = [];
+
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        dataset = JSON.parse(saved);
+      } else {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+      }
+    } catch(e) {
+      dataset = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    let currentIndex = 0;
+    let showKorean = false;
+    let currentMode = 'split';
+    let currentFontSize = 1.45;
+
+    // Single-pass bulletproof keyword highlighter
+                            function escapeRegex(s) {
+      var specialChars = '.*+?^${}()|[]' + String.fromCharCode(92);
+      return s.split('').map(function(c) {
+        return specialChars.indexOf(c) !== -1 ? String.fromCharCode(92) + c : c;
+      }).join('');
+    }
+
+    function renderHighlightedEnglish(rawEnglish, vocabList) {
+      if (!rawEnglish) return '';
+      
+      var formatted = rawEnglish;
+      var htmlTagMap = [];
+      formatted = formatted.replace(/<\/?[a-z][a-z0-9]*[^<>]*>/gi, function(match) {
+        var placeholder = '__HTML_TAG_' + htmlTagMap.length + '__';
+        htmlTagMap.push(match);
+        return placeholder;
+      });
+
+      // Parse markdown bold & italic safely (asterisk inside [] is literal)
+      var bs = String.fromCharCode(92);
+      var reBoldItalic = new RegExp(bs + '*' + bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBoldItalic, '<strong><em>$1</em></strong>');
+      var reBold = new RegExp(bs + '*' + bs + '*([^*]+)' + bs + '*' + bs + '*', 'g');
+      formatted = formatted.replace(reBold, '<strong>$1</strong>');
+      var reItalic = new RegExp(bs + '*([^*]+)' + bs + '*', 'g');
+      formatted = formatted.replace(reItalic, '<em>$1</em>');
+      var reUnderline = new RegExp('_([^_]+)_', 'g');
+      formatted = formatted.replace(reUnderline, '<em>$1</em>');
+
+      if (vocabList && vocabList.length > 0) {
+        var termMap = new Map();
+        vocabList.forEach(function(v) {
+          if (!v.word) return;
+          var clean = v.word.replace(/[~+()]/g, '').replace(/(동사|명사|형용사|부사|전치사)/g, '').trim();
+          if (clean.length >= 2) {
+            termMap.set(clean.toLowerCase(), clean);
+          }
+        });
+
+        if (termMap.size > 0) {
+          var terms = Array.from(termMap.values()).sort(function(a, b) { return b.length - a.length; });
+          var patternParts = terms.map(escapeRegex);
+          try {
+            var re = new RegExp(bs + 'b(' + patternParts.join('|') + ')' + bs + 'b', 'gi');
+            var segments = formatted.split(/(<[^>]+>|__HTML_TAG_\d+__)/g);
+            for (var i = 0; i < segments.length; i++) {
+              if (segments[i] && !segments[i].startsWith('<') && !segments[i].startsWith('__HTML_TAG_')) {
+                segments[i] = segments[i].replace(re, '<span class="hl-vocab" onclick="highlightVocab(this)">$1</span>');
+              }
+            }
+            formatted = segments.join('');
+          } catch(err) {
+            console.error(err);
+          }
+        }
+      }
+
+      htmlTagMap.forEach(function(tag, idx) {
+        formatted = formatted.replace('__HTML_TAG_' + idx + '__', tag);
+      });
+
+      return '<p>' + formatted.split('\n\n').join('</p><p>').split('\n').join('<br>') + '</p>';
+    }
+
+    function renderSlide(index) {
+      if (!dataset || dataset.length === 0) return;
+      if (index < 0) index = 0;
+      if (index >= dataset.length) index = dataset.length - 1;
+      
+      const item = dataset[index];
+      currentIndex = index;
+
+      document.getElementById('lblSection').innerText = item.section;
+      document.getElementById('lblTitle').innerText = `[${String(item.id).padStart(2, '0')}. ${item.title}]`;
+      
+      // Render English Text cleanly with single-pass highlight
+      document.getElementById('boxEnglish').innerHTML = renderHighlightedEnglish(item.english, item.vocab);
+
+      // Render Korean Translation
+      document.getElementById('boxKorean').innerHTML = `<strong>[한국어 해석]</strong><br>${(item.korean || '').replace(/\n\n/g, '<br><br>').replace(/\n/g, '<br>')}`;
+      if (showKorean) {
+        document.getElementById('boxKorean').classList.remove('hidden');
+      } else {
+        document.getElementById('boxKorean').classList.add('hidden');
+      }
+
+      // Render Bullets
+      const listBullets = document.getElementById('listBullets');
+      listBullets.innerHTML = (item.bullets || []).map(b => `<li>${b.replace(/^[•·\-\*\s]+/, '')}</li>`).join('');
+
+      // Render Table
+      const cardTable = document.getElementById('cardTable');
+      const boxTable = document.getElementById('boxTable');
+      if (item.table) {
+        cardTable.style.display = 'block';
+        boxTable.innerHTML = `
+          <table class="vote-table">
+            <thead>
+              <tr><th>선호 순위 (1st-2nd-3rd)</th><th>득표수</th><th>1지망</th><th>2지망</th><th>3지망</th></tr>
+            </thead>
+            <tbody>
+              ${item.table.map(r => `<tr><td><strong>${r.pref}</strong></td><td>${r.votes}표</td><td>${r.first}</td><td>${r.second}</td><td>${r.third}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        cardTable.style.display = 'none';
+      }
+
+      // Render Vocab
+      const gridVocab = document.getElementById('gridVocab');
+      gridVocab.innerHTML = (item.vocab || []).map((v, vIdx) => `
+        <div class="vocab-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="어휘 수정" onclick="openEditVocabModal(${vIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="어휘 삭제" onclick="deleteVocab(${vIdx})">🗑️</button>
+          </div>
+          <div><span class="vocab-word">${v.word}</span> <span class="vocab-meaning">: ${v.meaning}</span></div>
+          <div class="vocab-desc">← ${v.desc}</div>
+        </div>
+      `).join('');
+
+      // Render Nuance
+      const boxNuance = document.getElementById('boxNuance');
+      boxNuance.innerHTML = (item.nuance || []).map((n, nIdx) => `
+        <div class="nuance-card">
+          <div class="card-actions">
+            <button type="button" class="btn btn-tiny btn-edit" title="구문/설명 수정" onclick="openEditNuanceModal(${nIdx})">✏️ 수정</button>
+            <button type="button" class="btn btn-tiny btn-danger" title="구문 삭제" onclick="deleteNuance(${nIdx})">🗑️</button>
+          </div>
+          <div class="nuance-title">■ ${n.title}</div>
+          <div class="nuance-content">${n.content}</div>
+        </div>
+      `).join('');
+
+      const pageStr = String(index + 1).padStart(2, '0');
+      const totalStr = String(dataset.length).padStart(2, '0');
+      document.getElementById('lblProgress').innerText = `${pageStr} / ${totalStr}`;
+      document.getElementById('barFill').style.width = `${((index + 1) / dataset.length) * 100}%`;
+
+      document.getElementById('btnPrev').disabled = (index === 0);
+      document.getElementById('btnNext').disabled = (index === dataset.length - 1);
+    }
+
+    function nextSlide() {
+      if (currentIndex < dataset.length - 1) {
+        renderSlide(currentIndex + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentIndex > 0) {
+        renderSlide(currentIndex - 1);
+      }
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'focus') {
+        document.body.classList.add('mode-focus');
+        document.body.classList.remove('mode-split');
+        document.getElementById('btnModeFocus').classList.add('btn-active');
+        document.getElementById('btnModeSplit').classList.remove('btn-active');
+      } else {
+        document.body.classList.remove('mode-focus');
+        document.body.classList.add('mode-split');
+        document.getElementById('btnModeSplit').classList.add('btn-active');
+        document.getElementById('btnModeFocus').classList.remove('btn-active');
+      }
+    }
+
+    function toggleKorean() {
+      showKorean = !showKorean;
+      const box = document.getElementById('boxKorean');
+      const btn = document.getElementById('btnToggleKorean');
+      if (showKorean) {
+        box.classList.remove('hidden');
+        btn.classList.add('btn-active');
+      } else {
+        box.classList.add('hidden');
+        btn.classList.remove('btn-active');
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('theme-light');
+    }
+
+    function changeFontSize(delta) {
+      currentFontSize = Math.max(1.1, Math.min(2.2, currentFontSize + delta * 0.15));
+      document.getElementById('boxEnglish').style.fontSize = `${currentFontSize}rem`;
+    }
+
+    function highlightVocab(elem) {
+      if (currentMode === 'focus') {
+        setMode('split');
+      }
+      const wordText = elem.innerText.trim().toLowerCase();
+      const cards = document.querySelectorAll('.vocab-card');
+      for (let card of cards) {
+        if (card.innerText.toLowerCase().includes(wordText)) {
+          card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          card.style.borderColor = 'var(--accent-green)';
+          card.style.backgroundColor = 'var(--bg-card-sub)';
+          setTimeout(() => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.backgroundColor = 'var(--bg-card)';
+          }, 1800);
+          break;
+        }
+      }
+    }
+
+    // Modal Operations for Passage & Korean Text
+        function applyFormatting(elemId, prefix, suffix) {
+      const el = document.getElementById(elemId);
+      if (!el) return;
+      const start = el.selectionStart;
+      const end = el.selectionEnd;
+      const val = el.value;
+      if (start !== undefined && end !== undefined && start !== end) {
+        const selected = val.substring(start, end);
+        el.value = val.substring(0, start) + prefix + selected + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = end + prefix.length;
+        el.focus();
+      } else {
+        const sample = '이탤릭텍스트';
+        el.value = val.substring(0, start) + prefix + sample + suffix + val.substring(end);
+        el.selectionStart = start + prefix.length;
+        el.selectionEnd = start + prefix.length + sample.length;
+        el.focus();
+      }
+    }
+
+    function openEditPassageModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpPassageEnglish').value = item.english || '';
+      document.getElementById('inpPassageKorean').value = item.korean || '';
+      document.getElementById('modalPassage').classList.add('active');
+    }
+
+    function savePassageData() {
+      const eng = document.getElementById('inpPassageEnglish').value.trim();
+      const kor = document.getElementById('inpPassageKorean').value.trim();
+
+      if (!eng) {
+        alert('영어 본문 텍스트를 입력해주세요.');
+        return;
+      }
+
+      dataset[currentIndex].english = eng;
+      dataset[currentIndex].korean = kor;
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Bullets
+    function openEditBulletsModal() {
+      const item = dataset[currentIndex];
+      document.getElementById('inpSlideTitle').value = item.title || '';
+      document.getElementById('inpBulletsContent').value = (item.bullets || []).map(b => b.replace(/^[•·\-\*\s]+/, '')).join('\n');
+      document.getElementById('modalBullets').classList.add('active');
+    }
+
+    function saveBulletsData() {
+      const title = document.getElementById('inpSlideTitle').value.trim();
+      const rawBullets = document.getElementById('inpBulletsContent').value.trim();
+
+      if (title) {
+        dataset[currentIndex].title = title;
+      }
+      if (rawBullets) {
+        const lines = rawBullets.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+        dataset[currentIndex].bullets = lines;
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Vocab
+    function openAddVocabModal() {
+      document.getElementById('editVocabIndex').value = '-1';
+      document.getElementById('modalVocabTitle').innerText = '✨ 새 어휘 추가하기';
+      document.getElementById('inpVocabWord').value = '';
+      document.getElementById('inpVocabMeaning').value = '';
+      document.getElementById('inpVocabDesc').value = '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function openEditVocabModal(vIdx) {
+      const v = dataset[currentIndex].vocab[vIdx];
+      document.getElementById('editVocabIndex').value = vIdx;
+      document.getElementById('modalVocabTitle').innerText = '✏️ 어휘 내용 수정하기';
+      document.getElementById('inpVocabWord').value = v.word || '';
+      document.getElementById('inpVocabMeaning').value = v.meaning || '';
+      document.getElementById('inpVocabDesc').value = v.desc || '';
+      document.getElementById('modalVocab').classList.add('active');
+    }
+
+    function deleteVocab(vIdx) {
+      if (confirm(`'${dataset[currentIndex].vocab[vIdx].word}' 어휘를 삭제하시겠습니까?`)) {
+        dataset[currentIndex].vocab.splice(vIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveVocabData() {
+      const vIdx = parseInt(document.getElementById('editVocabIndex').value);
+      const word = document.getElementById('inpVocabWord').value.trim();
+      const meaning = document.getElementById('inpVocabMeaning').value.trim();
+      const desc = document.getElementById('inpVocabDesc').value.trim();
+
+      if (!word || !meaning) {
+        alert('단어와 의미를 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].vocab) dataset[currentIndex].vocab = [];
+
+      if (vIdx >= 0) {
+        dataset[currentIndex].vocab[vIdx] = { word, meaning, desc };
+      } else {
+        dataset[currentIndex].vocab.push({ word, meaning, desc });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    // Modal Operations for Nuance
+    function openAddNuanceModal() {
+      document.getElementById('editNuanceIndex').value = '-1';
+      document.getElementById('modalNuanceTitle').innerText = '✨ 새 구문 / 뉘앙스 설명 추가하기';
+      document.getElementById('inpNuanceTitle').value = '';
+      document.getElementById('inpNuanceContent').value = '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function openEditNuanceModal(nIdx) {
+      const n = dataset[currentIndex].nuance[nIdx];
+      document.getElementById('editNuanceIndex').value = nIdx;
+      document.getElementById('modalNuanceTitle').innerText = '✏️ 구문 / 뉘앙스 설명 수정하기';
+      document.getElementById('inpNuanceTitle').value = n.title || '';
+      document.getElementById('inpNuanceContent').value = n.content || '';
+      document.getElementById('modalNuance').classList.add('active');
+    }
+
+    function deleteNuance(nIdx) {
+      if (confirm(`'${dataset[currentIndex].nuance[nIdx].title}' 설명을 삭제하시겠습니까?`)) {
+        dataset[currentIndex].nuance.splice(nIdx, 1);
+        saveToStorage();
+        renderSlide(currentIndex);
+      }
+    }
+
+    function saveNuanceData() {
+      const nIdx = parseInt(document.getElementById('editNuanceIndex').value);
+      const title = document.getElementById('inpNuanceTitle').value.trim();
+      const content = document.getElementById('inpNuanceContent').value.trim();
+
+      if (!title || !content) {
+        alert('제목과 설명을 입력해주세요.');
+        return;
+      }
+
+      if (!dataset[currentIndex].nuance) dataset[currentIndex].nuance = [];
+
+      if (nIdx >= 0) {
+        dataset[currentIndex].nuance[nIdx] = { title, content };
+      } else {
+        dataset[currentIndex].nuance.push({ title, content });
+      }
+
+      saveToStorage();
+      closeModals();
+      renderSlide(currentIndex);
+    }
+
+    function closeModals() {
+      document.getElementById('modalPassage').classList.remove('active');
+      document.getElementById('modalBullets').classList.remove('active');
+      document.getElementById('modalVocab').classList.remove('active');
+      document.getElementById('modalNuance').classList.remove('active');
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+      } catch(e) {
+        console.error(e);
+      }
+    }
+
+    function resetToDefault() {
+      if (confirm('모든 수정 내용을 지우고 교재 기본 데이터로 초기화하시겠습니까?')) {
+        dataset = JSON.parse(JSON.stringify(defaultData));
+        localStorage.removeItem(STORAGE_KEY);
+        renderSlide(currentIndex);
+      }
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataset, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", "speech_chunjae_jomalone_custom_data.json");
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+      } else if (e.key === ' ') {
+        e.preventDefault();
+        setMode(currentMode === 'focus' ? 'split' : 'focus');
+      } else if (e.key === 't' || e.key === 'T' || e.key === 'ㅅ') {
+        toggleKorean();
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSlide(0);
+    });
+  </script>
+</body>
+</html>

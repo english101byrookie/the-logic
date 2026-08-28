@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LOGIC — 강의 포털</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #f8f7f4; --surface: #ffffff;
+            --navy: #1a2b4a; --gold: #b8862a; --green: #2d7a52; --blue: #3a6bb5; --purple: #7c3aed; --coral: #c2410c; --teal: #0f766e; --culture: #af5a2a; --speech: #0d9488;
+            --muted: #6b7280; --border: #e5e2db; --faint: #f3f1ec;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: #1a1a1a; min-height: 100vh; overflow-x: hidden; }
+        #progress { position: fixed; top: 0; left: 0; height: 3px; width: 0%; background: linear-gradient(90deg, var(--navy), var(--gold)); z-index: 100; }
+        
+        #auth-overlay { position: fixed; inset: 0; background: rgba(26, 43, 74, 0.95); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; transition: opacity 0.3s ease; }
+        .auth-box { background: var(--surface); width: 100%; max-width: 400px; padding: 36px 32px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-top: 6px solid var(--gold); }
+        .auth-box h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 900; color: var(--navy); margin-bottom: 8px; }
+        .auth-box p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+        .auth-input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; text-align: center; margin-bottom: 12px; outline: none; transition: border-color 0.2s; }
+        .auth-input:focus { border-color: var(--gold); }
+        .auth-btn { width: 100%; padding: 12px; background: var(--navy); color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+        .auth-btn:hover { background: #2c436d; }
+        .auth-error { color: #dc2626; font-size: 12px; margin-top: 8px; min-height: 18px; }
+
+        .page { max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+        .topbar { padding: 24px 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+        .brand-link { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 900; letter-spacing: .08em; color: var(--navy); text-decoration: none; }
+        .settings-btn { font-size: 12px; font-weight: 500; color: var(--muted); background: var(--faint); border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .settings-btn:hover { background: var(--border); color: var(--navy); }
+
+        .header { padding: 52px 0 40px; border-bottom: 1px solid var(--border); }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 6vw, 64px); font-weight: 900; line-height: 1.05; letter-spacing: -0.02em; color: var(--navy); }
+        .header h1 em { font-style: italic; font-weight: 400; color: var(--gold); }
+        .header-sub { margin-top: 14px; font-size: 15px; font-weight: 300; color: var(--muted); max-width: 520px; line-height: 1.7; }
+        
+        .section { padding: 40px 0 24px; }
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .section-title { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .2em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+        .section-line { flex: 1; height: 1px; background: var(--border); }
+        
+        .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+        .subject-card { display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px 22px 20px; position: relative; overflow: hidden; min-height: 200px; transition: all .24s ease; }
+        .subject-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent); opacity: .7; transition: opacity .24s; }
+        .subject-card.active:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.06); }
+        .subject-card.active:hover::before { opacity: 1; }
+        .subject-card.active:hover .sc-arrow { color: var(--navy); transform: translateX(4px); }
+        .subject-card.inactive { opacity: .45; cursor: default; pointer-events: none; }
+        
+        .sc-year { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .16em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+        .sc-name { font-family: 'Playfair Display', serif; font-size: 21px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .sc-books { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 16px; flex: 1; align-content: flex-start; }
+        .sc-book { font-size: 11px; color: var(--muted); background: var(--faint); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border); }
+        .sc-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--faint); margin-top: auto; padding-top: 12px; }
+        .sc-status { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+        .sc-status.live { color: var(--accent); font-weight: 500; }
+        .sc-arrow { font-size: 14px; color: #ccc; transition: all .24s ease; }
+
+        footer { padding: 40px 0 52px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .footer-brand { font-family: 'Playfair Display', serif; font-size: 14px; color: #bbb; }
+        .footer-note { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: .12em; color: #ccc; text-transform: uppercase; }
+
+        #modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1100; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { background: var(--surface); width: 100%; max-width: 380px; padding: 30px; border-radius: 16px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); }
+        .modal-box h3 { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
+        .modal-input { width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; margin-bottom: 10px; outline: none; }
+        .modal-btns { display: flex; gap: 8px; margin-top: 16px; }
+        .modal-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .modal-btn.cancel { background: var(--faint); color: var(--muted); }
+        .modal-btn.confirm { background: var(--navy); color: white; }
+
+        @media (max-width: 600px) { .subject-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div id="auth-overlay">
+    <div class="auth-box">
+        <h2>THE LOGIC</h2>
+        <p>포털 접근 권한 암호를 입력해 주세요.</p>
+        <form id="auth-form">
+            <input type="password" id="auth-password" class="auth-input" placeholder="접근 비밀번호 입력" autocomplete="current-password" autofocus>
+            <button type="submit" class="auth-btn">입장하기</button>
+            <div id="auth-error" class="auth-error"></div>
+        </form>
+    </div>
+</div>
+
+<div id="modal-overlay">
+    <div class="modal-box">
+        <h3>학생용 접근 비밀번호 변경</h3>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">관리자 인증을 위해 마스터 비밀번호를 입력하세요.</p>
+        <input type="password" id="modal-master" class="modal-input" placeholder="관리자 마스터 비밀번호">
+        <input type="password" id="modal-new" class="modal-input" placeholder="새로운 학생용 비밀번호">
+        <input type="password" id="modal-confirm" class="modal-input" placeholder="새로운 학생용 비밀번호 확인">
+        <div id="modal-error" class="auth-error"></div>
+        <div class="modal-btns">
+            <button type="button" class="modal-btn cancel" onclick="closeModal()">취소</button>
+            <button type="button" class="modal-btn confirm" onclick="changePassword()">변경하기</button>
+        </div>
+    </div>
+</div>
+
+<div id="progress"></div>
+<div class="page">
+    <nav class="topbar">
+        <a href="index.html" class="brand-link">THE LOGIC</a>
+        <button class="settings-btn" onclick="openModal()">비밀번호 변경</button>
+    </nav>
+    <header class="header fi">
+        <h1>THE LOGIC <em>Portal</em></h1>
+        <p class="header-sub">구조와 패턴을 통해 지문의 이면을 분석합니다. 교과 과정 및 부교재·모의고사 과정을 선택하여 학습을 시작하세요.</p>
+    </header>
+
+    <!-- 정규 및 심화 교과 과정 섹션 -->
+    <section class="section">
+        <div class="section-header"><span class="section-title">정규 및 심화 교과 과정</span><div class="section-line"></div></div>
+        <div class="subject-grid">
+            
+            <a href="공통영어1/index.html" class="subject-card active fi" style="--accent:var(--gold);">
+                <div>
+                    <div class="sc-year">2025년 제공</div>
+                    <div class="sc-name">공통영어 1</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(민병천)</span>
+                        <span class="sc-book">YBM(김은형)</span>
+                        <span class="sc-book">비상(황종배)</span>
+                        <span class="sc-book">천재(강상구)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="공통영어2/index.html" class="subject-card active fi" style="--accent:var(--blue);">
+                <div>
+                    <div class="sc-year">2025년 제공</div>
+                    <div class="sc-name">공통영어 2</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(민병천)</span>
+                        <span class="sc-book">YBM(김은형)</span>
+                        <span class="sc-book">천재(강상구)</span>
+                        <span class="sc-book">비상(홍민표)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--blue);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="영어1/index.html" class="subject-card active fi" style="--accent:var(--green);">
+                <div>
+                    <div class="sc-year">2026년 제공</div>
+                    <div class="sc-name">영어 I</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(오선영)</span>
+                        <span class="sc-book">YBM(박준언)</span>
+                        <span class="sc-book">동아(박용예)</span>
+                        <span class="sc-book">비상(홍민표)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--green);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="영어2/index.html" class="subject-card active fi" style="--accent:var(--purple);">
+                <div>
+                    <div class="sc-year">2026년 제공</div>
+                    <div class="sc-name">영어 II</div>
+                    <div class="sc-books">
+                        <span class="sc-book">NE능률(오선영)</span>
+                        <span class="sc-book">YBM(박준언)</span>
+                        <span class="sc-book">천재(강상구)</span>
+                        <span class="sc-book">비상(홍민표)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--purple);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="world-culture/index.html" class="subject-card active fi" style="--accent:var(--culture);">
+                <div>
+                    <div class="sc-year">Special Subject</div>
+                    <div class="sc-name">세계 문화와 영어</div>
+                    <div class="sc-books">
+                        <span class="sc-book">천재교과서(강규한)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--culture);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="english-speech/index.html" class="subject-card active fi" style="--accent:var(--speech);">
+                <div>
+                    <div class="sc-year">Special Subject</div>
+                    <div class="sc-name">영어 발표와 토론</div>
+                    <div class="sc-books">
+                        <span class="sc-book">천재교과서(김현지)</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color: var(--speech);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+        </div>
+    </section>
+
+    <!-- 부교재 및 모의고사 섹션 -->
+    <section class="section" style="padding-top: 10px;">
+        <div class="section-header"><span class="section-title">부교재 및 모의고사</span><div class="section-line"></div></div>
+        <div class="subject-grid">
+            
+            <a href="supplementary/index.html" class="subject-card active fi" style="--accent:var(--coral);">
+                <div>
+                    <div class="sc-year">Special Material</div>
+                    <div class="sc-name">부교재 분석</div>
+                    <div class="sc-books">
+                        <span class="sc-book">올림포스 영어독해 기본 2</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color:var(--coral);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <a href="mock-exam/index.html" class="subject-card active fi" style="--accent:var(--teal);">
+                <div>
+                    <div class="sc-year">Mock Exam Archive</div>
+                    <div class="sc-name">모의고사 분석</div>
+                    <div class="sc-books">
+                        <span class="sc-book">고1·고2·고3 연도별 학평 및 수능</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status live" style="color:var(--teal);">● 서비스 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </a>
+
+            <div class="subject-card inactive fi" style="--accent:#6b7280;">
+                <div>
+                    <div class="sc-year">추후 제공</div>
+                    <div class="sc-name">영어 독해와 작문</div>
+                    <div class="sc-books">
+                        <span class="sc-book">시중 핵심 교재 수록 예정</span>
+                    </div>
+                </div>
+                <div class="sc-footer">
+                    <span class="sc-status">준비 중</span>
+                    <span class="sc-arrow">→</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-brand">THE LOGIC</div>
+        <div class="footer-note">Interactive English Lecture Portal · 2026</div>
+    </footer>
+</div>
+
+<script>
+    const DEFAULT_PASSWORD = "Made by Rookie";
+    const MASTER_PASSWORD = "19780304";
+    
+    function getStoredPassword() {
+        return localStorage.getItem("portal_password") || DEFAULT_PASSWORD;
+    }
+
+    const authForm = document.getElementById("auth-form");
+    const authOverlay = document.getElementById("auth-overlay");
+    const authPassword = document.getElementById("auth-password");
+    const authError = document.getElementById("auth-error");
+
+    if (sessionStorage.getItem("portal_authenticated") === "true") {
+        authOverlay.style.display = "none";
+    }
+
+    authForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        if (authPassword.value === getStoredPassword()) {
+            sessionStorage.setItem("portal_authenticated", "true");
+            authOverlay.style.opacity = "0";
+            setTimeout(() => { authOverlay.style.display = "none"; }, 300);
+            authError.textContent = "";
+        } else {
+            authError.textContent = "비밀번호가 올바르지 않습니다.";
+            authPassword.value = "";
+        }
+    });
+
+    const modalOverlay = document.getElementById("modal-overlay");
+    const modalMaster = document.getElementById("modal-master");
+    const modalNew = document.getElementById("modal-new");
+    const modalConfirm = document.getElementById("modal-confirm");
+    const modalError = document.getElementById("modal-error");
+
+    function openModal() {
+        modalMaster.value = "";
+        modalNew.value = "";
+        modalConfirm.value = "";
+        modalError.textContent = "";
+        modalOverlay.style.display = "flex";
+    }
+
+    function closeModal() {
+        modalOverlay.style.display = "none";
+    }
+
+    function changePassword() {
+        if (modalMaster.value !== MASTER_PASSWORD) {
+            modalError.textContent = "관리자 마스터 비밀번호가 틀렸습니다.";
+            return;
+        }
+        if (modalNew.value.length < 4) {
+            modalError.textContent = "새 비밀번호는 4자 이상이어야 합니다.";
+            return;
+        }
+        if (modalNew.value !== modalConfirm.value) {
+            modalError.textContent = "새 비밀번호가 서로 일치하지 않습니다.";
+            return;
+        }
+
+        localStorage.setItem("portal_password", modalNew.value);
+        alert("학생용 입장 비밀번호가 성공적으로 변경되었습니다.");
+        closeModal();
+    }
+
+    window.addEventListener('scroll', () => {
+        const el = document.getElementById('progress');
+        const total = document.body.scrollHeight - window.innerHeight;
+        el.style.width = (total > 0 ? (window.scrollY / total) * 100 : 0) + '%';
+    });
+</script>
+</body>
+</html>
